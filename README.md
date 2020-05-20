@@ -4,9 +4,9 @@ Di sini saya akan membeberkan cara memancarkan kembali sinyal @wifi.id untuk dip
 
 ### **Persyaratan:**
 
-1. Terjangkau jaringan @wifi.id (nama wifi/SSID: @wifi.id, indischool@wifi.id, wifi.id@home)
+1. Terjangkau jaringan @wifi.id (nama wifi/SSID: @wifi.id, indischool<span></span>@wifi.id, wifi.id@home, dan seamless<span></span>@wifi.id)
 
-2. Punya router jaringan berbasiskan OpenWrt/LEDE (misalnya yang murah: [ini](http://www.jakartanotebook.com/movistar-asl-26555-openwrt-adsl-network-storage-3g-wireless-router-wifi-hotspot-white) dan [itu](http://www.jakartanotebook.com/gl.inet-openwrt-mini-smart-router-16mb-rom-6416a-white), daftar perangkat lain selengkapnya bisa lihat [di sini](http://wiki.openwrt.org/toh/start)), proses pemasangan firmware berbeda antara 1 perangkat dan lainnya, jadi tidak saya bahas di sini. Paket tambahan yang dibutuhkan hanya **luci** (dan **wpad** jika seamless@wifi.id), untuk memudahkan konfigurasi.
+2. Punya router jaringan berbasiskan OpenWrt/LEDE (misalnya yang murah: [ini](http://www.jakartanotebook.com/movistar-asl-26555-openwrt-adsl-network-storage-3g-wireless-router-wifi-hotspot-white) dan [itu](http://www.jakartanotebook.com/gl.inet-openwrt-mini-smart-router-16mb-rom-6416a-white), daftar perangkat lain selengkapnya bisa lihat [di sini](http://wiki.openwrt.org/toh/start)), proses pemasangan firmware berbeda antara 1 perangkat dan lainnya, jadi tidak saya bahas di sini. Paket tambahan yang dibutuhkan hanya **luci** (dan **wpad** jika seamless<span></span>@wifi.id), untuk memudahkan konfigurasi.
 
 3. Punya akun @wifi.id (beli voucher fisik, atau lewat SMS ke 98108, lewat aplikasi wifi.id GO ([android](https://play.google.com/store/apps/details?id=com.telkom.wifiidgo), [iOS](https://apps.apple.com/id/app/wifi-id-go/id1198078195)) atau lewat online marketplace seperti [Tokopedia](https://www.tokopedia.com/streaming/))
 
@@ -46,7 +46,7 @@ Berhubung tidak semua pemancar @wifi.id bisa digunakan, silahkan dicoba dulu unt
 
 2. Tekan tombol **Scan**
 
-3. Pilih jaringan @wifi.id (jangan pilih yang flashzone-seamless ataupun seamless<span></span>@wifi.id, yang bisa hanya @wifi.id, indischool@wifi.id, dan@wifi.id@home) dengan menekan tombol **Join Network** di sisi kanan nama jaringan.
+3. Pilih jaringan @wifi.id (jangan pilih yang flashzone-seamless ataupun seamless<span></span>@wifi.id, yang bisa hanya @wifi.id, indischool<span></span>@wifi.id, dan@wifi.id@home) dengan menekan tombol **Join Network** di sisi kanan nama jaringan.
 
    ![scan](pics/05-join-network.png)
 
