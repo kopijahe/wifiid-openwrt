@@ -8,7 +8,7 @@ Di sini saya akan membeberkan cara memancarkan kembali sinyal @wifi.id untuk dip
 
 2. Punya router jaringan berbasiskan OpenWrt/LEDE (misalnya yang murah: [ini](http://www.jakartanotebook.com/movistar-asl-26555-openwrt-adsl-network-storage-3g-wireless-router-wifi-hotspot-white) dan [itu](http://www.jakartanotebook.com/gl.inet-openwrt-mini-smart-router-16mb-rom-6416a-white), daftar perangkat lain selengkapnya bisa lihat [di sini](http://wiki.openwrt.org/toh/start)), proses pemasangan firmware berbeda antara 1 perangkat dan lainnya, jadi tidak saya bahas di sini. Paket tambahan yang dibutuhkan hanya **luci** (dan **wpad** jika seamless@wifi.id), untuk memudahkan konfigurasi.
 
-3. Punya akun @wifi.id (beli voucher fisik, atau lewat SMS ke 98108, lewat aplikasi@wifi.id GO ([android](https://play.google.com/store/apps/details?id=com.telkom.wifiidgo), [iOS](https://apps.apple.com/id/app/wifi-id-go/id1198078195)) atau lewat online marketplace seperti [Tokopedia](https://www.tokopedia.com/streaming/))
+3. Punya akun @wifi.id (beli voucher fisik, atau lewat SMS ke 98108, lewat aplikasi wifi.id GO ([android](https://play.google.com/store/apps/details?id=com.telkom.wifiidgo), [iOS](https://apps.apple.com/id/app/wifi-id-go/id1198078195)) atau lewat online marketplace seperti [Tokopedia](https://www.tokopedia.com/streaming/))
 
 ### **Cara mengetahui apakah jaringan @wifi.id bisa dipakai atau tidak**
 Untuk mengecek ketersediaan pemancar @wifi.id di daerah sekitar, bisa mengecek di fitur "Hotspot Finder" yang tersedia di aplikasi wifi.id GO ([android](https://play.google.com/store/apps/details?id=com.telkom.wifiidgo), [iOS](https://apps.apple.com/id/app/wifi-id-go/id1198078195)), atau melalui situs resmi @wifi.id: https://wifi.id/cari-wifi
@@ -73,3 +73,7 @@ Untuk memancarkan kembali sinyal @wifi.id, saya menyarankan untuk menggunakan pe
    ![topology](pics/topology.png)
 
 Jika ada keterbatasan dana yang menghalangi penggunaan 2 perangkat router (1 untuk menangkap dan 1 untuk menyebarkan kembali), sebenarnya anda bisa saja menggunakan 1 perangkat untuk kedua tugas tersebut, hanya saja kecepatan jaringan akan berkurang sebesar 50%. Langkah-langkahnya bisa dibaca di dokumen [repeater-mode.md](repeater-mode.md)
+
+### seamless@wifi.id
+
+Karena adanya tambahan langkah-langkah agar terkoneksi ke sinyal seamless@wifi.id, maka saya pisahkan ke dokumen [seamless.md](seamless.md)
