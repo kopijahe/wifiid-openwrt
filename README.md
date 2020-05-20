@@ -38,7 +38,7 @@ Berhubung tidak semua pemancar @wifi.id bisa digunakan, silahkan dicoba dulu unt
 
 7. Cabut-pasang kembali kabel LAN agar pengaturan ini langsung dipakai oleh perangkat
 
-#### **B Koneksi dengan jaringan @wifi.id (selain \seamless@wifi.id)**
+#### **B Koneksi dengan jaringan @wifi.id (selain seamless<span></span>@wifi.id)**
 
 1. Buka tab **Network** -> **Wifi/Wireless**
 
@@ -46,7 +46,7 @@ Berhubung tidak semua pemancar @wifi.id bisa digunakan, silahkan dicoba dulu unt
 
 2. Tekan tombol **Scan**
 
-3. Pilih jaringan @wifi.id (jangan pilih yang flashzone-seamless ataupun \seamless@wifi.id, yang bisa hanya @wifi.id, indischool@wifi.id, dan@wifi.id@home) dengan menekan tombol **Join Network** di sisi kanan nama jaringan.
+3. Pilih jaringan @wifi.id (jangan pilih yang flashzone-seamless ataupun seamless<span></span>@wifi.id, yang bisa hanya @wifi.id, indischool@wifi.id, dan@wifi.id@home) dengan menekan tombol **Join Network** di sisi kanan nama jaringan.
 
    ![scan](pics/05-join-network.png)
 
@@ -74,6 +74,6 @@ Untuk memancarkan kembali sinyal @wifi.id, saya menyarankan untuk menggunakan pe
 
 Jika ada keterbatasan dana yang menghalangi penggunaan 2 perangkat router (1 untuk menangkap dan 1 untuk menyebarkan kembali), sebenarnya anda bisa saja menggunakan 1 perangkat untuk kedua tugas tersebut, hanya saja kecepatan jaringan akan berkurang sebesar 50%. Langkah-langkahnya bisa dibaca di dokumen [repeater-mode.md](repeater-mode.md)
 
-### \seamless@wifi.id
+### seamless<span></span>@wifi.id
 
-Karena adanya tambahan langkah-langkah agar terkoneksi ke sinyal \seamless@wifi.id, maka saya pisahkan ke dokumen [seamless.md](seamless.md)
+Karena adanya tambahan langkah-langkah agar terkoneksi ke sinyal seamless<span></span>@wifi.id, maka saya pisahkan ke dokumen [seamless.md](seamless.md)
