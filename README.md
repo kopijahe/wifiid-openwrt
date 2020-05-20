@@ -46,7 +46,7 @@ Berhubung tidak semua pemancar @wifi.id bisa digunakan, silahkan dicoba dulu unt
 
 2. Tekan tombol **Scan**
 
-3. Pilih jaringan @wifi.id (jangan pilih yang flashzone-seamless ataupun seamless<span></span>@wifi.id, yang bisa hanya @wifi.id, indischool<span></span>@wifi.id, dan@wifi.id@home) dengan menekan tombol **Join Network** di sisi kanan nama jaringan.
+3. Pilih jaringan @wifi.id (jangan pilih yang flashzone-seamless ataupun seamless<span></span>@wifi.id, yang bisa hanya @wifi.id, indischool<span></span>@wifi.id, danwifi.id@home) dengan menekan tombol **Join Network** di sisi kanan nama jaringan.
 
    ![scan](pics/05-join-network.png)
 

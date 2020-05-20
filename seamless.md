@@ -4,7 +4,7 @@ Apabila sinyal @wifi.id lain tidak memerlukan paket khusus untuk bisa terkoneksi
 
 Kelebihan sinyal seamless<span></span>@wifi.id ketimbang sinyal @wifi.id lainnya adalah tidak perlu login ulang dalam selang waktu tertentu atau jika tidak dipakai dalam waktu tertentu.
 
-!!! **Perhatian!** paket **wpad** membutuhkan ukuran ruang kosong yang lebih besar daripada paket **wpad-mini**/**wpad-basic**, pastikan router anda memiliki ruang yang cukup sebelum melanjutkan.
+> :warning: **Perhatian!** paket **wpad** membutuhkan ukuran ruang kosong yang lebih besar daripada paket **wpad-mini**/**wpad-basic**, pastikan router anda memiliki ruang yang cukup sebelum melanjutkan.
 
 #### Pembelian Akun seamless<span></span>@wifi.id
 
