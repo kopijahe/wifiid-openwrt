@@ -6,6 +6,8 @@ Kelebihan sinyal seamless<span></span>@wifi.id ketimbang sinyal @wifi.id lainnya
 
 > :warning: **Perhatian!** paket **wpad** membutuhkan ukuran ruang kosong yang lebih besar daripada paket **wpad-mini**/**wpad-basic**, pastikan router anda memiliki ruang yang cukup sebelum melanjutkan.
 
+> :loudspeaker: Langkah-langkah di bawah hanya bisa dilakukan jika router sudah dalam keadaan online! Jika belum pernah online, bisa diakali dengan konek ke jaringan @wifi.id biasa terlebih dahulu (beli voucher Rp 5.000), baru kemudian konek ke seamless<span></span>@wifi.id.
+
 #### Pembelian Akun seamless<span></span>@wifi.id
 
 Pembelian akun seamless<span></span>@wifi.id hanya bisa dilakukan melalui aplikasi wifi.id GO ([android](https://play.google.com/store/apps/details?id=com.telkom.wifiidgo), [iOS](https://apps.apple.com/id/app/wifi-id-go/id1198078195)) atau melalui aplikasi myIndihome (aktivasi add-on seamless) ([android](https://play.google.com/store/apps/details?id=com.telkom.indihome.external), [iOS](https://apps.apple.com/id/app/myindihome/id1119407221))
