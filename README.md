@@ -71,3 +71,5 @@ Berhubung tidak semua pemancar @wifi.id bisa digunakan, silahkan dicoba dulu unt
 Untuk memancarkan kembali sinyal @wifi.id, saya menyarankan untuk menggunakan perangkat/router kedua, agar bandwidth tidak terpotong 50% dan lebih stabil dalam penggunaannya, seperti gambar berikut:
 
    ![topology](pics/topology.png)
+
+Jika ada keterbatasan dana yang menghalangi penggunaan 2 perangkat router (1 untuk menangkap dan 1 untuk menyebarkan kembali), sebenarnya anda bisa saja menggunakan 1 perangkat untuk kedua tugas tersebut, hanya saja kecepatan jaringan akan berkurang sebesar 50%. Langkah-langkahnya bisa dibaca di dokumen [repeater-mode.md](repeater-mode.md)
