@@ -13,9 +13,7 @@ Jika ada keterbatasan dana yang menghalangi penggunaan 2 perangkat router (1 unt
 
 2. Buka tab **Network** -> **Wifi/Wireless**
 
-   ![wireless](pics/04-interface-wlan.png)
-
-3. Tekan tombol "Add"
+3. Tekan tombol **Add**
 
    ![wireless-add](pics/10-wlan-add.png)
 
