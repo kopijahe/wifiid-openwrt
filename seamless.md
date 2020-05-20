@@ -1,14 +1,14 @@
-#### Tutorial untuk terkoneksi dengan sinyal seamless@wifi.id
+### Tutorial untuk terkoneksi dengan sinyal \seamless@wifi.id
 
-Apabila sinyal @wifi.id lain tidak memerlukan paket khusus untuk bisa terkoneksi dengan jaringan, seamless@wifi.id perlu menggunakan paket **wpad** agar bisa terkoneksi.
+Apabila sinyal @wifi.id lain tidak memerlukan paket khusus untuk bisa terkoneksi dengan jaringan, \seamless@wifi.id perlu menggunakan paket **wpad** agar bisa terkoneksi.
 
-Kelebihan sinyal seamless@wifi.id ketimbang sinyal @wifi.id lainnya adalah tidak perlu login ulang dalam selang waktu tertentu atau jika tidak dipakai dalam waktu tertentu.
+Kelebihan sinyal \seamless@wifi.id ketimbang sinyal @wifi.id lainnya adalah tidak perlu login ulang dalam selang waktu tertentu atau jika tidak dipakai dalam waktu tertentu.
 
-**Perhatian!** paket **wpad** membutuhkan ukuran ruang kosong yang lebih besar daripada paket **wpad-mini**/**wpad-basic**, pastikan router anda memiliki ruang yang cukup sebelum melanjutkan.
+!!! **Perhatian!** paket **wpad** membutuhkan ukuran ruang kosong yang lebih besar daripada paket **wpad-mini**/**wpad-basic**, pastikan router anda memiliki ruang yang cukup sebelum melanjutkan.
 
-#### Pembelian Akun seamless@wifi.id
+#### Pembelian Akun \seamless@wifi.id
 
-Pembelian akun seamless@wifi.id hanya bisa dilakukan melalui aplikasi wifi.id GO ([android](https://play.google.com/store/apps/details?id=com.telkom.wifiidgo), [iOS](https://apps.apple.com/id/app/wifi-id-go/id1198078195)) atau melalui aplikasi myIndihome (aktivasi add-on seamless) ([android](https://play.google.com/store/apps/details?id=com.telkom.indihome.external), [iOS](https://apps.apple.com/id/app/myindihome/id1119407221))
+Pembelian akun \seamless@wifi.id hanya bisa dilakukan melalui aplikasi wifi.id GO ([android](https://play.google.com/store/apps/details?id=com.telkom.wifiidgo), [iOS](https://apps.apple.com/id/app/wifi-id-go/id1198078195)) atau melalui aplikasi myIndihome (aktivasi add-on seamless) ([android](https://play.google.com/store/apps/details?id=com.telkom.indihome.external), [iOS](https://apps.apple.com/id/app/myindihome/id1119407221))
 
 #### Langkah-Langkah
 
@@ -42,7 +42,7 @@ Pembelian akun seamless@wifi.id hanya bisa dilakukan melalui aplikasi wifi.id GO
 
 9. Tekan tombol **Scan**
 
-10. Pilih jaringan seamless@wifi.id dengan menekan tombol **Join Network** di sisi kanan nama jaringan.
+10. Pilih jaringan \seamless@wifi.id dengan menekan tombol **Join Network** di sisi kanan nama jaringan.
 
    ![scan](pics/05-join-network.png)
 
