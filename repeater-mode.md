@@ -33,7 +33,7 @@ Jika ada keterbatasan dana yang menghalangi penggunaan 2 perangkat router (1 unt
    Wireless	Security:
    
    Encryption: WPA-PSK/WPA2-PSK Mixed Mode
-   Chiper: auto
+   Cipher: auto
    Key: <diisi dengan password wifi sesuai selera>
    ```
 
