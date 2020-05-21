@@ -1,19 +1,20 @@
-### **Tutorial Untuk Memancarkan Kembali Sinyal @wifi.id Menggunakan OpenWrt/LEDE**
+<p align="center">
+    <img src="https://github.com/kopijahe/wifiid-openwrt/blob/master/pics/header.png" alt="wifi.id ✖ OpenWrt" width="330">
+</p>
 
-Di sini saya akan membeberkan cara memancarkan kembali sinyal @wifi.id untuk dipakai bersama-sama (misalnya saya untuk berlangganan internet di rumah).
+### **Tutorial Untuk Menangkap dan Memancarkan Kembali Sinyal @wifi.id Menggunakan OpenWrt/LEDE**
+
+Di sini saya akan membeberkan cara menangkap dan memancarkan kembali sinyal @wifi.id untuk dipakai bersama-sama (misalnya saya untuk berlangganan internet di rumah).
 
 ### **Persyaratan:**
 
-1. Terjangkau jaringan @wifi.id (nama wifi/SSID: @wifi.id, indischool<span></span>@wifi.id, wifi.id@home, dan seamless<span></span>@wifi.id)
+1. Terjangkau jaringan @wifi.id (nama wifi/SSID: @wifi.id, indischool<span></span>@wifi.id, wifi.id@home, dan seamless<span></span>@wifi.id). Untuk mengecek ketersediaan pemancar @wifi.id di daerah sekitar, bisa mengecek di fitur "Hotspot Finder" yang tersedia di aplikasi wifi.id GO ([android](https://play.google.com/store/apps/details?id=com.telkom.wifiidgo), [iOS](https://apps.apple.com/id/app/wifi-id-go/id1198078195)), atau melalui situs resmi @wifi.id: https://wifi.id/cari-wifi
 
-2. Punya router jaringan berbasiskan OpenWrt/LEDE (misalnya yang murah: [ini](http://www.jakartanotebook.com/movistar-asl-26555-openwrt-adsl-network-storage-3g-wireless-router-wifi-hotspot-white) dan [itu](http://www.jakartanotebook.com/gl.inet-openwrt-mini-smart-router-16mb-rom-6416a-white), daftar perangkat lain selengkapnya bisa lihat [di sini](http://wiki.openwrt.org/toh/start)), proses pemasangan firmware berbeda antara 1 perangkat dan lainnya, jadi tidak saya bahas di sini. Paket tambahan yang dibutuhkan hanya **luci** (dan **wpad** jika seamless<span></span>@wifi.id), untuk memudahkan konfigurasi.
+> :warning: Berhubung tidak semua pemancar @wifi.id bisa digunakan, silahkan dicoba dulu untuk login menggunakan handphone atau laptop sebelum melanjutkan.
 
-3. Punya akun @wifi.id (beli voucher fisik, atau lewat SMS ke 98108, lewat aplikasi wifi.id GO ([android](https://play.google.com/store/apps/details?id=com.telkom.wifiidgo), [iOS](https://apps.apple.com/id/app/wifi-id-go/id1198078195)) atau lewat online marketplace seperti [Tokopedia](https://www.tokopedia.com/streaming/))
+2. Punya router jaringan berbasiskan OpenWrt/LEDE (banyak terjual yang sudah terpasang openwrt di marketplace online ([Tokopedia](https://www.tokopedia.com/search?st=product&q=openwrt), [BukaLapak](https://www.bukalapak.com/products?search%5Bkeywords%5D=openwrt), [Shopee](https://shopee.co.id/search?keyword=openwrt)), daftar perangkat selengkapnya bisa lihat [di sini](http://wiki.openwrt.org/toh/start)), karena proses pemasangan firmware openwrt berbeda antara 1 perangkat dan lainnya, jadi tidak saya bahas di sini. Jika menggunakan versi SNAPSHOT, paket tambahan yang dibutuhkan hanya **luci** (dan **wpad** jika ingin terkoneksi dengan seamless<span></span>@wifi.id).
 
-### **Cara mengetahui apakah jaringan @wifi.id bisa dipakai atau tidak**
-Untuk mengecek ketersediaan pemancar @wifi.id di daerah sekitar, bisa mengecek di fitur "Hotspot Finder" yang tersedia di aplikasi wifi.id GO ([android](https://play.google.com/store/apps/details?id=com.telkom.wifiidgo), [iOS](https://apps.apple.com/id/app/wifi-id-go/id1198078195)), atau melalui situs resmi @wifi.id: https://wifi.id/cari-wifi
-
-Berhubung tidak semua pemancar @wifi.id bisa digunakan, silahkan dicoba dulu untuk login menggunakan handphone atau laptop sebelum melanjutkan.
+3. Punya akun @wifi.id (beli voucher fisik, atau lewat SMS ke 98108, lewat aplikasi wifi.id GO ([android](https://play.google.com/store/apps/details?id=com.telkom.wifiidgo), [iOS](https://apps.apple.com/id/app/wifi-id-go/id1198078195)) atau lewat online marketplace seperti [Tokopedia](https://www.tokopedia.com/streaming/), keterangan lebih lanjut bisa merujuk ke: https://wifi.id/beli-paket )
 
 
 ### **Langkah-Langkah**
