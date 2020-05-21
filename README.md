@@ -12,7 +12,7 @@ Di sini saya akan membeberkan cara menangkap dan memancarkan kembali sinyal @wif
 
 > :warning: Berhubung tidak semua pemancar @wifi.id bisa digunakan, silahkan dicoba dulu untuk login menggunakan handphone atau laptop sebelum melanjutkan.
 
-2. Punya router jaringan berbasiskan OpenWrt/LEDE (banyak terjual yang sudah terpasang openwrt di marketplace online ([Tokopedia](https://www.tokopedia.com/search?st=product&q=openwrt), [BukaLapak](https://www.bukalapak.com/products?search%5Bkeywords%5D=openwrt), [Shopee](https://shopee.co.id/search?keyword=openwrt)), daftar perangkat selengkapnya bisa lihat [di sini](http://wiki.openwrt.org/toh/start)), karena proses pemasangan firmware openwrt berbeda antara 1 perangkat dan lainnya, jadi tidak saya bahas di sini. Jika menggunakan versi SNAPSHOT, paket tambahan yang dibutuhkan hanya **luci** (dan **wpad** jika ingin terkoneksi dengan seamless<span></span>@wifi.id).
+2. Punya router jaringan berbasiskan OpenWrt/LEDE (banyak terjual yang sudah terpasang OpenWrt di marketplace online ([Tokopedia](https://www.tokopedia.com/search?st=product&q=openwrt), [BukaLapak](https://www.bukalapak.com/products?search%5Bkeywords%5D=openwrt), [Shopee](https://shopee.co.id/search?keyword=openwrt)), daftar perangkat selengkapnya bisa lihat [di sini](http://wiki.openwrt.org/toh/start)), karena proses pemasangan firmware OpenWrt berbeda antara 1 perangkat dan lainnya, jadi tidak saya bahas di sini. Jika menggunakan versi snapshot, paket tambahan yang dibutuhkan hanya **luci** (dan **wpad** jika ingin terkoneksi dengan seamless<span></span>@wifi.id).
 
 3. Punya akun @wifi.id (beli voucher fisik, atau lewat SMS ke 98108, lewat aplikasi wifi.id GO ([android](https://play.google.com/store/apps/details?id=com.telkom.wifiidgo), [iOS](https://apps.apple.com/id/app/wifi-id-go/id1198078195)) atau lewat online marketplace seperti [Tokopedia](https://www.tokopedia.com/streaming/), keterangan lebih lanjut bisa merujuk ke: https://wifi.id/beli-paket )
 
@@ -47,7 +47,7 @@ Di sini saya akan membeberkan cara menangkap dan memancarkan kembali sinyal @wif
 
 2. Tekan tombol **Scan**
 
-3. Pilih jaringan @wifi.id (jangan pilih yang flashzone-seamless ataupun seamless<span></span>@wifi.id, yang bisa hanya @wifi.id, indischool<span></span>@wifi.id, danwifi.id@home) dengan menekan tombol **Join Network** di sisi kanan nama jaringan.
+3. Pilih jaringan @wifi.id (jangan pilih yang flashzone-seamless ataupun seamless<span></span>@wifi.id, yang bisa hanya @wifi.id, indischool<span></span>@wifi.id, dan wifi.id@home) dengan menekan tombol **Join Network** di sisi kanan nama jaringan.
 
    ![scan](pics/05-join-network.png)
 
