@@ -41,7 +41,7 @@ Pengguna produk TP-Link berbasis Pharos (tipe CPE210/220, CPE510/520, CPE605 dan
    Security: None
    ```
 
-![wireless-config2](pics/pharos/05-wireless-config2.png)
+![wireless-config2](pics/pharos/05-wireless-config-2.png)
 
 8. Di halaman **Wireless AP Settings**, saya sarankan untuk dimatikan saja, kecuali ada keterbatasan dana yang menyebabkan tidak bisa menggunakan 2 router terpisah untuk menangkap dan memancarkan kembali sinyal @wifi.id, karena kecepatan koneksi akan berkurang 50%. Jika sudah, tekan tombol **Next**.
 
