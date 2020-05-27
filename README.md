@@ -10,7 +10,7 @@ Di sini saya akan membeberkan cara menangkap dan memancarkan kembali sinyal @wif
 
 1. Terjangkau jaringan @wifi.id (nama wifi/SSID: @wifi.id, indischool<span></span>@wifi.id, wifi.id@home, dan seamless<span></span>@wifi.id). Untuk mengecek ketersediaan pemancar @wifi.id di daerah sekitar, bisa mengecek di fitur "Hotspot Finder" yang tersedia di aplikasi wifi.id GO ([android](https://play.google.com/store/apps/details?id=com.telkom.wifiidgo), [iOS](https://apps.apple.com/id/app/wifi-id-go/id1198078195)), atau melalui situs resmi @wifi.id: https://wifi.id/cari-wifi
 
-> :warning: Berhubung tidak semua pemancar @wifi.id bisa digunakan, silahkan dicoba dulu untuk login menggunakan handphone atau laptop sebelum melanjutkan.
+> :warning: Berhubung tidak semua pemancar @wifi.id bisa digunakan, silahkan dicoba dulu untuk login menggunakan handphone atau laptop sebelum melanjutkan. Untuk memudahkan, bisa lihat ciri-ciri pemancar yang biasanya bisa dipakai di dokumen [access-points.md](access-points.md)
 
 2. Punya router jaringan berbasiskan OpenWrt/LEDE (banyak terjual yang sudah terpasang OpenWrt di marketplace online ([Tokopedia](https://www.tokopedia.com/search?st=product&q=openwrt), [BukaLapak](https://www.bukalapak.com/products?search%5Bkeywords%5D=openwrt), [Shopee](https://shopee.co.id/search?keyword=openwrt)), daftar perangkat selengkapnya bisa lihat [di sini](http://wiki.openwrt.org/toh/start)), karena proses pemasangan firmware OpenWrt berbeda antara 1 perangkat dan lainnya, jadi tidak saya bahas di sini. Jika menggunakan versi snapshot, paket tambahan yang dibutuhkan hanya **luci** (dan **wpad** jika ingin terkoneksi dengan seamless<span></span>@wifi.id).
 
