@@ -1,4 +1,4 @@
-### Ciri-ciri Pemancar sinyal @wifi.id yang Bisa Dipakai
+### **Ciri-ciri Pemancar sinyal @wifi.id yang Bisa Dipakai**
 
 Mudahnya, hampir semua pemancar sinyal @wifi.id yang bisa dipakai ada stiker logo @wifi.id, tapi ada saja beberapa pemancar yang tidak ada stikernya, entah memang dari awalnya tidak terpasang atau memang dilepas. Berikut adalah beberapa merk dan tipe yang bisa dijumpai di lapangan:
 
