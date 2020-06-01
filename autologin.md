@@ -59,37 +59,41 @@ Solusinya ada 2:
 
 12. Buka PuTTY, mulai koneksi **SSH** ke router (biasanya ```192.168.1.1```)
 
-13. Ketikkan: ```vi /etc/autologin.sh```
+13. Ketikkan: ```opkg update && opkg install curl```
+
+![opkg-update-install-curl](pics/autologin/opkg-update-install-curl.png)
+
+14. Ketikkan: ```vi /etc/autologin.sh```
 
 ![vi-autologin](pics/autologin/09-vi-autologin.png)
 
-14. Sebelum paste hasil dari no. 11, tekan huruf ```i``` terlebih dahulu, perhatikan status di bagian pojok kiri bawah:
+15. Sebelum paste hasil dari no. 11, tekan huruf ```i``` terlebih dahulu, perhatikan status di bagian pojok kiri bawah:
 
 ![vi-autologin-2](pics/autologin/10-vi-autologin-2.png)
 
 ![vi-autologin-3](pics/autologin/11-vi-autologin-3.png)
 
-15. Paste hasil dari no. 11 dengan menekan tombol kanan mouse
+16. Paste hasil dari no. 11 dengan menekan tombol kanan mouse
 
-16. Tekan tombol ```ESC``` lalu ketikkan ```:wq``` untuk menyimpan perubahan berkas
+17. Tekan tombol ```ESC``` lalu ketikkan ```:wq``` untuk menyimpan perubahan berkas
 
 ![vi-autologin-4](pics/autologin/12-vi-autologin-4.png)
 
-17. Atur supaya berkas ```autologin.sh``` bisa dijalankan dengan mengetikkan ```chmod +x /etc/autologin.sh```
+18. Atur supaya berkas ```autologin.sh``` bisa dijalankan dengan mengetikkan ```chmod +x /etc/autologin.sh```
 
 ![chmod-autologin](pics/autologin/13-chmod-autologin.png)
 
-18. Buka berkas ```/etc/rc.local``` dengan mengetikkan ```vi /etc/rc.local```
+19. Buka berkas ```/etc/rc.local``` dengan mengetikkan ```vi /etc/rc.local```
 
 ![vi-rc-local](pics/autologin/14-vi-rc-local.png)
 
-19. Tekan huruf ```i```, lalu tambahkan baris ```/bin/sh /etc/autologin.sh &``` di atas baris ```exit 0```
+20. Tekan huruf ```i```, lalu tambahkan baris ```/bin/sh /etc/autologin.sh &``` di atas baris ```exit 0```
 
 ![vi-rc-local-2](pics/autologin/15-vi-rc-local-2.png)
 
-20. Tekan tombol ```ESC``` lalu ketikkan ```:wq``` untuk menyimpan perubahan berkas
+21. Tekan tombol ```ESC``` lalu ketikkan ```:wq``` untuk menyimpan perubahan berkas
 
-21. Ketikkan ```sh /etc/rc.local``` untuk menjalankan script yang sudah kita racik, jika muncul tulisan ```Connected to the internet``` maka **anda sudah berhasil**.
+22. Ketikkan ```sh /etc/rc.local``` untuk menjalankan script yang sudah kita racik, jika muncul tulisan ```Connected to the internet``` maka **anda sudah berhasil**.
 
 ![sh-rc-local](pics/autologin/16-sh-rc-local.png)
 
