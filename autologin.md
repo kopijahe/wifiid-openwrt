@@ -25,7 +25,7 @@ Solusinya ada 2:
 
 3. Di halaman login, tekan tombol ```F12```, lalu buka tab **Network** di bagian samping kanan dan centang **Preserve log**
 
-![preserve-log](pics/autologin/01-preserve-log.png)
+![preserve-log](pics/autologin/01-chrome-preserve-log.png)
 
 4. Lakukan login seperti biasa
 
