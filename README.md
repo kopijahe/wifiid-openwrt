@@ -77,4 +77,10 @@ Jika ada keterbatasan dana yang menghalangi penggunaan 2 perangkat router (1 unt
 
 ### seamless<span></span>@wifi.id
 
+Kelebihan sinyal seamless<span></span>@wifi.id ketimbang sinyal @wifi.id lainnya adalah tidak perlu login ulang dalam selang waktu tertentu atau jika tidak dipakai dalam waktu tertentu.
+
 Karena adanya tambahan langkah-langkah agar terkoneksi ke sinyal seamless<span></span>@wifi.id, maka saya pisahkan ke dokumen [seamless.md](seamless.md)
+
+### Login Otomatis di jaringan @wifi.id
+
+Jika tidak tersedia jaringan seamless<span></span>@wifi.id yang bisa dipakai di daerah anda, bisa merujuk dokumen [autologin.md](autologin.md) untuk cara agar tidak capek berulang-ulang login ke jaringan.
