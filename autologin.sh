@@ -2,7 +2,7 @@
 #
 while [ true ]; do
 status=$(wget -q --timeout 10 http://periksakoneksi.kopijahe.my.id/cek -O -)
-if [[ $status = "OK" ]]; then
+if [[ "$status" = "OK" ]]; then
 echo "Connected to the internet" | tee /tmp/internet.status
 else
 echo "Last login attempt:" | tee /tmp/last.login
