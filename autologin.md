@@ -18,7 +18,32 @@ Solusinya ada 2:
 3. PuTTY (unduh dan pasang [dari situs ini](https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html))
 
 ### **Langkah-Langkah**
+#### **A. Mengatur hostnames**
+1. Koneksikan perangkat (PC/laptop) ke router (biasanya [192.168.1.1](http://192.168.1.1))
 
+   ![login](pics/01-login-router.png)
+
+2. Masuk ke tab **Network** -> **Hostnames**
+
+   ![hostnames-1](pics/autologin/18-hostnames-1.png)
+
+3. Tekan tombol **Add**
+
+   ![hostnames-2](pics/autologin/19-hostnames-2.png)
+
+4. Masukkan ```welcome2.wifi.id``` di bagian **hostname**
+
+5. Di bagian IP, pilih **custom**, lalu masukkan ```10.233.16.32``` (atau kalau tidak bisa: ```10.233.16.13```)
+
+   ![hostnames-3](pics/autologin/20-hostnames-3.png)
+
+6. Ulangi untuk hostname ```lp.wifi.id``` dengan IP ```36.86.63.19``` (atau kalau tidak bisa: ```36.91.226.203```)
+
+7. Tekan tombol **Save & Apply**
+
+   ![hostnames-4](pics/autologin/20-hostnames-4.png)
+
+#### **B. Script autologin**
 1. Pastikan sudah terkoneksi ke jaringan @wifi.id **dan belum login**
 
 2. Buka halaman login menggunakan Google Chrome
