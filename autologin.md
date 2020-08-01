@@ -41,7 +41,7 @@ Solusinya ada 2:
 
 7. Tekan tombol **Save & Apply**
 
-   ![hostnames-4](pics/autologin/20-hostnames-4.png)
+   ![hostnames-4](pics/autologin/21-hostnames-4.png)
 
 #### **B. Script autologin**
 1. Pastikan sudah terkoneksi ke jaringan @wifi.id **dan belum login**
