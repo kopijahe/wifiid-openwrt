@@ -8,13 +8,13 @@
 
 :bulb: Bisa dilihat dari sewaktu survey menggunakan handphone/laptop, ataupun dari informasi yang diberikan oleh openwrt, bisa dilihat di halaman status koneksi. Contohnya bisa dilihat di gambar-gambar berikut:
 
-    openwrt:
+   openwrt:
    ![dns-openwrt](pics/technical-info/DNS-openwrt.png)
 
-    android:
+   android:
    ![dns-android](pics/technical-info/DNS-android.png)
 
-    windows:
+   windows:
    ![dns-windows](pics/technical-info/DNS-windows.png)
 
 Kalau misal di daerah anda ternyata menggunakan alamat server DNS yang berbeda, bisa disesuaikan dengan kondisi di daerah masing-masing.
@@ -25,9 +25,9 @@ Kalau misal di daerah anda ternyata menggunakan alamat server DNS yang berbeda, 
 
 :bulb: Bisa menggunakan perintah `nslookup <nama domain> <server DNS>`, baik di openwrt ataupun di perangkat lainnya yang terhubung ke jaringan, dan dikonfirmasi setelah dicoba tambahkan sebagai hostname di openwrt. Bila perintahnya tidak menghasilkan IP yang sesuai (misal tetap tidak bisa login), maka disarankan untuk memasang paket `bind-dig` dengan perintah: `opkg update && opkg install bind-dig`. Setelah terpasang, lakukan perintah: `dig @<server DNS> <nama domain>`
 
-    ![dns-nslookup](pics/technical-info/DNS-nslookup.png)
+   ![dns-nslookup](pics/technical-info/DNS-nslookup.png)
 	
-	![dns-dig](pics/technical-info/DNS-dig.png)
+   ![dns-dig](pics/technical-info/DNS-dig.png)
 
 ### **Autologin**
 
