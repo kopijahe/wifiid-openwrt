@@ -84,3 +84,7 @@ Karena adanya tambahan langkah-langkah agar terkoneksi ke sinyal seamless<span><
 ### Login Otomatis di jaringan @wifi.id
 
 Jika tidak tersedia jaringan seamless<span></span>@wifi.id yang bisa dipakai di daerah anda, bisa merujuk dokumen [autologin.md](autologin.md) untuk cara agar tidak capek berulang-ulang login ke jaringan.
+
+### Informasi teknis dan pertanyaan yang mungkin diajukan
+
+Jika mengalami kendala dalam menerapkan tutorial di atas, misalnya ada perbedaan dalam server DNS di daerah anda, dll., bisa merujuk ke dokumen [faq-technical-info.md](faq-technical-info.md)
