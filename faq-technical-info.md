@@ -47,7 +47,7 @@ Bila perintahnya tidak menghasilkan IP yang sesuai (misal tetap tidak bisa login
 
 :question: _Saya lihat di script, untuk periksa koneksinya ke domain `periksakoneksi.kopijahe.my.id`, apa aman? Kenapa tidak mengecek ke tempat lain saja?_
 
-:bulb: Aman-aman saja, karena tujuannya hanya mengunduh berkas [cek](https://github.com/kopijahe/periksakoneksi.kopijahe.my.id/blob/master/cek) lalu melihat apakah isinya benar (OK). Saya tidak mendapatkan/mengambil data apapun dari perangkat anda. Soal kenapa kok tidak mengecek ke tempat lain, karena untuk itu butuh paket tambahan (`wget`) yang ukurannya lumayan besar, jadi bisa memberatkan ke pengguna script dengan perangkat yang punya penyimpanan terbatas.
+:bulb: Aman-aman saja, karena tujuannya hanya mengunduh berkas [cek](https://github.com/kopijahe/periksakoneksi.kopijahe.my.id/blob/master/cek) lalu melihat apakah isinya benar (OK). Saya tidak mendapatkan/mengambil data apapun dari perangkat anda. Soal kenapa kok tidak mengecek ke tempat lain, karena untuk itu butuh paket tambahan (`wget`) yang ukurannya lumayan besar, jadi bisa memberatkan ke pengguna script dengan perangkat yang punya penyimpanan terbatas. Jika masih ragu, bisa menggunakan script alternatif [autologin-google.sh](autologin-google.sh), script ini mengecek ke domain yang sama dengan yang digunakan perangkat android untuk mengecek status koneksi internet. Syaratnya harus memasang paket ```wget``` dengan perintah ```opkg update && opkg install wget``` supaya tidak ada masalah.
 
 <br><br>
 

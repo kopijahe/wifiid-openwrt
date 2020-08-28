@@ -76,6 +76,8 @@ Solusinya ada 2:
 
 10. Buka berkas [autologin.sh](autologin.sh), lalu salin isinya ke berkas baru di notepad
 
+> :pushpin: Jika terdapat gangguan (misal: script mengulang-ulang login padahal sudah login) di berkas autologin biasa, bisa dicoba menggunakan berkas [autologin-google.sh](autologin-google.sh) dengan syarat sudah memasang paket tambahan ```wget``` menggunakan perintah: ```opkg update && opkg install wget```
+
 11. Paste hasil dari no. 9 di atas ke bagian ```curl <paste output curl>``` seperti contoh berikut:
 
 ![paste-curl](pics/autologin/07-paste-curl.png)
@@ -123,3 +125,5 @@ Solusinya ada 2:
 ![sh-rc-local](pics/autologin/16-sh-rc-local.png)
 
 ![result](pics/autologin/17-result.png)
+
+> :loudspeaker: Masih ada pertanyaan, bisa merujuk ke dokumen [faq-technical-info.md](faq-technical-info.md)
