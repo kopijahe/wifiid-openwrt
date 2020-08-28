@@ -126,4 +126,5 @@ Solusinya ada 2:
 
 ![result](pics/autologin/17-result.png)
 
-> :loudspeaker: Masih ada pertanyaan, bisa merujuk ke dokumen [faq-technical-info.md](faq-technical-info.md)
+<br><br>
+> :loudspeaker: Masih ada pertanyaan? Bisa merujuk ke dokumen [faq-technical-info.md](faq-technical-info.md)
