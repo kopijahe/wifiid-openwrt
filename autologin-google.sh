@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 while [ true ]; do
-/usr/bin/wget -v --spider --max-redirect=1 http://connectivitycheck.gstatic.com/generate_204 > /dev/null
+/usr/bin/wget -q --spider --max-redirect=1 http://connectivitycheck.gstatic.com/generate_204 > /dev/null
 if [[ $? -eq 0 ]]; then
 echo "Connected to the internet" | tee /tmp/internet.status
 else
