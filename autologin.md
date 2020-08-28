@@ -92,31 +92,35 @@ Solusinya ada 2:
 
 ![login_file-7](pics/autologin/login_file-7.png)
 
-15. Unduh script autologin dengan menggunakan perintah: ```wget http://github.com/kopijahe/wifiid-openwrt/raw/master/autologin.sh```
+15. Pindah ke folder /etc/ dengan menggunakan perintah: ```cd /etc/```
+
+16. Unduh script autologin dengan menggunakan perintah: ```wget http://github.com/kopijahe/wifiid-openwrt/raw/master/autologin.sh```
 
 ![login_file-8](pics/autologin/login_file-8.png)
 
 > :pushpin: Jika terdapat gangguan (misal: script mengulang-ulang login padahal sudah login) di berkas autologin biasa, bisa dicoba menggunakan berkas [autologin-google.sh](autologin-google.sh) dengan syarat sudah memasang paket tambahan ```wget``` menggunakan perintah: ```opkg update && opkg install wget```
 
-16. Atur supaya berkas ```autologin.sh``` bisa dijalankan dengan mengetikkan ```chmod +x /etc/autologin.sh```
+17. Atur supaya berkas ```autologin.sh``` bisa dijalankan dengan mengetikkan ```chmod +x /etc/autologin.sh```
 
 ![login_file-9](pics/autologin/login_file-9.png)
 
-17. Buka berkas ```/etc/rc.local``` dengan mengetikkan ```vi /etc/rc.local```
+18. Buka berkas ```/etc/rc.local``` dengan mengetikkan ```vi /etc/rc.local```
 
 ![vi-rc-local](pics/autologin/14-vi-rc-local.png)
 
-18. Tekan huruf ```i```, lalu tambahkan baris ```/bin/sh /etc/autologin.sh &``` di atas baris ```exit 0```
+19. Tekan huruf ```i```, lalu tambahkan baris ```/bin/sh /etc/autologin.sh &``` di atas baris ```exit 0```
 
 ![vi-rc-local-2](pics/autologin/15-vi-rc-local-2.png)
 
-19. Tekan tombol ```ESC``` lalu ketikkan ```:wq``` untuk menyimpan perubahan berkas
+20. Tekan tombol ```ESC``` lalu ketikkan ```:wq``` untuk menyimpan perubahan berkas
 
-20. Ketikkan ```sh /etc/rc.local``` untuk menjalankan script yang sudah kita racik, jika muncul tulisan ```Sudah terkoneksi ke Internet``` maka **anda sudah berhasil**.
+21. Ketikkan ```sh /etc/rc.local``` untuk menjalankan script yang sudah kita racik, jika muncul tulisan ```Sudah terkoneksi ke Internet``` maka **anda sudah berhasil**.
 
 ![sh-rc-local](pics/autologin/16-sh-rc-local.png)
 
 ![result](pics/autologin/login_file-10.png)
 
+> Untuk kedepannya, jika voucher yang digunakan untuk login sudah habis/tidak berlakuu, atau proses autologin sudah tidak lagi berjalan, maka hanya perlu mengulangi langkah nomor 9 sampai 14 saja.
+
 <br><br>
-> :loudspeaker: Masih ada pertanyaan? Bisa merujuk ke dokumen [faq-technical-info.md](faq-technical-info.md)
+> :loudspeaker: **Masih ada pertanyaan lain?** Bisa merujuk ke dokumen [faq-technical-info.md](faq-technical-info.md)
