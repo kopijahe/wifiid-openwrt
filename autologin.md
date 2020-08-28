@@ -4,7 +4,7 @@ Kesal harus bolak-balik login ketika memakai jaringan @wifi.id di rumah?
 
 Solusinya ada 2:
 
-1. Pakai jaringan seamless@wifi.id (tidak semua pemancar yang bisa dipakai ada dan bisa sampai login)
+1. Pakai jaringan seamless<span></span>@wifi.id (tidak semua pemancar yang bisa dipakai ada dan bisa sampai login)
 2. Pakai router berbasis openwrt dan script untuk login secara otomatis jika jaringan internet terdeteksi tidak tersambung
 
 ### **Persyaratan:**
