@@ -60,71 +60,63 @@ Solusinya ada 2:
 
 ![check-login](pics/autologin/02-check-login.png)
 
-7. Paste hasilnya ke notepad, hapus baris yang berisikan ```--compressed```
+7. Buka PuTTY, mulai koneksi **SSH** ke router (biasanya ```192.168.1.1```)
 
-![curl-bash-1](pics/autologin/03-curl-bash-1.png)
-
-8. Jadikan hasilnya ke 1 baris saja seperti ini:
-
-![curl-bash-2](pics/autologin/04-curl-bash-2.png)
-
-9. Tekan tombol ```Ctrl + H```, lalu ganti semua tanda kutip 1 menjadi tanda kutip 2
-
-![curl-bash-3](pics/autologin/05-curl-bash-3.png)
-
-![curl-bash-4](pics/autologin/06-curl-bash-4.png)
-
-10. Buka berkas [autologin.sh](autologin.sh), lalu salin isinya ke berkas baru di notepad
-
-> :pushpin: Jika terdapat gangguan (misal: script mengulang-ulang login padahal sudah login) di berkas autologin biasa, bisa dicoba menggunakan berkas [autologin-google.sh](autologin-google.sh) dengan syarat sudah memasang paket tambahan ```wget``` menggunakan perintah: ```opkg update && opkg install wget```
-
-11. Paste hasil dari no. 9 di atas ke bagian ```curl <paste output curl>``` seperti contoh berikut:
-
-![paste-curl](pics/autologin/07-paste-curl.png)
-
-![paste-curl-2](pics/autologin/08-paste-curl-2.png)
-
-12. Buka PuTTY, mulai koneksi **SSH** ke router (biasanya ```192.168.1.1```)
-
-13. Ketikkan: ```opkg update && opkg install curl```
+8. Ketikkan: ```opkg update && opkg install curl```
 
 ![opkg-update-install-curl](pics/autologin/opkg-update-install-curl.png)
 
-14. Ketikkan: ```vi /etc/autologin.sh```
+9. Ketikkan: ```vi /etc/login_file.txt```
 
-![vi-autologin](pics/autologin/09-vi-autologin.png)
+![login_file](pics/autologin/login_file.png)
 
-15. Sebelum paste hasil dari no. 11, tekan huruf ```i``` terlebih dahulu, perhatikan status di bagian pojok kiri bawah:
+10. Sebelum paste hasil dari no. 6, tekan huruf ```i``` terlebih dahulu, perhatikan status di bagian pojok kiri bawah:
 
-![vi-autologin-2](pics/autologin/10-vi-autologin-2.png)
+![login_file-2](pics/autologin/login_file-2.png)
 
-![vi-autologin-3](pics/autologin/11-vi-autologin-3.png)
+![login_file-3](pics/autologin/login_file-3.png)
 
-16. Paste hasil dari no. 11 dengan menekan tombol kanan mouse
+11. Paste hasil dari no. 6 dengan menekan tombol kanan mouse
 
-17. Tekan tombol ```ESC``` lalu ketikkan ```:wq``` untuk menyimpan perubahan berkas
+![login_file-4](pics/autologin/login_file-4.png)
 
-![vi-autologin-4](pics/autologin/12-vi-autologin-4.png)
+12. Hapus baris yang berisikan ```--compressed```
 
-18. Atur supaya berkas ```autologin.sh``` bisa dijalankan dengan mengetikkan ```chmod +x /etc/autologin.sh```
+![login_file-5](pics/autologin/login_file-5.png)
 
-![chmod-autologin](pics/autologin/13-chmod-autologin.png)
+13. Tekan tombol ```ESC``` lalu ketikkan ```:wq``` untuk menyimpan perubahan berkas
 
-19. Buka berkas ```/etc/rc.local``` dengan mengetikkan ```vi /etc/rc.local```
+![login_file-6](pics/autologin/login_file-6.png)
+
+14. Atur supaya berkas ```login_file.txt``` bisa dijalankan dengan mengetikkan ```chmod +x /etc/login_file.txt```
+
+![login_file-7](pics/autologin/login_file-7.png)
+
+15. Unduh script autologin dengan menggunakan perintah: ```wget http://github.com/kopijahe/wifiid-openwrt/raw/master/autologin.sh```
+
+![login_file-8](pics/autologin/login_file-8.png)
+
+> :pushpin: Jika terdapat gangguan (misal: script mengulang-ulang login padahal sudah login) di berkas autologin biasa, bisa dicoba menggunakan berkas [autologin-google.sh](autologin-google.sh) dengan syarat sudah memasang paket tambahan ```wget``` menggunakan perintah: ```opkg update && opkg install wget```
+
+16. Atur supaya berkas ```autologin.sh``` bisa dijalankan dengan mengetikkan ```chmod +x /etc/autologin.sh```
+
+![login_file-9](pics/autologin/login_file-9.png)
+
+17. Buka berkas ```/etc/rc.local``` dengan mengetikkan ```vi /etc/rc.local```
 
 ![vi-rc-local](pics/autologin/14-vi-rc-local.png)
 
-20. Tekan huruf ```i```, lalu tambahkan baris ```/bin/sh /etc/autologin.sh &``` di atas baris ```exit 0```
+18. Tekan huruf ```i```, lalu tambahkan baris ```/bin/sh /etc/autologin.sh &``` di atas baris ```exit 0```
 
 ![vi-rc-local-2](pics/autologin/15-vi-rc-local-2.png)
 
-21. Tekan tombol ```ESC``` lalu ketikkan ```:wq``` untuk menyimpan perubahan berkas
+19. Tekan tombol ```ESC``` lalu ketikkan ```:wq``` untuk menyimpan perubahan berkas
 
-22. Ketikkan ```sh /etc/rc.local``` untuk menjalankan script yang sudah kita racik, jika muncul tulisan ```Connected to the internet``` maka **anda sudah berhasil**.
+20. Ketikkan ```sh /etc/rc.local``` untuk menjalankan script yang sudah kita racik, jika muncul tulisan ```Sudah terkoneksi ke Internet``` maka **anda sudah berhasil**.
 
 ![sh-rc-local](pics/autologin/16-sh-rc-local.png)
 
-![result](pics/autologin/17-result.png)
+![result](pics/autologin/login_file-10.png)
 
 <br><br>
 > :loudspeaker: Masih ada pertanyaan? Bisa merujuk ke dokumen [faq-technical-info.md](faq-technical-info.md)
