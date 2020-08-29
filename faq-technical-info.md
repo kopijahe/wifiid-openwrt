@@ -33,12 +33,6 @@ Bila perintahnya tidak menghasilkan IP yang sesuai (misal tetap tidak bisa login
 
 ### **Autologin**
 
-:question: _Saya kesulitan di bagian mengubah hasil curl ke 1 baris, bisa dibantu cara yang lebih mudah?_
-
-:bulb: Kalau cara manual di notepad bawaan Windows tidak berhasil/dirasa sulit, bisa menggunakan aplikasi [notepad\+\+](https://notepad-plus-plus.org/downloads/), tinggal diblok bagian pergantian baris, lalu tekan tombol `Ctrl + H`, lalu isikan spasi di bagian `Replace with`, lalu tekan tombol `Ctrl + A`.
-
-<br><br>
-
 :question: _Saya lihat di script itu ada jeda pengecekan setiap 10 detik, kenapa tidak dibikin lebih pendek, misalnya 1 detik saja? Supaya kalau terputus pas lagi main game ga nunggu lama-lama..._
 
 :bulb: Biasanya kalau terlalu cepat dalam autologin, akan mendapat status \[Ban IP\] yang menyebabkan gagalnya autologin dan juga kemungkinan turunnya kecepatan internet.
@@ -47,13 +41,22 @@ Bila perintahnya tidak menghasilkan IP yang sesuai (misal tetap tidak bisa login
 
 :question: _Saya lihat di script, untuk periksa koneksinya ke domain `periksakoneksi.kopijahe.my.id`, apa aman? Kenapa tidak mengecek ke tempat lain saja?_
 
-:bulb: Aman-aman saja, karena tujuannya hanya mengunduh berkas [cek](https://github.com/kopijahe/periksakoneksi.kopijahe.my.id/blob/master/cek) lalu melihat apakah isinya benar (OK). Saya tidak mendapatkan/mengambil data apapun dari perangkat anda. Soal kenapa kok tidak mengecek ke tempat lain, karena untuk itu butuh paket tambahan (`wget`) yang ukurannya lumayan besar, jadi bisa memberatkan ke pengguna script dengan perangkat yang punya penyimpanan terbatas. Jika masih ragu, bisa menggunakan script alternatif [autologin-google.sh](autologin-google.sh), script ini mengecek ke domain yang sama dengan yang digunakan perangkat android untuk mengecek status koneksi internet. Syaratnya harus memasang paket ```wget``` dengan perintah ```opkg update && opkg install wget``` supaya tidak ada masalah.
+:bulb: Aman-aman saja, karena tujuannya hanya mengunduh berkas [cek](https://github.com/kopijahe/periksakoneksi.kopijahe.my.id/blob/master/cek) lalu melihat apakah isinya benar "OK". Saya tidak mendapatkan/mengambil data apapun dari perangkat anda. Soal kenapa kok tidak mengecek ke tempat lain, karena untuk itu butuh paket tambahan (`wget`) yang ukurannya lumayan besar, jadi bisa memberatkan ke pengguna script dengan perangkat yang punya penyimpanan terbatas. Jika masih ragu, bisa menggunakan script alternatif [autologin-google.sh](autologin-google.sh), script ini mengecek ke domain yang sama dengan yang digunakan perangkat android untuk mengecek status koneksi internet. Syaratnya harus memasang paket ```wget``` dengan perintah ```opkg update && opkg install wget``` supaya tidak ada masalah.
 
 <br><br>
 
 :question: _Bisakah autologin dipakai untuk 2 koneksi berbeda? Router saya bisa 2 frekuensi (2,4 GHz dan 5,8 Ghz), rencananya saya pakai 2 akun dan di loadbalance (misal pakai mwan di openwrt)..._
 
-:bulb: Bisa saja, bikin 2 berkas autologin, misal `autologin.sh` dan `autologin2.sh`, lalu tambahkan parameter `--interface <nama interface>` di awal perintah curl. Misalnya seperti ini: `curl --interface wlan0 ...` di `autologin.sh` dan `curl --interface wlan1 ...` di `autologin2.sh`
+:bulb: Bisa saja:
+
+ > 1. Buat berkas autologin kedua dengan perintah ```cp /etc/autologin.sh /etc/autologin2.sh```
+ > 2. Buka berkas autologin2.sh dengan perintah ```vi /etc/autologin2.sh```
+ > 3. Tekan huruf ```i``` untuk memulai edit berkas autologin2.sh
+ > 4. Ganti isi variabel loginwifi dengan nama berkas lain, misalnya menjadi ```loginwifi=/etc/login_file2.txt```
+ > 5. Matikan dulu koneksi pertama, lalu lakukan login di koneksi kedua dan taruh hasil curl-nya di file login_file2.txt (dokumen [autologin.md](autologin.md), langkah no. 9-14)
+ > 6. Edit berkas login_file.txt dengan perintah ```vi /etc/file_login.txt```, tambahkan parameter ```--interface <nama interface>``` setelah teks curl, misalnya jadi ```curl --interface wlan0 -H ....```, lalu simpan berkas
+ > 7. Edit berkas login_file.txt dengan perintah ```vi /etc/file_login.txt```, tambahkan parameter ```--interface <nama interface>``` setelah teks curl, misalnya jadi ```curl --interface wlan1 -H ....```, lalu simpan berkas
+ > 8. Tambahkan berkas autologin kedua di berkas ```/etc/rc.local```
 
 ### **Lain-lain**
 
