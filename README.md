@@ -14,7 +14,7 @@ Di sini saya akan membeberkan cara menangkap dan memancarkan kembali sinyal @wif
 
 2. Punya router jaringan berbasiskan OpenWrt/LEDE (banyak terjual yang sudah terpasang OpenWrt di marketplace online ([Tokopedia](https://www.tokopedia.com/search?st=product&q=openwrt), [BukaLapak](https://www.bukalapak.com/products?search%5Bkeywords%5D=openwrt), [Shopee](https://shopee.co.id/search?keyword=openwrt)), daftar perangkat selengkapnya bisa lihat [di sini](http://wiki.openwrt.org/toh/start)), karena proses pemasangan firmware OpenWrt berbeda antara 1 perangkat dan lainnya, jadi tidak saya bahas di sini. Jika menggunakan versi snapshot, paket tambahan yang dibutuhkan hanya **luci** (dan **wpad** jika ingin terkoneksi dengan seamless<span></span>@wifi.id).
 
-> :satellite: Jika tidak bisa mendapatkan router berbasis OpenWrt, bisa diganti dengan lini produk dengan mengikuti langkah-langkah di dokumen [tplink-pharos.md](tplink-pharos.md).
+> :satellite: Jika tidak bisa mendapatkan router berbasis OpenWrt, bisa diganti dengan produk-produk TP-Link Pharos (seri CPE 210/220/510/520/605/610) dengan mengikuti langkah-langkah di dokumen [tplink-pharos.md](tplink-pharos.md).
 
 3. Punya akun @wifi.id (beli voucher fisik, atau lewat SMS ke 98108, lewat aplikasi wifi.id GO ([android](https://play.google.com/store/apps/details?id=com.telkom.wifiidgo), [iOS](https://apps.apple.com/id/app/wifi-id-go/id1198078195)) atau lewat online marketplace seperti [Tokopedia](https://www.tokopedia.com/streaming/), keterangan lebih lanjut bisa merujuk ke: https://wifi.id/beli-paket )
 
