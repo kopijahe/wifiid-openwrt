@@ -55,7 +55,7 @@ Bila perintahnya tidak menghasilkan IP yang sesuai (misal tetap tidak bisa login
  > 4. Ganti isi variabel loginwifi dengan nama berkas lain, misalnya menjadi ```loginwifi=/etc/login_file2.txt```
  > 5. Matikan dulu koneksi pertama, lalu lakukan login di koneksi kedua dan taruh hasil curl-nya di file login_file2.txt (dokumen [autologin.md](autologin.md), langkah no. 9-14)
  > 6. Edit berkas login_file.txt dengan perintah ```vi /etc/file_login.txt```, tambahkan parameter ```--interface <nama interface>``` setelah teks curl, misalnya jadi ```curl --interface wlan0 -H ....```, lalu simpan berkas
- > 7. Edit berkas login_file.txt dengan perintah ```vi /etc/file_login.txt```, tambahkan parameter ```--interface <nama interface>``` setelah teks curl, misalnya jadi ```curl --interface wlan1 -H ....```, lalu simpan berkas
+ > 7. Edit berkas login_file2.txt dengan perintah ```vi /etc/file_login2.txt```, tambahkan parameter ```--interface <nama interface>``` setelah teks curl, misalnya jadi ```curl --interface wlan1 -H ....```, lalu simpan berkas
  > 8. Tambahkan berkas autologin kedua di berkas ```/etc/rc.local```
 
 ### **Lain-lain**
