@@ -41,7 +41,14 @@ Bila perintahnya tidak menghasilkan IP yang sesuai (misal tetap tidak bisa login
 
 :question: _Saya lihat di script, untuk periksa koneksinya ke domain `periksakoneksi.kopijahe.my.id`, apa aman? Kenapa tidak mengecek ke tempat lain saja?_
 
-:bulb: Aman-aman saja, karena tujuannya hanya mengunduh berkas [cek](https://github.com/kopijahe/periksakoneksi.kopijahe.my.id/blob/master/cek) lalu melihat apakah isinya benar "OK". Saya tidak mendapatkan/mengambil data apapun dari perangkat anda. Soal kenapa kok tidak mengecek ke tempat lain, karena untuk itu butuh paket tambahan (`wget`) yang ukurannya lumayan besar, jadi bisa memberatkan ke pengguna script dengan perangkat yang punya penyimpanan terbatas. Jika masih ragu, bisa menggunakan script alternatif [autologin-google.sh](autologin-google.sh), script ini mengecek ke domain yang sama dengan yang digunakan perangkat android untuk mengecek status koneksi internet. Syaratnya harus memasang paket ```wget``` dengan perintah ```opkg update && opkg install wget``` supaya tidak ada masalah.
+:bulb: Aman-aman saja, karena tujuannya hanya mengunduh berkas [cek](https://github.com/kopijahe/periksakoneksi.kopijahe.my.id/blob/master/cek) lalu melihat apakah isinya benar "OK". Saya tidak mendapatkan/mengambil data apapun dari perangkat anda.
+
+Soal kenapa kok tidak mengecek ke tempat lain, karena untuk itu butuh paket tambahan (`wget`) yang ukurannya lumayan besar, jadi bisa memberatkan ke pengguna script dengan perangkat yang punya penyimpanan terbatas (misal router dengan ROM 4MB).
+
+Jika masih ragu, bisa menggunakan script alternatif:
+
+> 1. [autologin-firefox.sh](), script ini menggunakan sistem yang sama dengan script [autologin.sh](autologin.sh), hanya saja domainnya milik mozilla/firefox.
+> 2. [autologin-google.sh](autologin-google.sh), script ini mengecek ke domain yang sama dengan yang digunakan perangkat android untuk mengecek status koneksi internet. Syaratnya harus memasang paket ```wget``` dengan perintah ```opkg update && opkg install wget``` supaya tidak ada masalah.
 
 <br><br>
 
@@ -57,6 +64,12 @@ Bila perintahnya tidak menghasilkan IP yang sesuai (misal tetap tidak bisa login
  > 6. Edit berkas login_file.txt dengan perintah ```vi /etc/file_login.txt```, tambahkan parameter ```--interface <nama interface>``` setelah teks curl, misalnya jadi ```curl --interface wlan0 -H ....```, lalu simpan berkas
  > 7. Edit berkas login_file2.txt dengan perintah ```vi /etc/file_login2.txt```, tambahkan parameter ```--interface <nama interface>``` setelah teks curl, misalnya jadi ```curl --interface wlan1 -H ....```, lalu simpan berkas
  > 8. Tambahkan berkas autologin kedua di berkas ```/etc/rc.local```
+
+<br><br>
+
+:question: _Misal saya pakai kombinasi TP-Link Pharos untuk menangkap sinyal <span></span>@wifi.id + router openwrt untuk memancarkan sinyal kembali, bisakah pakai autologin di router openwrt?_
+
+:bulb: Bisa saja. Jika nanti semisal gagal autologin, coba ditambahkan parameter ```-interface <nama interface port WAN>``` setelah perintah ```curl``` di berkas ```/etc/login_file.txt```, misalnya jadi ```curl --interface eth0.1 -H ....```
 
 ### **Lain-lain**
 

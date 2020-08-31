@@ -98,7 +98,11 @@ Solusinya ada 2:
 
 ![login_file-8](pics/autologin/login_file-8.png)
 
-> :pushpin: Jika terdapat gangguan (misal: script mengulang-ulang login padahal sudah login) di berkas autologin biasa, bisa dicoba menggunakan berkas [autologin-google.sh](autologin-google.sh) dengan syarat sudah memasang paket tambahan ```wget``` menggunakan perintah: ```opkg update && opkg install wget```
+> :pushpin: Jika terdapat gangguan (misal: script mengulang-ulang login padahal sudah login) di berkas autologin biasa, bisa dicoba menggunakan berkas alternatif:
+> 1. [autologin-firefox.sh](autologin-firefox.sh)
+> 2. [autologin-google.sh](autologin-google.sh), dengan syarat sudah memasang paket tambahan ```wget``` menggunakan perintah: ```opkg update && opkg install wget```
+>
+> Jika menggunakan berkas script alternatif, harap disesuaikan namanya di langkah-langkah berikutnya.
 
 17. Atur supaya berkas ```autologin.sh``` bisa dijalankan dengan mengetikkan ```chmod +x /etc/autologin.sh```
 
@@ -120,7 +124,7 @@ Solusinya ada 2:
 
 ![result](pics/autologin/login_file-10.png)
 
-> Untuk kedepannya, jika voucher yang digunakan untuk login sudah habis/tidak berlakuu, atau proses autologin sudah tidak lagi berjalan, maka hanya perlu mengulangi langkah nomor 9 sampai 14 saja.
+> Untuk kedepannya, jika voucher yang digunakan untuk login sudah habis/tidak berlaku, atau proses autologin sudah tidak lagi berjalan, maka hanya perlu mengulangi langkah nomor 9 sampai 14 saja.
 
 <br><br>
 > :loudspeaker: **Masih ada pertanyaan lain?** Bisa merujuk ke dokumen [faq-technical-info.md](faq-technical-info.md)
