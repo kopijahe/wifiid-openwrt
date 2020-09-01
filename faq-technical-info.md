@@ -47,7 +47,7 @@ Soal kenapa kok tidak mengecek ke tempat lain, karena untuk itu butuh paket tamb
 
 Jika masih ragu, bisa menggunakan script alternatif:
 
-> 1. [autologin-firefox.sh](), script ini menggunakan sistem yang sama dengan script [autologin.sh](autologin.sh), hanya saja domainnya milik mozilla/firefox.
+> 1. [autologin-firefox.sh](autologin-firefox.sh), script ini menggunakan sistem yang sama dengan script [autologin.sh](autologin.sh), hanya saja domainnya milik mozilla/firefox.
 > 2. [autologin-google.sh](autologin-google.sh), script ini mengecek ke domain yang sama dengan yang digunakan perangkat android untuk mengecek status koneksi internet. Syaratnya harus memasang paket ```wget``` dengan perintah ```opkg update && opkg install wget``` supaya tidak ada masalah.
 
 <br><br>
