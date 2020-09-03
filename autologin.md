@@ -56,6 +56,8 @@ Solusinya ada 2:
 
 5. Setelah login, di bagian kanan tadi carilah item berawalan **check-login.php** dengan scroll ke atas
 
+> :warning: Jika digunakan untuk autologin SSID venue WMS, maka item yang dicari adalah **quarantine.php**
+
 6. Klik kanan **check-login.php**, lalu pilih **Copy** -> **Copy as cURL (bash)**
 
 ![check-login](pics/autologin/02-check-login.png)
