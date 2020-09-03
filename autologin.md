@@ -98,11 +98,13 @@ Solusinya ada 2:
 
 ![login_file-8](pics/autologin/login_file-8.png)
 
-> :pushpin: Jika terdapat gangguan (misal: script mengulang-ulang login padahal sudah login) di berkas autologin biasa, bisa dicoba menggunakan berkas alternatif:
-> 1. [autologin-firefox.sh](autologin-firefox.sh)
-> 2. [autologin-google.sh](autologin-google.sh), dengan syarat sudah memasang paket tambahan ```wget``` menggunakan perintah: ```opkg update && opkg install wget```
+> :pushpin: Jika terdapat gangguan (misal: script mengulang-ulang login padahal sudah login) di berkas [autologin.sh](autologin.sh), bisa dicoba menggunakan berkas alternatif:
+> 1. [autologin-firefox.sh](autologin-firefox.sh), dengan perintah: ```wget http://github.com/kopijahe/wifiid-openwrt/raw/master/autologin-firefox.sh```
+> 2. [autologin-google.sh](autologin-google.sh), dengan perintah: ```wget http://github.com/kopijahe/wifiid-openwrt/raw/master/autologin-google.sh```
 >
-> Jika menggunakan berkas script alternatif, harap disesuaikan namanya di langkah-langkah berikutnya.
+> :warning: Jika menggunakan script alternatif google, harus sudah memasang paket tambahan ```wget``` dengan menggunakan perintah: ```opkg update && opkg install wget```
+>
+> :warning: Jika menggunakan berkas script alternatif, harap disesuaikan namanya di langkah-langkah berikutnya.
 
 17. Atur supaya berkas ```autologin.sh``` bisa dijalankan dengan mengetikkan ```chmod +x /etc/autologin.sh```
 
