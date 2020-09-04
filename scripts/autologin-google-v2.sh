@@ -21,7 +21,7 @@ loginwifi=/etc/login_file.txt
 # untuk berjaga-jaga jika IP terblokir
 # karena terlalu cepat dalam autologin
 
-ipblocked=$(cat /tmp/last.login | grep "Blocked IP")
+ipblocked=$(cat /tmp/last.login | grep -o "Blocked IP")
 
 # Selama script berjalan, lakukan hal ini:
 while [ true ]; do
@@ -38,28 +38,27 @@ echo "Sudah terkoneksi dengan Internet" | tee /tmp/internet.status
 # Jika hasilnya tidak sama, berarti tidak terkoneksi dengan Internet, maka:
 #
 # Cek terlebih dahulu apakah IP terblokir?
-elif [[ $ipblocked = ]]; then
-# Jika hasilnya kosong,
-# artinya IP tidak terblokir, maka:
-# Beritahu pengguna bahwa IP tidak terblokir
-echo "Status IP: Tidak terblokir" | tee /tmp/last.login
+elif [[ "$ipblocked" = "Blocked IP" ]]; then
+# Jika terblokir, maka:
+# Beritahu pengguna bahwa IP terblokir
+echo "Status IP: Terblokir" | tee /tmp/last.login
+# Dan minta penggantian IP ke server
+killall -SIGUSR2 udhcpc && ifup wwan
+# Istirahat selama 10 detik sambil menunggu koneksi
+sleep 10
 # Catat tanggal dan jam login terakhir,
-echo "Percobaan login terakhir:" | tee /tmp/last.login
+echo "Percobaan login terakhir:" | tee -a /tmp/last.login
 date | tee -a /tmp/last.login
 # Catat pula status percobaan login terakhir
 echo "Status percobaan login terakhir:" | tee -a  /tmp/last.login
 # Dan lakukan login, serta catat semua hasilnya di berkas /tmp/last.login untuk pengecekan
 $loginwifi | tee -a /tmp/internet.status /tmp/last.login | logger
 else
-# Jika terblokir, maka:
-# Beritahu pengguna bahwa IP terblokir
-echo "Status IP: Terblokir" | tee 
-# Dan minta penggantian IP ke server
-killall -SIGUSR2 udhcpc && ifup wwan
-# Istirahat selama 5 detik sambil menunggu koneksi
-sleep 5
+# Jika IP tidak terblokir, maka:
+# Beritahu pengguna bahwa IP tidak terblokir
+echo "Status IP: Tidak terblokir" | tee /tmp/last.login
 # Catat tanggal dan jam login terakhir,
-echo "Percobaan login terakhir:" | tee /tmp/last.login
+echo "Percobaan login terakhir:" | tee -a /tmp/last.login
 date | tee -a /tmp/last.login
 # Catat pula status percobaan login terakhir
 echo "Status percobaan login terakhir:" | tee -a  /tmp/last.login
