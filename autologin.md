@@ -94,35 +94,33 @@ Solusinya ada 2:
 
 ![login_file-7](pics/autologin/login_file-7.png)
 
-15. Pindah ke folder /etc/ dengan menggunakan perintah: ```cd /etc/```
-
-16. Unduh script autologin dengan menggunakan perintah: ```wget http://github.com/kopijahe/wifiid-openwrt/raw/master/autologin.sh```
+15. Unduh script autologin dengan menggunakan perintah: ```wget http://github.com/kopijahe/wifiid-openwrt/raw/master/scripts/autologin.sh -O /etc/autologin.sh```
 
 ![login_file-8](pics/autologin/login_file-8.png)
 
-> :pushpin: Jika terdapat gangguan (misal: script mengulang-ulang login padahal sudah login) di berkas [autologin.sh](autologin.sh), bisa dicoba menggunakan berkas alternatif:
-> 1. [autologin-firefox.sh](autologin-firefox.sh), dengan perintah: ```wget http://github.com/kopijahe/wifiid-openwrt/raw/master/autologin-firefox.sh```
-> 2. [autologin-google.sh](autologin-google.sh), dengan perintah: ```wget http://github.com/kopijahe/wifiid-openwrt/raw/master/autologin-google.sh```
+> :pushpin: Jika terdapat gangguan (misal: script mengulang-ulang login padahal sudah login) di berkas [autologin.sh](scripts/autologin.sh), bisa dicoba menggunakan berkas alternatif:
+> 1. [autologin-firefox.sh](scripts/autologin-firefox.sh), dengan perintah: ```wget http://github.com/kopijahe/wifiid-openwrt/raw/master/scripts/autologin-firefox.sh  -O /etc/autologin.sh```
+> 2. [autologin-google.sh](scripts/autologin-google.sh), dengan perintah: ```wget http://github.com/kopijahe/wifiid-openwrt/raw/master/scripts/autologin-google.sh -O /etc/autologin.sh```
 >
 > :warning: Jika menggunakan script alternatif google, harus sudah memasang paket tambahan ```wget``` dengan menggunakan perintah: ```opkg update && opkg install wget```
 >
-> :warning: Jika menggunakan berkas script alternatif, harap disesuaikan namanya di langkah-langkah berikutnya.
+> :warning: Jika menggunakan berkas script alternatif, **tidak perlu** disesuaikan namanya di langkah-langkah berikutnya.
 
-17. Atur supaya berkas ```autologin.sh``` bisa dijalankan dengan mengetikkan ```chmod +x /etc/autologin.sh```
+16. Atur supaya berkas ```autologin.sh``` bisa dijalankan dengan mengetikkan ```chmod +x /etc/autologin.sh```
 
 ![login_file-9](pics/autologin/login_file-9.png)
 
-18. Buka berkas ```/etc/rc.local``` dengan mengetikkan ```vi /etc/rc.local```
+17. Buka berkas ```/etc/rc.local``` dengan mengetikkan ```vi /etc/rc.local```
 
 ![vi-rc-local](pics/autologin/14-vi-rc-local.png)
 
-19. Tekan huruf ```i```, lalu tambahkan baris ```/bin/sh /etc/autologin.sh &``` di atas baris ```exit 0```
+18. Tekan huruf ```i```, lalu tambahkan baris ```/bin/sh /etc/autologin.sh &``` di atas baris ```exit 0```
 
 ![vi-rc-local-2](pics/autologin/15-vi-rc-local-2.png)
 
-20. Tekan tombol ```ESC``` lalu ketikkan ```:wq``` untuk menyimpan perubahan berkas
+19. Tekan tombol ```ESC``` lalu ketikkan ```:wq``` untuk menyimpan perubahan berkas
 
-21. Ketikkan ```sh /etc/rc.local``` untuk menjalankan script yang sudah kita racik, jika muncul tulisan ```Sudah terkoneksi ke Internet``` maka **anda sudah berhasil**.
+20. Ketikkan ```sh /etc/rc.local``` untuk menjalankan script yang sudah kita racik, jika muncul tulisan ```Sudah terkoneksi ke Internet``` maka **anda sudah berhasil**.
 
 ![sh-rc-local](pics/autologin/16-sh-rc-local.png)
 

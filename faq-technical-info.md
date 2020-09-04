@@ -35,7 +35,7 @@ Bila perintahnya tidak menghasilkan IP yang sesuai (misal tetap tidak bisa login
 
 :question: _Saya lihat di script itu ada jeda pengecekan setiap 10 detik, kenapa tidak dibikin lebih pendek, misalnya 1 detik saja? Supaya kalau terputus pas lagi main game ga nunggu lama-lama..._
 
-:bulb: Biasanya kalau terlalu cepat dalam autologin, akan mendapat status \[Ban IP\] yang menyebabkan gagalnya autologin dan juga kemungkinan turunnya kecepatan internet.
+:bulb: Biasanya kalau terlalu cepat dalam autologin, akan mendapat status \[Ban IP\] atau \[IP Blocked\] yang menyebabkan gagalnya autologin dan juga kemungkinan turunnya kecepatan internet.
 
 <br><br>
 
@@ -47,8 +47,8 @@ Soal kenapa kok tidak mengecek ke tempat lain, karena untuk itu butuh paket tamb
 
 Jika masih ragu, bisa menggunakan script alternatif:
 
-> 1. [autologin-firefox.sh](autologin-firefox.sh), script ini menggunakan sistem yang sama dengan script [autologin.sh](autologin.sh), hanya saja domainnya milik mozilla/firefox.
-> 2. [autologin-google.sh](autologin-google.sh), script ini mengecek ke domain yang sama dengan yang digunakan perangkat android untuk mengecek status koneksi internet. Syaratnya harus memasang paket ```wget``` dengan perintah ```opkg update && opkg install wget``` supaya tidak ada masalah.
+> 1. [autologin-firefox.sh](scripts/autologin-firefox.sh), script ini menggunakan sistem yang sama dengan script [autologin.sh](scripts/autologin.sh), hanya saja domainnya milik mozilla/firefox.
+> 2. [autologin-google.sh](scripts/autologin-google.sh), script ini mengecek ke domain yang sama dengan yang digunakan perangkat android untuk mengecek status koneksi internet. Syaratnya harus memasang paket ```wget``` dengan perintah ```opkg update && opkg install wget``` supaya tidak ada masalah.
 
 <br><br>
 
@@ -71,7 +71,29 @@ Jika masih ragu, bisa menggunakan script alternatif:
 
 :bulb: Bisa saja. Jika nanti semisal gagal autologin, coba ditambahkan parameter ```-interface <nama interface port WAN>``` setelah perintah ```curl``` di berkas ```/etc/login_file.txt```, misalnya jadi ```curl --interface eth0.1 -H ....```
 
+<br><br>
+
+:question: _Bisakah jika terdeteksi IP terblokir, script otomatis meminta IP baru ke server sebelum mencoba login kembali?_
+
+:bulb: Gunakan script seri v2:
+
+> 1. [autologin-v2.sh](scripts/autologin-v2.sh), dengan perintah: ```wget http://github.com/kopijahe/wifiid-openwrt/raw/master/scripts/autologin-v2.sh  -O /etc/autologin.sh```
+> 2. [autologin-firefox-v2.sh](scripts/autologin-firefox-v2.sh), dengan perintah: ```wget http://github.com/kopijahe/wifiid-openwrt/raw/master/scripts/autologin-firefox-v2.sh  -O /etc/autologin.sh```
+> 3. [autologin-google-v2.sh](scripts/autologin-google-v2.sh), dengan perintah: ```wget http://github.com/kopijahe/wifiid-openwrt/raw/master/scripts/autologin-google-v2.sh -O /etc/autologin.sh```
+
+
 ### **Lain-lain**
+
+
+
+:question: _Bagaimana cara meminta IP baru ke server jika IP saya terblokir? Kalau di non-OpenWrt kan ada tombolnya untuk release dan obtain IP baru..._
+
+:bulb: Bisa lewat SSH:
+
+> 1. Buka PuTTY, mulai koneksi **SSH** ke router (biasanya ```192.168.1.1```)
+> 2. Ketikkan: ```killall -SIGUSR2 udhcpc && ifup wwan```
+
+<br><br>
 
 :question: _Bisa di-remote saja lewat teamviewer?_
 
