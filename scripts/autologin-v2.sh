@@ -12,14 +12,15 @@
 
 loginwifi=/etc/login_file.txt
 
+# Selama script berjalan, lakukan hal ini:
+while [ true ]; do
+
 # Tentukan variabel ipblocked
 # untuk berjaga-jaga jika IP terblokir
 # karena terlalu cepat dalam autologin
 
 ipblocked=$(cat /tmp/last.login | grep -o "Blocked IP")
 
-# Selama script berjalan, lakukan hal ini:
-while [ true ]; do
 # Tentukan variabel status dari hasil unduhan berkas
 # dari: http://periksakoneksi.kopijahe.my.id/cek
 # dan simpan hasilnya di stdout
