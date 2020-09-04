@@ -45,8 +45,8 @@ elif [[ "$ipblocked" = "Blocked IP" ]]; then
 echo "Status IP: Terblokir" | tee /tmp/last.login
 # Dan minta penggantian IP ke server
 killall -SIGUSR2 udhcpc && ifup wwan
-# Istirahat selama 10 detik sambil menunggu koneksi
-sleep 10
+# Istirahat selama 20 detik sambil menunggu koneksi
+sleep 20
 # Catat tanggal dan jam login terakhir,
 echo "Percobaan login terakhir:" | tee -a /tmp/last.login
 date | tee -a /tmp/last.login
