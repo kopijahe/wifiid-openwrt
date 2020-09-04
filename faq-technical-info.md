@@ -77,6 +77,8 @@ Jika masih ragu, bisa menggunakan script alternatif:
 
 :bulb: Gunakan script seri v2:
 
+![script-v2](pics/autologin/anti-ip-block.png)
+
 > Lakukan sesuai langkah-langkah di dokumen [autologin.md](autologin.md), sampai bagian B, langkah no. 15 diganti:
 >
 > 1. [autologin-v2.sh](scripts/autologin-v2.sh), dengan perintah: ```wget http://github.com/kopijahe/wifiid-openwrt/raw/master/scripts/autologin-v2.sh  -O /etc/autologin.sh```
