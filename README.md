@@ -16,7 +16,7 @@ Di sini saya akan membeberkan cara menangkap dan memancarkan kembali sinyal @wif
 
 > :loudspeaker: Jika tidak bisa mendapatkan router berbasis OpenWrt, bisa diganti dengan produk-produk TP-Link Pharos (seri CPE 210/220/510/520/605/610) dengan mengikuti langkah-langkah di dokumen [tplink-pharos.md](tplink-pharos.md).
 
-3. Punya akun @wifi.id (beli voucher fisik, atau lewat SMS ke 98108, lewat aplikasi wifi.id GO ([android](https://play.google.com/store/apps/details?id=com.telkom.wifiidgo), [iOS](https://apps.apple.com/id/app/wifi-id-go/id1198078195)) atau lewat online marketplace seperti [Tokopedia](https://www.tokopedia.com/streaming/), keterangan lebih lanjut bisa merujuk ke: https://wifi.id/beli-paket )
+3. Punya akun @wifi.id (beli voucher fisik, atau lewat SMS ke 98108, lewat aplikasi wifi.id GO ([android](https://play.google.com/store/apps/details?id=com.telkom.wifiidgo), [iOS](https://apps.apple.com/id/app/wifi-id-go/id1198078195)) atau lewat online marketplace seperti [Tokopedia](https://www.tokopedia.com/streaming/), keterangan lebih lanjut bisa merujuk ke: https://wifi.id/belivoucher )
 
 
 ### **Langkah-Langkah**
