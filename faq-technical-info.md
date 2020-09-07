@@ -43,12 +43,10 @@ Bila perintahnya tidak menghasilkan IP yang sesuai (misal tetap tidak bisa login
 
 :bulb: Aman-aman saja, karena tujuannya hanya mengunduh berkas [cek](https://github.com/kopijahe/periksakoneksi.kopijahe.my.id/blob/master/cek) lalu melihat apakah isinya benar "OK". Saya tidak mendapatkan/mengambil data apapun dari perangkat anda.
 
-Soal kenapa kok tidak mengecek ke tempat lain, karena untuk itu butuh paket tambahan (`wget`) yang ukurannya lumayan besar, jadi bisa memberatkan ke pengguna script dengan perangkat yang punya penyimpanan terbatas (misal router dengan ROM 4MB).
-
 Jika masih ragu, bisa menggunakan script alternatif:
 
 > 1. [autologin-firefox.sh](scripts/autologin-firefox.sh), script ini menggunakan sistem yang sama dengan script [autologin.sh](scripts/autologin.sh), hanya saja domainnya milik mozilla/firefox.
-> 2. [autologin-google.sh](scripts/autologin-google.sh), script ini mengecek ke domain yang sama dengan yang digunakan perangkat android untuk mengecek status koneksi internet. Syaratnya harus memasang paket ```wget``` dengan perintah ```opkg update && opkg install wget``` supaya tidak ada masalah.
+> 2. [autologin-google.sh](scripts/autologin-google.sh), script ini mengecek ke domain yang sama dengan yang digunakan perangkat android untuk mengecek status koneksi internet.
 
 <br><br>
 

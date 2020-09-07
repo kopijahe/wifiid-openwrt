@@ -102,8 +102,6 @@ Solusinya ada 2:
 > 1. [autologin-firefox.sh](scripts/autologin-firefox.sh), dengan perintah: ```wget http://github.com/kopijahe/wifiid-openwrt/raw/master/scripts/autologin-firefox.sh  -O /etc/autologin.sh```
 > 2. [autologin-google.sh](scripts/autologin-google.sh), dengan perintah: ```wget http://github.com/kopijahe/wifiid-openwrt/raw/master/scripts/autologin-google.sh -O /etc/autologin.sh```
 >
-> :warning: Jika menggunakan script alternatif google, harus sudah memasang paket tambahan ```wget``` dengan menggunakan perintah: ```opkg update && opkg install wget```
->
 > :warning: Jika menggunakan berkas script alternatif, **tidak perlu** disesuaikan namanya di langkah-langkah berikutnya.
 
 16. Atur supaya berkas ```autologin.sh``` bisa dijalankan dengan mengetikkan ```chmod +x /etc/autologin.sh```
