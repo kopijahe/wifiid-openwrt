@@ -103,6 +103,8 @@ Solusinya ada 2:
 > 2. [autologin-google.sh](scripts/autologin-google.sh), dengan perintah: ```wget http://github.com/kopijahe/wifiid-openwrt/raw/master/scripts/autologin-google.sh -O /etc/autologin.sh```
 >
 > :warning: Jika menggunakan berkas script alternatif, **tidak perlu** disesuaikan namanya di langkah-langkah berikutnya.
+>
+> :loudspeaker: Gagal ketika mengunduh script? Lihat solusinya [di sini](https://github.com/kopijahe/wifiid-openwrt/issues/3).
 
 16. Atur supaya berkas ```autologin.sh``` bisa dijalankan dengan mengetikkan ```chmod +x /etc/autologin.sh```
 
