@@ -15,7 +15,7 @@ while [ true ]; do
 # dengan batasan redirect 1 kali:
 # http://connectivitycheck.google.com/generate_204
 # dan simpan hasilnya di stdout supaya tidak memakan tempat penyimpanan
-status=$(curl --silent --max-redirs 1 -LI "http://connectivitycheck.gstatic.com/generate_204" | grep -o "204")
+status=$(curl --silent --max-redirs 1 --connect-timeout 10 -LI "http://connectivitycheck.gstatic.com/generate_204" | grep -o "204")
 # Jika respon dari server adalah "HTTP/1.1 204 No Content", maka:
 if [[ "$status" = "204" ]]; then
 # Beritahu pengguna bahwa sudah terkoneksi dengan Internet
