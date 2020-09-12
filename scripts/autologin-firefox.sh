@@ -14,7 +14,7 @@ while [ true ]; do
 # Tentukan variabel status dari hasil unduhan berkas
 # dari: http://detectportal.firefox.com/success.txt
 # dan simpan hasilnya di stdout
-status=$(wget -q --timeout 10 http://detectportal.firefox.com/success.txt -O -)
+status=$(curl --silent --max-redirs 1 --connect-timeout 10  "http://detectportal.firefox.com/success.txt")
 # Jika variabel status hasil unduhan tadi sama dengan "success", maka
 if [[ "$status" = "success" ]]; then
 # Beritahu pengguna bahwa sudah terkoneksi dengan Internet
