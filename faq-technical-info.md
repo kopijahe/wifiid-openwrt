@@ -79,9 +79,9 @@ Jika masih ragu, bisa menggunakan script alternatif:
 
 > Lakukan sesuai langkah-langkah di dokumen [autologin.md](autologin.md), sampai bagian B, langkah no. 15 diganti:
 >
-> 1. [autologin-v2.sh](scripts/autologin-v2.sh), dengan perintah: ```wget http://github.com/kopijahe/wifiid-openwrt/raw/master/scripts/autologin-v2.sh  -O /etc/autologin.sh```
-> 2. [autologin-firefox-v2.sh](scripts/autologin-firefox-v2.sh), dengan perintah: ```wget http://github.com/kopijahe/wifiid-openwrt/raw/master/scripts/autologin-firefox-v2.sh  -O /etc/autologin.sh```
-> 3. [autologin-google-v2.sh](scripts/autologin-google-v2.sh), dengan perintah: ```wget http://github.com/kopijahe/wifiid-openwrt/raw/master/scripts/autologin-google-v2.sh -O /etc/autologin.sh```
+> 1. [autologin-v2.sh](scripts/autologin-v2.sh), dengan perintah: ```curl https://raw.githubusercontent.com/kopijahe/wifiid-openwrt/master/scripts/autologin-v2.sh -o /etc/autologin.sh```
+> 2. [autologin-firefox-v2.sh](scripts/autologin-firefox-v2.sh), dengan perintah: ```curl https://raw.githubusercontent.com/kopijahe/wifiid-openwrt/master/scripts/autologin-firefox-v2.sh -o /etc/autologin.sh```
+> 3. [autologin-google-v2.sh](scripts/autologin-google-v2.sh), dengan perintah: ```curl https://raw.githubusercontent.com/kopijahe/wifiid-openwrt/master/scripts/autologin-google-v2.sh -o /etc/autologin.sh```
 >
 > :warning: script seri v2 tidak bisa digunakan jika perangkat autologin openwrt bukan penangkap langsung sinyal <span></span>@wifi.id (misal yang tidak bisa: Sinyal <span></span>@wifi.id ditangkap oleh TP-Link CPE210, lalu disebarkan lagi dengan Bolt 201, script autologin ada di Bolt 201).
 

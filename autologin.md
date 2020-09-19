@@ -94,13 +94,13 @@ Solusinya ada 2:
 
 ![login_file-7](pics/autologin/login_file-7.png)
 
-15. Unduh script autologin dengan menggunakan perintah: ```wget http://github.com/kopijahe/wifiid-openwrt/raw/master/scripts/autologin.sh -O /etc/autologin.sh```
+15. Unduh script autologin dengan menggunakan perintah: ```curl https://raw.githubusercontent.com/kopijahe/wifiid-openwrt/master/scripts/autologin.sh -o /etc/autologin.sh```
 
 ![login_file-8](pics/autologin/login_file-8.png)
 
 > :pushpin: Jika terdapat gangguan (misal: script mengulang-ulang login padahal sudah login) di berkas [autologin.sh](scripts/autologin.sh), bisa dicoba menggunakan berkas alternatif:
-> 1. [autologin-firefox.sh](scripts/autologin-firefox.sh), dengan perintah: ```wget http://github.com/kopijahe/wifiid-openwrt/raw/master/scripts/autologin-firefox.sh  -O /etc/autologin.sh```
-> 2. [autologin-google.sh](scripts/autologin-google.sh), dengan perintah: ```wget http://github.com/kopijahe/wifiid-openwrt/raw/master/scripts/autologin-google.sh -O /etc/autologin.sh```
+> 1. [autologin-firefox.sh](scripts/autologin-firefox.sh), dengan perintah: ```curl https://raw.githubusercontent.com/kopijahe/wifiid-openwrt/master/scripts/autologin-firefox.sh -o /etc/autologin.sh```
+> 2. [autologin-google.sh](scripts/autologin-google.sh), dengan perintah: ```curl https://raw.githubusercontent.com/kopijahe/wifiid-openwrt/master/scripts/autologin-google.sh -o /etc/autologin.sh```
 >
 > :warning: Jika menggunakan berkas script alternatif, **tidak perlu** disesuaikan namanya di langkah-langkah berikutnya.
 >
