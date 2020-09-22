@@ -31,7 +31,7 @@ Di sini saya akan membeberkan cara menangkap dan memancarkan kembali sinyal @wif
 
    ![interfaces](pics/02-interfaces.png)
 
-4. Scroll ke bagian **DHCP Server** di bawah, lalu tekan tab **Advanced Settings*
+4. Scroll ke bagian **DHCP Server** di bawah, lalu tekan tab **Advanced Settings**
 
 5. Masukkan `6,118.98.44.10,118.98.44.100` di bagian **DHCP-Options**
 
