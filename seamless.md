@@ -30,7 +30,7 @@ Pembelian akun seamless<span></span>@wifi.id hanya bisa dilakukan melalui aplika
 
 5. Buka tab **Installed Packages**
 
-6. Scroll ke bawah dan cari paket **wpad-basic** atau **wpad-mini**, lalu tekan tombol **remove** yang ada di sampingnya
+6. Scroll ke bawah dan cari paket **wpad-basic** atau **wpad-mini** atau **wpad-basic-wolfssl**, lalu tekan tombol **remove** yang ada di sampingnya
 
    ![remove-wpad-mini-basic](pics/14-remove-wpad-mini-basic.png)
 
