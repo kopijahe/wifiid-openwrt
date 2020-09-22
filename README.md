@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="https://github.com/kopijahe/wifiid-openwrt/blob/master/pics/header.png" alt="wifi.id ✖ OpenWrt" width="330">
+    <img src="https://github.com/kopijahe/wifiid-openwrt/blob/master/pics/header.svg" alt="wifi.id ✖ OpenWrt" width="330">
 </p>
 
 ### **Tutorial Untuk Menangkap dan Memancarkan Kembali Sinyal @wifi.id Menggunakan OpenWrt/LEDE**
