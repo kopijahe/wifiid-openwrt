@@ -1,3 +1,7 @@
+<p align="center">
+    <img src="https://github.com/kopijahe/wifiid-openwrt/blob/master/pics/header-pharos.svg" alt="wifi.id ✖ TP-Link Pharos" width="330">
+</p>
+
 ### **Tutorial Untuk Menangkap dan Memancarkan Kembali Sinyal @wifi.id Menggunakan TP-Link Pharos**
 
 Pengguna produk TP-Link berbasis Pharos (tipe CPE210/220, CPE510/520, CPE605 dan CPE610) juga bisa memanfaatkan sinyal @wifi.id untuk dipakai bersama.
