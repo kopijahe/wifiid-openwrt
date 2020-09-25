@@ -1,11 +1,6 @@
-### **Tutorial Login Otomatis di Jaringan @wifi.id**
+### **Tutorial Login Otomatis di Jaringan Venue WMS**
 
-Kesal harus bolak-balik login ketika memakai jaringan @wifi.id di rumah?
-
-Solusinya ada 2:
-
-1. Pakai jaringan seamless<span></span>@wifi.id (tidak semua pemancar yang bisa dipakai ada dan bisa sampai login)
-2. Pakai router berbasis openwrt dan script untuk login secara otomatis jika jaringan internet terdeteksi tidak tersambung
+Kesal harus bolak-balik login ketika memakai jaringan Venue WMS di rumah?
 
 ### **Persyaratan:**
 
@@ -19,7 +14,7 @@ Solusinya ada 2:
 
 ### **Langkah-Langkah**
 
-> :loudspeaker: Jika digunakan untuk autologin SSID venue WMS, maka bisa mengikuti langkah-langkah di dokumen [autologin-wms.md](autologin-wms.md)
+> :warning: Jika digunakan untuk autologin SSID venue WMS, maka bisa mengikuti langkah-langkah di dokumen [autologin-wms.md](autologin-wms.md)
 
 #### **A. Mengatur hostnames**
 1. Koneksikan perangkat (PC/laptop) ke router (biasanya [192.168.1.1](http://192.168.1.1))
@@ -53,15 +48,15 @@ Solusinya ada 2:
 
 3. Di halaman login, tekan tombol ```F12```, lalu buka tab **Network** di bagian samping kanan dan centang **Preserve log**
 
-![preserve-log](pics/autologin/01-chrome-preserve-log.png)
+![preserve-log](pics/wms-venue/01-chrome-preserve-log.png)
 
 4. Lakukan login seperti biasa
 
-5. Setelah login, di bagian kanan tadi carilah item berawalan **check-login.php** dengan scroll ke atas
+5. Setelah login, di bagian kanan tadi carilah item berawalan **quarantine.php** dengan scroll ke atas
 
-6. Klik kanan **check-login.php**, lalu pilih **Copy** -> **Copy as cURL (bash)**
+6. Klik kanan **quarantine.php**, lalu pilih **Copy** -> **Copy as cURL (bash)**
 
-![check-login](pics/autologin/02-check-login.png)
+![check-login](pics/wms-venue/02-check-login.png)
 
 7. Buka PuTTY, mulai koneksi **SSH** ke router (biasanya ```192.168.1.1```)
 
@@ -81,47 +76,60 @@ Solusinya ada 2:
 
 11. Paste hasil dari no. 6 dengan menekan tombol kanan mouse
 
-![login_file-4](pics/autologin/login_file-4.png)
+![login_file-4](pics/wms-venue/login_file-4.png)
 
 12. Hapus baris yang berisikan ```--compressed```
 
-![login_file-5](pics/autologin/login_file-5.png)
+![login_file-5](pics/wms-venue/login_file-5.png)
 
-13. Tekan tombol ```ESC``` lalu ketikkan ```:wq``` untuk menyimpan perubahan berkas
+13. Hapus akhiran ` \`
 
-![login_file-6](pics/autologin/login_file-6.png)
+![login_file-5a](pics/wms-venue/login_file-5a.png)
+![login_file-5b](pics/wms-venue/login_file-5b.png)
 
-14. Atur supaya berkas ```login_file.txt``` bisa dijalankan dengan mengetikkan ```chmod +x /etc/login_file.txt```
+ > :warning: Jika tidak dihapus, akan mengalami error ini: `/etc/autologin.sh: eval: line 1: syntax error: unterminated quote string`
+
+14. Ganti 4 karakter di bagian sebelum `%40freeMS` dengan `$randomid`
+
+![login_file-5a](pics/wms-venue/login_file-5c.png)
+![login_file-5b](pics/wms-venue/login_file-5d.png)
+
+
+15. Tekan tombol ```ESC``` lalu ketikkan ```:wq``` untuk menyimpan perubahan berkas
+
+![login_file-6](pics/wms-venue/login_file-6.png)
+
+16. Atur supaya berkas ```login_file.txt``` bisa dijalankan dengan mengetikkan ```chmod +x /etc/login_file.txt```
 
 ![login_file-7](pics/autologin/login_file-7.png)
 
-15. Unduh script autologin dengan menggunakan perintah: ```curl https://raw.githubusercontent.com/kopijahe/wifiid-openwrt/master/scripts/autologin.sh -o /etc/autologin.sh```
+16. Unduh script autologin dengan menggunakan perintah: ```curl https://raw.githubusercontent.com/kopijahe/wifiid-openwrt/master/scripts/autologin-wms.sh -o /etc/autologin.sh```
 
-![login_file-8](pics/autologin/login_file-8.png)
+![login_file-8](pics/wms-venue/login_file-8.png)
 
 > :pushpin: Jika terdapat gangguan (misal: script mengulang-ulang login padahal sudah login) di berkas [autologin.sh](scripts/autologin.sh), bisa dicoba menggunakan berkas alternatif:
-> 1. [autologin-firefox.sh](scripts/autologin-firefox.sh), dengan perintah: ```curl https://raw.githubusercontent.com/kopijahe/wifiid-openwrt/master/scripts/autologin-firefox.sh -o /etc/autologin.sh```
-> 2. [autologin-google.sh](scripts/autologin-google.sh), dengan perintah: ```curl https://raw.githubusercontent.com/kopijahe/wifiid-openwrt/master/scripts/autologin-google.sh -o /etc/autologin.sh```
+> 1. [autologin-firefox.sh](scripts/autologin-firefox.sh), dengan perintah: ```curl https://raw.githubusercontent.com/kopijahe/wifiid-openwrt/master/scripts/autologin-wms-firefox.sh -o /etc/autologin.sh```
+> 2. [autologin-google.sh](scripts/autologin-google.sh), dengan perintah: ```curl https://raw.githubusercontent.com/kopijahe/wifiid-openwrt/master/scripts/autologin-wms-google.sh -o /etc/autologin.sh```
 >
 > :warning: Jika menggunakan berkas script alternatif, **tidak perlu** disesuaikan namanya di langkah-langkah berikutnya.
 >
 > :loudspeaker: Gagal ketika mengunduh script? Lihat solusinya [di sini](https://github.com/kopijahe/wifiid-openwrt/issues/3).
 
-16. Atur supaya berkas ```autologin.sh``` bisa dijalankan dengan mengetikkan ```chmod +x /etc/autologin.sh```
+17. Atur supaya berkas ```autologin.sh``` bisa dijalankan dengan mengetikkan ```chmod +x /etc/autologin.sh```
 
 ![login_file-9](pics/autologin/login_file-9.png)
 
-17. Buka berkas ```/etc/rc.local``` dengan mengetikkan ```vi /etc/rc.local```
+18. Buka berkas ```/etc/rc.local``` dengan mengetikkan ```vi /etc/rc.local```
 
 ![vi-rc-local](pics/autologin/14-vi-rc-local.png)
 
-18. Tekan huruf ```i```, lalu tambahkan baris ```/bin/sh /etc/autologin.sh &``` di atas baris ```exit 0```
+19. Tekan huruf ```i```, lalu tambahkan baris ```/bin/sh /etc/autologin.sh &``` di atas baris ```exit 0```
 
 ![vi-rc-local-2](pics/autologin/15-vi-rc-local-2.png)
 
-19. Tekan tombol ```ESC``` lalu ketikkan ```:wq``` untuk menyimpan perubahan berkas
+20. Tekan tombol ```ESC``` lalu ketikkan ```:wq``` untuk menyimpan perubahan berkas
 
-20. Ketikkan ```sh /etc/rc.local``` untuk menjalankan script yang sudah kita racik, jika muncul tulisan ```Sudah terkoneksi ke Internet``` maka **anda sudah berhasil**.
+21. Ketikkan ```sh /etc/rc.local``` untuk menjalankan script yang sudah kita racik, jika muncul tulisan ```Sudah terkoneksi ke Internet``` maka **anda sudah berhasil**.
 
 ![sh-rc-local](pics/autologin/16-sh-rc-local.png)
 
