@@ -18,9 +18,6 @@ Solusinya ada 2:
 3. PuTTY (unduh dan pasang [dari situs ini](https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html))
 
 ### **Langkah-Langkah**
-
-> :loudspeaker: Jika digunakan untuk autologin SSID venue WMS, maka bisa mengikuti langkah-langkah di dokumen [autologin-wms.md](autologin-wms.md)
-
 #### **A. Mengatur hostnames**
 1. Koneksikan perangkat (PC/laptop) ke router (biasanya [192.168.1.1](http://192.168.1.1))
 
@@ -58,6 +55,8 @@ Solusinya ada 2:
 4. Lakukan login seperti biasa
 
 5. Setelah login, di bagian kanan tadi carilah item berawalan **check-login.php** dengan scroll ke atas
+
+> :warning: Jika digunakan untuk autologin SSID venue WMS, maka item yang dicari adalah **quarantine.php**
 
 6. Klik kanan **check-login.php**, lalu pilih **Copy** -> **Copy as cURL (bash)**
 
