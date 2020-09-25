@@ -135,7 +135,7 @@ Kesal harus bolak-balik login ketika memakai jaringan Venue WMS di rumah?
 
 ![result](pics/autologin/login_file-10.png)
 
-> Untuk kedepannya, jika voucher yang digunakan untuk login sudah habis/tidak berlaku, atau proses autologin sudah tidak lagi berjalan, maka hanya perlu mengulangi langkah nomor 9 sampai 14 saja.
+> Untuk kedepannya, jika username/password yang digunakan sudah diganti/tidak berlaku, atau proses autologin sudah tidak lagi berjalan, maka hanya perlu mengulangi langkah nomor 9 sampai 14 saja.
 
 <br><br>
 > :loudspeaker: **Masih ada pertanyaan lain?** Bisa merujuk ke dokumen [faq-technical-info.md](faq-technical-info.md)
