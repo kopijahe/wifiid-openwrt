@@ -14,8 +14,6 @@ Kesal harus bolak-balik login ketika memakai jaringan Venue WMS di rumah?
 
 ### **Langkah-Langkah**
 
-> :warning: Jika digunakan untuk autologin SSID venue WMS, maka bisa mengikuti langkah-langkah di dokumen [autologin-wms.md](autologin-wms.md)
-
 #### **A. Mengatur hostnames**
 1. Koneksikan perangkat (PC/laptop) ke router (biasanya [192.168.1.1](http://192.168.1.1))
 
