@@ -28,7 +28,7 @@ cp "$filelogintxt" "$loginwms"
 # Setelah username pengguna setiap kali login
 randomid=$(head -4 /dev/urandom | tr -dc "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" | head -c4)
 # Masukkan hasil randomid ke berkas sementara
-sed "s/kopijahe/$randomid/g" $loginwms
+sed -i "s/kopijahe/$randomid/g" $loginwms
 # Beri izin eksekusi berkas sementara
 chmod +x $loginwms
 # Catat tanggal dan jam login terakhir,
