@@ -48,6 +48,8 @@ Jika masih ragu, bisa menggunakan script alternatif:
 > 1. [autologin-firefox.sh](scripts/autologin-firefox.sh), script ini menggunakan sistem yang sama dengan script [autologin.sh](scripts/autologin.sh), hanya saja domainnya milik mozilla/firefox.
 > 2. [autologin-google.sh](scripts/autologin-google.sh), script ini mengecek ke domain yang sama dengan yang digunakan perangkat android untuk mengecek status koneksi internet.
 
+Penjelasan lebih lanjut mengenai cara kerja script, bisa merujuk ke dokumen [ini](scripts/README.md).
+
 <br><br>
 
 :question: _Bisakah autologin dipakai untuk 2 koneksi berbeda? Router saya bisa 2 frekuensi (2,4 GHz dan 5,8 Ghz), rencananya saya pakai 2 akun dan di loadbalance (misal pakai mwan di openwrt)..._
@@ -84,6 +86,8 @@ Jika masih ragu, bisa menggunakan script alternatif:
 > 3. [autologin-google-v2.sh](scripts/autologin-google-v2.sh), dengan perintah: ```curl https://raw.githubusercontent.com/kopijahe/wifiid-openwrt/master/scripts/autologin-google-v2.sh -o /etc/autologin.sh```
 >
 > :warning: script seri v2 tidak bisa digunakan jika perangkat autologin openwrt bukan penangkap langsung sinyal <span></span>@wifi.id (misal yang tidak bisa: Sinyal <span></span>@wifi.id ditangkap oleh TP-Link CPE210, lalu disebarkan lagi dengan Bolt 201, script autologin ada di Bolt 201).
+
+
 
 ### **Lain-lain**
 
