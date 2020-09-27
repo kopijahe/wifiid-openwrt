@@ -97,7 +97,7 @@ Kesal harus bolak-balik login ketika memakai jaringan Venue WMS di rumah?
 
 ![login_file-8](pics/wms-venue/login_file-8.png)
 
-> :pushpin: Jika terdapat gangguan (misal: script mengulang-ulang login padahal sudah login) di berkas [autologin-wms.sh](scripts/autologin.sh), bisa dicoba menggunakan berkas alternatif:
+> :pushpin: Jika terdapat gangguan (misal: script mengulang-ulang login padahal sudah login) di berkas [autologin-wms.sh](scripts/autologin-wms.sh), bisa dicoba menggunakan berkas alternatif:
 > 1. [autologin-wms-firefox.sh](scripts/autologin-wms-firefox.sh), dengan perintah: ```curl https://raw.githubusercontent.com/kopijahe/wifiid-openwrt/master/scripts/autologin-wms-firefox.sh -o /etc/autologin.sh```
 > 2. [autologin-wms-google.sh](scripts/autologin-wms-google.sh), dengan perintah: ```curl https://raw.githubusercontent.com/kopijahe/wifiid-openwrt/master/scripts/autologin-wms-google.sh -o /etc/autologin.sh```
 >
