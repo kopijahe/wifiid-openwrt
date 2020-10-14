@@ -12,7 +12,7 @@
 filelogintxt=/etc/login_file.txt
 # Tentukan lokasi berkas sementara
 loginwifi=/tmp/login_file.txt
-# Tentukan interface yang digunakan untuk menangkap sinyal WMS
+# Tentukan interface yang digunakan untuk menangkap sinyal wifi.id
 # Jika digunakan untuk load-balance, silahkan diganti 
 # Sesuai dengan interface yang digunakan (misal: wwan2)
 waninterface=wwan
