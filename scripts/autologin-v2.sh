@@ -47,7 +47,7 @@ date | tee -a /tmp/last.login
 # Catat pula status percobaan login terakhir
 echo "Status percobaan login terakhir:" | tee -a  /tmp/last.login
 # Dan lakukan login, serta catat semua hasilnya di berkas /tmp/last.login untuk pengecekan
-$loginwifi | tee -a /tmp/internet.status /tmp/last.login | logger
+$loginwifi | jsonfilter -e '@["message"]' | tee -a /tmp/internet.status /tmp/last.login | logger
 else
 # Jika IP tidak terblokir, maka:
 # Beritahu pengguna bahwa IP tidak terblokir
@@ -58,7 +58,7 @@ date | tee -a /tmp/last.login
 # Catat pula status percobaan login terakhir
 echo "Status percobaan login terakhir:" | tee -a  /tmp/last.login
 # Dan lakukan login, serta catat semua hasilnya di berkas /tmp/last.login untuk pengecekan
-$loginwifi | tee -a /tmp/internet.status /tmp/last.login | logger
+$loginwifi | jsonfilter -e '@["message"]' | tee -a /tmp/internet.status /tmp/last.login | logger
 fi
 # Istirahat selama 10 detik sebelum melakukan pengecekan lagi
 sleep 10
