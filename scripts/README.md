@@ -9,6 +9,8 @@ Berkas ini mengandung perintah yang diperlukan untuk mengulangi login menggunaka
 
 Berkas harus diberi izin eksekusi dengan perintah `chmod +x <nama file>` (biasanya: `chmod +x /etc/login_file.txt`) agar bisa dijalankan oleh sistem.
 
+Lalu berkas ini dibawa ke tempat sementara untuk diproses oleh script sebelum dijalankan untuk keperluan login kembali.
+
 ### autologin.sh
 
 Terdiri dari beberapa varian dan tipe, script akan mengecek kondisi jaringan terlebih dahulu ke server-server yang telah ditentukan, jika tidak terdeteksi adanya koneksi internet, baru akan dicoba untuk login kembali. Jadi tidak membombardir server login pihak hotspot (dalam ini <span></span>@wifi.id dan turunannya), yang bisa menyebabkan akun diblokir.
@@ -30,7 +32,7 @@ Sistem login Venue WMS berbeda dengan jaringan <span></span>@wifi.id, dimana sis
 
 Pertama kita buat 4 karakter huruf dan angka baru secara acak dari `/dev/urandom`, lalu kita masukkan ke berkas login_file.txt, akan tetapi jika dilakukan seperti ini, setiap kali script melakukan login kembali, 4 karakter tadi akan berubah, yang menyebabkan script tidak akan berjalan...
 
-Maka dari itu, saya atur supaya berkas asli dirubah saja 4 karakter tadi menjadi `kopijahe`, supaya selalu konsisten. Lalu berkas ini dibawa ke tempat sementara untuk diproses oleh script sebelum dijalankan untuk keperluan login kembali.
+Maka dari itu, saya atur supaya berkas asli dirubah saja 4 karakter tadi menjadi `kopijahe`, supaya selalu konsisten.
 
 ### Script v2
 
