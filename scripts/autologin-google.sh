@@ -9,10 +9,26 @@
 filelogintxt=/etc/login_file.txt
 # Tentukan lokasi berkas sementara
 loginwifi=/tmp/login_file.txt
-# Tentukan interface yang digunakan untuk menangkap sinyal wifi.id
-# Jika digunakan untuk load-balance, silahkan diganti 
+
+# Tentukan interface yang digunakan untuk menangkap sinyal wifi.id secara otomatis
+# Jika digunakan untuk load-balance, rubah baris di bawah menjadi LB=ON
+LB=OFF
+if [[ "$LB" = "OFF" ]]; then
+# Muat library network OpenWrt
+. /lib/functions/network.sh
+# Bersihkan cache terlebih dahulu
+network_flush_cache
+# Cari interface jaringan WAN yang digunakan
+# untuk koneksi ke jaringan wifi.id
+# dan simpan hasilnya di variabel waninterface
+network_find_wan waninterface
+else
+# Jika digunakan untuk load-balance,
+# Maka tentukan variabel waninterface secara manual
 # Sesuai dengan interface yang digunakan (misal: wwan2)
 waninterface=wwan
+fi
+
 # Tentukan lokasi perangkat radio waninterface (misal: wlan0 atau wlan1)
 radiointerface=$(ifstatus $waninterface | jsonfilter -e '@["device"]')
 
