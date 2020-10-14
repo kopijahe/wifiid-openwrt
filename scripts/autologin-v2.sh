@@ -6,11 +6,18 @@
 # Varian ini juga mengecek apakah IP terblokir
 # atau tidak, agar proses autologin tetap berjalan mulus
 #
-# Tentukan variabel loginwifi dari berkas /etc/login_file.txt
+# Tentukan lokasi berkas login_file.txt
 # Jangan lupa untuk berikan izin eksekusi berkas dengan perintah:
 # chmod +x /etc/login_file.txt
-
-loginwifi=/etc/login_file.txt
+filelogintxt=/etc/login_file.txt
+# Tentukan lokasi berkas sementara
+loginwifi=/tmp/login_file.txt
+# Tentukan interface yang digunakan untuk menangkap sinyal WMS
+# Jika digunakan untuk load-balance, silahkan diganti 
+# Sesuai dengan interface yang digunakan (misal: wwan2)
+waninterface=wwan
+# Tentukan lokasi perangkat radio waninterface (misal: wlan0 atau wlan1)
+radiointerface=$(ifstatus $waninterface | jsonfilter -e '@["device"]')
 
 # Selama script berjalan, lakukan hal ini:
 while [ true ]; do
@@ -24,7 +31,7 @@ ipblocked=$(cat /tmp/last.login | grep -o "Blocked IP")
 # Tentukan variabel status dari hasil unduhan berkas
 # dari: http://periksakoneksi.kopijahe.my.id/cek
 # dan simpan hasilnya di stdout
-status=$(curl --silent --max-redirs 1 --connect-timeout 10  "http://periksakoneksi.kopijahe.my.id/cek")
+status=$(curl --interface $radiointerface --silent --max-redirs 1 --connect-timeout 10  "http://periksakoneksi.kopijahe.my.id/cek")
 # Jika variabel status hasil unduhan tadi sama dengan "OK", maka
 if [[ "$status" = "OK" ]]; then
 # Beritahu pengguna bahwa sudah terkoneksi dengan Internet
@@ -37,10 +44,18 @@ elif [[ "$ipblocked" = "Blocked IP" ]]; then
 # Jika terblokir, maka:
 # Beritahu pengguna bahwa IP terblokir
 echo "Status IP: Terblokir" | tee /tmp/last.login
+# Cari tahu PID dari proses udhcpc koneksi yang terblokir
+udhcpcpid=$(cat /var/run/udhcpc-$radiointerface.pid)
 # Dan minta penggantian IP ke server
-killall -SIGUSR2 udhcpc && ifup wwan
+kill -SIGUSR2 $udhcpcpid && ifup $waninterface
 # Istirahat selama 20 detik sambil menunggu koneksi
 sleep 20
+# Gandakan berkas login_file.txt ke lokasi berkas sementara
+cp $filelogintxt $loginwifi
+# Sesuaikan interface yang akan digunakan dengan variable radiointerface
+sed -i "s/curl/curl --interface $radiointerface/g" $loginwifi
+# Beri izin eksekusi berkas sementara
+chmod +x $loginwifi
 # Catat tanggal dan jam login terakhir,
 echo "Percobaan login terakhir:" | tee -a /tmp/last.login
 date | tee -a /tmp/last.login
@@ -52,6 +67,12 @@ else
 # Jika IP tidak terblokir, maka:
 # Beritahu pengguna bahwa IP tidak terblokir
 echo "Status IP: Tidak terblokir" | tee /tmp/last.login
+# Gandakan berkas login_file.txt ke lokasi berkas sementara
+cp $filelogintxt $loginwifi
+# Sesuaikan interface yang akan digunakan dengan variable radiointerface
+sed -i "s/curl/curl --interface $radiointerface/g" $loginwifi
+# Beri izin eksekusi berkas sementara
+chmod +x $loginwifi
 # Catat tanggal dan jam login terakhir,
 echo "Percobaan login terakhir:" | tee -a /tmp/last.login
 date | tee -a /tmp/last.login

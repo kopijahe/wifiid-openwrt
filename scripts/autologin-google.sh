@@ -3,11 +3,18 @@
 # Script untuk login otomatis di jaringan wifi.id
 # Oleh: KopiJahe (https://github.com/kopijahe)
 #
-# Tentukan variabel loginwifi dari berkas /etc/login_file.txt
+# Tentukan lokasi berkas login_file.txt
 # Jangan lupa untuk berikan izin eksekusi berkas dengan perintah:
 # chmod +x /etc/login_file.txt
-
-loginwifi=/etc/login_file.txt
+filelogintxt=/etc/login_file.txt
+# Tentukan lokasi berkas sementara
+loginwifi=/tmp/login_file.txt
+# Tentukan interface yang digunakan untuk menangkap sinyal WMS
+# Jika digunakan untuk load-balance, silahkan diganti 
+# Sesuai dengan interface yang digunakan (misal: wwan2)
+waninterface=wwan
+# Tentukan lokasi perangkat radio waninterface (misal: wlan0 atau wlan1)
+radiointerface=$(ifstatus $waninterface | jsonfilter -e '@["device"]')
 
 # Selama script berjalan, lakukan hal ini:
 while [ true ]; do
@@ -15,7 +22,7 @@ while [ true ]; do
 # dengan batasan redirect 1 kali:
 # http://connectivitycheck.google.com/generate_204
 # dan simpan hasilnya di stdout supaya tidak memakan tempat penyimpanan
-status=$(curl --silent --max-redirs 1 --connect-timeout 10 -LI "http://connectivitycheck.gstatic.com/generate_204" | grep -o "204")
+status=$(curl --interface $radiointerface --silent --max-redirs 1 --connect-timeout 10 -LI "http://connectivitycheck.gstatic.com/generate_204" | grep -o "204")
 # Jika respon dari server adalah "HTTP/1.1 204 No Content", maka:
 if [[ "$status" = "204" ]]; then
 # Beritahu pengguna bahwa sudah terkoneksi dengan Internet
@@ -23,6 +30,12 @@ if [[ "$status" = "204" ]]; then
 echo "Sudah terkoneksi dengan Internet" | tee /tmp/internet.status
 # Jika terdapat error (kode bukan 0), berarti tidak terkoneksi dengan Internet, maka:
 else
+# Gandakan berkas login_file.txt ke lokasi berkas sementara
+cp $filelogintxt $loginwifi
+# Sesuaikan interface yang akan digunakan dengan variable radiointerface
+sed -i "s/curl/curl --interface $radiointerface/g" $loginwifi
+# Beri izin eksekusi berkas sementara
+chmod +x $loginwifi
 # Catat tanggal dan jam login terakhir,
 echo "Percobaan login terakhir:" | tee /tmp/last.login
 date | tee -a /tmp/last.login
