@@ -42,6 +42,7 @@ if [[ "$status" = "success" ]]; then
 # Dan simpan hasilnya di /tmp/internet.status.wms untuk pengecekan
 echo "Sudah terkoneksi dengan Internet" | tee /tmp/internet.status.wms
 # Jika hasilnya tidak sama, berarti tidak terkoneksi dengan Internet, maka:
+else
 # Gandakan berkas login_file.txt ke lokasi berkas sementara
 cp "$filelogintxt" "$loginwms"
 # Buat variabel randomid yang terdiri dari 4 karakter angka dan huruf acak
