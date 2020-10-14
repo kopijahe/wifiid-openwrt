@@ -85,15 +85,20 @@ Kesal harus bolak-balik login ketika memakai jaringan Venue WMS di rumah?
 ![login_file-5a](pics/wms-venue/login_file-5a.png)
 ![login_file-5b](pics/wms-venue/login_file-5b.png)
 
-14. Tekan tombol ```ESC``` lalu ketikkan ```:wq``` untuk menyimpan perubahan berkas
+14. Ganti nilai alamat IP di bagian atas (setelah ```ipc=```) dengan `iprouter`
+
+![login_file-5c](pics/wms-venue/login_file-5c.png)
+![login_file-5d](pics/wms-venue/login_file-5d.png)
+
+15. Tekan tombol ```ESC``` lalu ketikkan ```:wq``` untuk menyimpan perubahan berkas
 
 ![login_file-6](pics/wms-venue/login_file-6.png)
 
-15. Atur supaya berkas ```login_file.txt``` bisa dijalankan dengan mengetikkan ```chmod +x /etc/login_file.txt```
+16. Atur supaya berkas ```login_file.txt``` bisa dijalankan dengan mengetikkan ```chmod +x /etc/login_file.txt```
 
 ![login_file-7](pics/autologin/login_file-7.png)
 
-16. Unduh script autologin dengan menggunakan perintah: ```curl https://raw.githubusercontent.com/kopijahe/wifiid-openwrt/master/scripts/autologin-wms.sh -o /etc/autologin.sh```
+17. Unduh script autologin dengan menggunakan perintah: ```curl https://raw.githubusercontent.com/kopijahe/wifiid-openwrt/master/scripts/autologin-wms.sh -o /etc/autologin.sh```
 
 ![login_file-8](pics/wms-venue/login_file-8.png)
 
@@ -105,21 +110,21 @@ Kesal harus bolak-balik login ketika memakai jaringan Venue WMS di rumah?
 >
 > :loudspeaker: Gagal ketika mengunduh script? Lihat solusinya [di sini](https://github.com/kopijahe/wifiid-openwrt/issues/3).
 
-17. Atur supaya berkas ```autologin.sh``` bisa dijalankan dengan mengetikkan ```chmod +x /etc/autologin.sh```
+18. Atur supaya berkas ```autologin.sh``` bisa dijalankan dengan mengetikkan ```chmod +x /etc/autologin.sh```
 
 ![login_file-9](pics/autologin/login_file-9.png)
 
-18. Buka berkas ```/etc/rc.local``` dengan mengetikkan ```vi /etc/rc.local```
+19. Buka berkas ```/etc/rc.local``` dengan mengetikkan ```vi /etc/rc.local```
 
 ![vi-rc-local](pics/autologin/14-vi-rc-local.png)
 
-19. Tekan huruf ```i```, lalu tambahkan baris ```/bin/sh /etc/autologin.sh &``` di atas baris ```exit 0```
+20. Tekan huruf ```i```, lalu tambahkan baris ```/bin/sh /etc/autologin.sh &``` di atas baris ```exit 0```
 
 ![vi-rc-local-2](pics/autologin/15-vi-rc-local-2.png)
 
-20. Tekan tombol ```ESC``` lalu ketikkan ```:wq``` untuk menyimpan perubahan berkas
+21. Tekan tombol ```ESC``` lalu ketikkan ```:wq``` untuk menyimpan perubahan berkas
 
-21. Ketikkan ```sh /etc/rc.local``` untuk menjalankan script yang sudah kita racik, jika muncul tulisan ```Sudah terkoneksi ke Internet``` maka **anda sudah berhasil**.
+22. Ketikkan ```sh /etc/rc.local``` untuk menjalankan script yang sudah kita racik, jika muncul tulisan ```Sudah terkoneksi ke Internet``` maka **anda sudah berhasil**.
 
 ![sh-rc-local](pics/autologin/16-sh-rc-local.png)
 
