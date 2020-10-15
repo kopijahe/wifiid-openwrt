@@ -24,7 +24,7 @@ Berhubung tidak semua pemancar <span></span>@wifi.id bisa digunakan, silahkan co
 Tutorial bergambar dari awal sampai terkoneksi ke jaringan <span></span>@wifi.id menggunakan router berbasis OpenWrt/LEDE.  
 Router banyak dijual yang sudah terpasang OpenWrt di marketplace online ([Tokopedia](https://www.tokopedia.com/search?st=product&q=openwrt), [BukaLapak](https://www.bukalapak.com/products?search%5Bkeywords%5D=openwrt), [Shopee](https://shopee.co.id/search?keyword=openwrt)), daftar perangkat selengkapnya bisa lihat [di sini](http://wiki.openwrt.org/toh/start)).  
 Karena proses pemasangan firmware OpenWrt berbeda antara satu perangkat dan lainnya, jadi tidak saya bahas di sini.  
-> :loudspeaker: Jika menggunakan versi SNAPSHOT, paket tambahan yang dibutuhkan hanya **luci** (dan **wpad** jika ingin terkoneksi dengan seamless<span></span>@wifi.id).
+> :loudspeaker: Jika menggunakan versi SNAPSHOT, paket tambahan yang dibutuhkan hanya **luci** (dan **wpad** jika ingin terkoneksi dengan seamless<span></span>@wifi.id). Jika belum ada koneksi internet sama-sekali dan tetap ingin terkoneksi dengan jaringan <span></span>@wifi.id, bisa membaca [tutorial ini](https://blog.kopijahe.my.id/posts/tutorial-openwrt-ssh/) tanpa perlu memasang **luci** terlebih dahulu.
 
 * [Tutorial seamless<span></span>@wifi.id](seamless.md)  
 Kelebihan sinyal seamless<span></span>@wifi.id ketimbang sinyal @wifi.id lainnya adalah tidak perlu login ulang dalam selang waktu tertentu atau jika tidak dipakai dalam waktu tertentu.  
