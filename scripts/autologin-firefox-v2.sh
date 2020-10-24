@@ -55,6 +55,30 @@ if [[ "$status" = "success" ]]; then
 echo "Sudah terkoneksi dengan Internet" | tee /tmp/internet.status
 # Jika hasilnya tidak sama, berarti tidak terkoneksi dengan Internet, maka:
 #
+# Cek dulu apakah hasil unduhan kosong?
+elif [[ "$status" = "" ]]; then
+# Beritahu pengguna bahwa hasil download kosong
+echo "Hasil unduhan kosong" | tee /tmp/last.login
+# Cari tahu PID dari proses udhcpc koneksi yang terblokir
+udhcpcpid=$(cat /var/run/udhcpc-$radiointerface.pid)
+# Dan minta penggantian IP ke server
+kill -SIGUSR2 $udhcpcpid && ifup $waninterface
+# Istirahat selama 20 detik sambil menunggu koneksi
+sleep 20
+# Gandakan berkas login_file.txt ke lokasi berkas sementara
+cp $filelogintxt $loginwifi
+# Sesuaikan interface yang akan digunakan dengan variable radiointerface
+sed -i "s/curl/curl --interface $radiointerface/g" $loginwifi
+# Beri izin eksekusi berkas sementara
+chmod +x $loginwifi
+# Catat tanggal dan jam login terakhir,
+echo "Percobaan login terakhir:" | tee -a /tmp/last.login
+date | tee -a /tmp/last.login
+# Catat pula status percobaan login terakhir
+echo "Status percobaan login terakhir:" | tee -a  /tmp/last.login
+# Dan lakukan login, serta catat semua hasilnya di berkas /tmp/last.login untuk pengecekan
+$loginwifi | jsonfilter -e '@["message"]' | tee -a /tmp/internet.status /tmp/last.login | logger
+# Jika hasil unduhan tidak kosong, maka:
 # Cek terlebih dahulu apakah IP terblokir?
 elif [[ "$ipblocked" = "Blocked IP" ]]; then
 # Jika terblokir, maka:
