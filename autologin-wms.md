@@ -130,7 +130,9 @@ Kesal harus bolak-balik login ketika memakai jaringan Venue WMS di rumah?
 
 ![result](pics/autologin/login_file-10.png)
 
-> Untuk kedepannya, jika username/password yang digunakan sudah diganti/tidak berlaku, atau proses autologin sudah tidak lagi berjalan, maka hanya perlu mengulangi langkah nomor 9 sampai 15 saja.
+> Untuk kedepannya, jika username/password yang digunakan sudah diganti/tidak berlaku, atau proses autologin sudah tidak lagi berjalan, maka hanya perlu memperbarui berkas login_file.txt saja.
+
+> :warning: Jika script tidak berjalan setelah router sempat mati/reboot, bisa lihat [pemecahan masalahnya di sini](https://github.com/kopijahe/wifiid-openwrt/issues/4).
 
 <br><br>
 > :loudspeaker: **Masih ada pertanyaan lain?** Bisa merujuk ke dokumen [faq-technical-info.md](faq-technical-info.md)

@@ -33,6 +33,12 @@ Bila perintahnya tidak menghasilkan IP yang sesuai (misal tetap tidak bisa login
 
 ### **Autologin**
 
+:question: _Pas awal pakai script, bisa jalan sih, berhari-hari juga tidak ada masalah. Tapi begitu padam listrik, atau router saya reboot, script tidak jalan lagi, gimana?_
+
+:bulb: Silahkan mengecek [pemecahan masalahnya di sini](https://github.com/kopijahe/wifiid-openwrt/issues/4).
+
+<br><br>
+
 :question: _Saya lihat di script itu ada jeda pengecekan setiap 10 detik, kenapa tidak dibikin lebih pendek, misalnya 1 detik saja? Supaya kalau terputus pas lagi main game ga nunggu lama-lama..._
 
 :bulb: Biasanya kalau terlalu cepat dalam autologin, akan mendapat status \[Ban IP\] atau \[IP Blocked\] yang menyebabkan gagalnya autologin dan juga kemungkinan turunnya kecepatan internet.
