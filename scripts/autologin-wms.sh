@@ -2,7 +2,7 @@
 #
 # Script untuk login otomatis di jaringan venue WMS
 # Oleh: KopiJahe (https://github.com/kopijahe)
-#
+
 # Tentukan lokasi berkas login_file.txt
 filelogintxt=/etc/login_file.txt
 # Tentukan lokasi berkas sementara

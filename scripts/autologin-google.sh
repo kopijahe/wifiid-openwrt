@@ -2,7 +2,7 @@
 #
 # Script untuk login otomatis di jaringan wifi.id
 # Oleh: KopiJahe (https://github.com/kopijahe)
-#
+
 # Tentukan lokasi berkas login_file.txt
 # Jangan lupa untuk berikan izin eksekusi berkas dengan perintah:
 # chmod +x /etc/login_file.txt

@@ -2,10 +2,10 @@
 #
 # Script untuk login otomatis di jaringan wifi.id
 # Oleh: KopiJahe (https://github.com/kopijahe)
-#
+
 # Varian ini juga mengecek apakah IP terblokir
 # atau tidak, agar proses autologin tetap berjalan mulus
-#
+
 # Tentukan lokasi berkas login_file.txt
 # Jangan lupa untuk berikan izin eksekusi berkas dengan perintah:
 # chmod +x /etc/login_file.txt
