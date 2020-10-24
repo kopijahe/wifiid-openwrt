@@ -12,6 +12,8 @@ Kesal harus bolak-balik login ketika memakai jaringan Venue WMS di rumah?
 
 3. PuTTY (unduh dan pasang [dari situs ini](https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html))
 
+> :loudspeaker: Untuk autologin di jaringan <span></span>@wifi.id (bukan WMS/Venue), bisa melihat dokumen [autologin.md](autologin.md).
+
 ### **Langkah-Langkah**
 
 #### **A. Mengatur hostnames**
