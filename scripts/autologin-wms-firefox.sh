@@ -33,7 +33,7 @@ radiointerface=$(ifstatus $waninterface | jsonfilter -e '@["device"]')
 # Selama script berjalan, lakukan hal ini:
 while [ true ]; do
 # Tentukan variabel status dari hasil unduhan berkas
-# dari: http://periksakoneksi.kopijahe.my.id/cek
+# dari: http://detectportal.firefox.com/success.txt
 # dan simpan hasilnya di stdout
 status=$(curl --interface $radiointerface --silent --max-redirs 1 --connect-timeout 10  "http://detectportal.firefox.com/success.txt")
 # Jika variabel status hasil unduhan tadi sama dengan "success", maka
