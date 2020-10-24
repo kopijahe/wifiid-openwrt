@@ -90,6 +90,9 @@ Penjelasan lebih lanjut mengenai cara kerja script, bisa merujuk ke dokumen [ini
 > 1. [autologin-v2.sh](scripts/autologin-v2.sh), dengan perintah: ```curl https://raw.githubusercontent.com/kopijahe/wifiid-openwrt/master/scripts/autologin-v2.sh -o /etc/autologin.sh```
 > 2. [autologin-firefox-v2.sh](scripts/autologin-firefox-v2.sh), dengan perintah: ```curl https://raw.githubusercontent.com/kopijahe/wifiid-openwrt/master/scripts/autologin-firefox-v2.sh -o /etc/autologin.sh```
 > 3. [autologin-google-v2.sh](scripts/autologin-google-v2.sh), dengan perintah: ```curl https://raw.githubusercontent.com/kopijahe/wifiid-openwrt/master/scripts/autologin-google-v2.sh -o /etc/autologin.sh```
+> 4. [autologin-wms-v2.sh](scripts/autologin-v2.sh), dengan perintah: ```curl https://raw.githubusercontent.com/kopijahe/wifiid-openwrt/master/scripts/autologin-wms-v2.sh -o /etc/autologin.sh```
+> 5. [autologin-wms-firefox-v2.sh](scripts/autologin-firefox-v2.sh), dengan perintah: ```curl https://raw.githubusercontent.com/kopijahe/wifiid-openwrt/master/scripts/autologin-wms-firefox-v2.sh -o /etc/autologin.sh```
+> 6. [autologin-wms-google-v2.sh](scripts/autologin-google-v2.sh), dengan perintah: ```curl https://raw.githubusercontent.com/kopijahe/wifiid-openwrt/master/scripts/autologin-wms-google-v2.sh -o /etc/autologin.sh```
 >
 > :warning: script seri v2 tidak bisa digunakan jika perangkat autologin openwrt bukan penangkap langsung sinyal <span></span>@wifi.id (misal yang tidak bisa: Sinyal <span></span>@wifi.id ditangkap oleh TP-Link CPE210, lalu disebarkan lagi dengan Bolt 201, script autologin ada di Bolt 201).
 
