@@ -62,6 +62,8 @@ kill -SIGUSR2 $udhcpcpid && ifup $waninterface
 sleep 20
 # Gandakan berkas login_file.txt ke lokasi berkas sementara
 cp $filelogintxt $loginwms
+#Buat variabel iprouter dengan mengambil ip terbaru dari variabel waninterface
+iprouter=$(ifstatus $waninterface |  jsonfilter -e '@["ipv4-address"][0].address')
 # Sesuaikan alamat IP dengan versi terbaru dari variabel iprouter
 sed -i "s/iprouter/$iprouter/g" $loginwms
 # Sesuaikan interface yang akan digunakan dengan variable radiointerface
