@@ -81,7 +81,7 @@ $loginwwms | jsonfilter -e '@["message"]' | tee -a /tmp/internet.status /tmp/las
 # Cek terlebih dahulu apakah IP terblokir?
 else
 # Gandakan berkas login_file.txt ke lokasi berkas sementara
-cp "$filelogintxt" "$loginwms"
+cp $filelogintxt $loginwms
 # Buat variabel randomid yang terdiri dari 4 karakter angka dan huruf acak
 # Hal ini diperlukan karena sistem login WMS menambahkan 4 karakter acak
 # Setelah username pengguna setiap kali login
