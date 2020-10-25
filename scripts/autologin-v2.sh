@@ -103,9 +103,6 @@ echo "Status percobaan login terakhir:" | tee -a  /tmp/last.login
 # Dan lakukan login, serta catat semua hasilnya di berkas /tmp/last.login untuk pengecekan
 $loginwifi | jsonfilter -e '@["message"]' | tee -a /tmp/internet.status /tmp/last.login | logger
 else
-# Jika IP tidak terblokir, maka:
-# Beritahu pengguna bahwa IP tidak terblokir
-echo "Status IP: Tidak terblokir" | tee /tmp/last.login
 # Gandakan berkas login_file.txt ke lokasi berkas sementara
 cp $filelogintxt $loginwifi
 # Sesuaikan interface yang akan digunakan dengan variable radiointerface

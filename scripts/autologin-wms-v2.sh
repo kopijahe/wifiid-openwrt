@@ -48,8 +48,12 @@ if [[ "$status" = "OK" ]]; then
 # Dan simpan hasilnya di /tmp/internet.status.wms untuk pengecekan
 echo "WMS sudah terkoneksi dengan Internet" | tee /tmp/internet.status.wms
 # Jika hasilnya tidak sama, berarti tidak terkoneksi dengan Internet, maka:
-# Cek terlebih dahulu apakah IP terblokir?
-elif [[ "$gagallogin" = "Gagal Login" ]]; then
+# Cek dulu apakah hasil unduhan kosong ("koneksi bengong") ataukah ada gagal login?
+elif [[ "$status" = "" ]] || [[ "$gagallogin" = "Gagal Login" ]]; then
+# Beritahu koneksi dengan Internet terputus
+echo "Koneksi dengan Internet terputus" | tee /tmp/last.login
+# Dan mulai proses penggantian alamat IP
+echo "Minta penggantian alamat IP ke server" | tee /tmp/last.login
 # Jika terblokir, maka:
 # Beritahu pengguna bahwa IP terblokir
 echo "Gagal Login" | tee /tmp/last.login.wms

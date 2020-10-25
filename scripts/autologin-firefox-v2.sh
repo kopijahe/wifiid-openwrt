@@ -54,11 +54,12 @@ if [[ "$status" = "success" ]]; then
 # Dan simpan hasilnya di /tmp/internet.status untuk pengecekan
 echo "Sudah terkoneksi dengan Internet" | tee /tmp/internet.status
 # Jika hasilnya tidak sama, berarti tidak terkoneksi dengan Internet, maka:
-#
-# Cek dulu apakah hasil unduhan kosong?
-elif [[ "$status" = "" ]]; then
-# Beritahu pengguna bahwa hasil download kosong
-echo "Hasil unduhan kosong" | tee /tmp/last.login
+# Cek dulu apakah hasil unduhan kosong ("koneksi bengong") ataukah IP terblokir?
+elif [[ "$status" = "" ]] || [[ "$ipblocked" = "Blocked IP" ]]; then
+# Beritahu koneksi dengan Internet terputus
+echo "Koneksi dengan Internet terputus" | tee /tmp/last.login
+# Dan mulai proses penggantian alamat IP
+echo "Minta penggantian alamat IP ke server" | tee /tmp/last.login
 # Cari tahu PID dari proses udhcpc koneksi yang terblokir
 udhcpcpid=$(cat /var/run/udhcpc-$radiointerface.pid)
 # Dan minta penggantian IP ke server
@@ -80,33 +81,7 @@ echo "Status percobaan login terakhir:" | tee -a  /tmp/last.login
 $loginwifi | jsonfilter -e '@["message"]' | tee -a /tmp/internet.status /tmp/last.login | logger
 # Jika hasil unduhan tidak kosong, maka:
 # Cek terlebih dahulu apakah IP terblokir?
-elif [[ "$ipblocked" = "Blocked IP" ]]; then
-# Jika terblokir, maka:
-# Beritahu pengguna bahwa IP terblokir
-echo "Status IP: Terblokir" | tee /tmp/last.login
-# Cari tahu PID dari proses udhcpc koneksi yang terblokir
-udhcpcpid=$(cat /var/run/udhcpc-$radiointerface.pid)
-# Dan minta penggantian IP ke server
-kill -SIGUSR2 $udhcpcpid && ifup $waninterface
-# Istirahat selama 20 detik sambil menunggu koneksi
-sleep 20
-# Gandakan berkas login_file.txt ke lokasi berkas sementara
-cp $filelogintxt $loginwifi
-# Sesuaikan interface yang akan digunakan dengan variable radiointerface
-sed -i "s/curl/curl --interface $radiointerface/g" $loginwifi
-# Beri izin eksekusi berkas sementara
-chmod +x $loginwifi
-# Catat tanggal dan jam login terakhir,
-echo "Percobaan login terakhir:" | tee -a /tmp/last.login
-date | tee -a /tmp/last.login
-# Catat pula status percobaan login terakhir
-echo "Status percobaan login terakhir:" | tee -a  /tmp/last.login
-# Dan lakukan login, serta catat semua hasilnya di berkas /tmp/last.login untuk pengecekan
-$loginwifi | jsonfilter -e '@["message"]' | tee -a /tmp/internet.status /tmp/last.login | logger
 else
-# Jika IP tidak terblokir, maka:
-# Beritahu pengguna bahwa IP tidak terblokir
-echo "Status IP: Tidak terblokir" | tee /tmp/last.login
 # Gandakan berkas login_file.txt ke lokasi berkas sementara
 cp $filelogintxt $loginwifi
 # Sesuaikan interface yang akan digunakan dengan variable radiointerface
