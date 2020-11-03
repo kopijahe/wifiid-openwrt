@@ -6,14 +6,35 @@
 # Varian ini juga mengecek apakah IP terblokir
 # atau tidak, agar proses autologin tetap berjalan mulus
 
-# Tentukan lokasi berkas login_file.txt
-filelogintxt=/etc/login_file.txt
-# Tentukan lokasi berkas sementara
-loginwms=/tmp/login_file.txt
+# Jika digunakan untuk Load-Balance,
+# bagian di bawah baris ini bisa diubah sesuai kebutuhan
+# ===================================================
 
-# Tentukan interface yang digunakan untuk menangkap sinyal WMS secara otomatis
 # Jika digunakan untuk load-balance, rubah baris di bawah menjadi LB=ON
 LB=OFF
+
+# Tentukan lokasi berkas login_file.txt
+# Jangan lupa untuk berikan izin eksekusi berkas dengan perintah:
+# chmod +x /etc/login_file.txt
+filelogintxt=/etc/login_file.txt
+# Tentukan lokasi berkas sementara
+loginwifi=/tmp/login_file.txt
+
+# Jika menggunakan 2 script autologin
+# Ganti nama berkas login_file.txt di 2 variabel
+# Di atas untuk menghindari konflik
+
+# Dan tentukan interface yang digunakan untuk script
+# Misal: wwan1, wwan2
+lbinterface=wwan
+
+# =================================================
+# Bagian di bawah baris ini tidak perlu diubah-ubah
+
+# Selama script berjalan, lakukan hal ini:
+while [ true ]; do
+
+# Tentukan interface yang digunakan untuk menangkap sinyal wifi.id secara otomatis
 if [[ "$LB" = "OFF" ]]; then
 # Muat library network OpenWrt
 . /lib/functions/network.sh
@@ -26,18 +47,17 @@ network_find_wan waninterface
 else
 # Jika digunakan untuk load-balance,
 # Maka tentukan variabel waninterface secara manual
-# Sesuai dengan interface yang digunakan (misal: wwan2)
-waninterface=wwan2
+# Sesuai dengan pengaturan variabel LBInterface
+waninterface=$lbinterface
 fi
 
 # Tentukan lokasi perangkat radio waninterface (misal: wlan0 atau wlan1)
 radiointerface=$(ifstatus $waninterface | jsonfilter -e '@["device"]')
 
-# Selama script berjalan, lakukan hal ini:
-while [ true ]; do
 # Tentukan variabel gagallogin
 # untuk berjaga-jaga jika gagal login
 gagallogin=$(cat /tmp/last.login.wms | grep -o "Gagal Login")
+
 # Cek apakah berkas ini tersedia atau tidak
 # dengan batasan redirect 1 kali:
 # http://connectivitycheck.google.com/generate_204
