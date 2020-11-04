@@ -46,3 +46,11 @@ Ingin mengatur ulang jaringan Venue WMS dengan OpenWrt (misal untuk komputer kas
 * [Informasi teknis dan pertanyaan yang mungkin diajukan](faq-technical-info.md)  
 Ada kendala dalam menerapkan tutorial di atas? Bisa merujuk ke dokumen ini untuk beberapa solusinya.  
 Pertanyaan anda belum tercantum di sini? Bisa langsung bertanya di [tab Issues](https://github.com/kopijahe/wifiid-openwrt/issues) dengan menekan tombol hijau `New Issue` (harus membuat akun gratis github sebelum bertanya).
+
+<br><br>
+<p align="center">
+	<b>Kirim dukungan donasi melalui:</b>
+</p>
+<p align="center">
+    <a href="https://trakteer.id/kopijahe"><img src="https://github.com/kopijahe/wifiid-openwrt/blob/master/pics/trakteer-button.svg" alt="Trakteer ✖ KopiJahe" width="225">
+</p>

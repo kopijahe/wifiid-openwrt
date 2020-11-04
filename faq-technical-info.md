@@ -110,4 +110,4 @@ Penjelasan lebih lanjut mengenai cara kerja script, bisa merujuk ke dokumen [ini
 
 :question: _Donasi?_
 
-:bulb: ![no](https://media1.giphy.com/media/jl7eVqDXCFcm4/giphy.gif)
+:bulb: Tidak wajib, tapi bisa melalui halaman https://trakteer.id/kopijahe
