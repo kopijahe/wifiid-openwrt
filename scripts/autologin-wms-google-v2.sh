@@ -31,13 +31,15 @@ lbinterface=wwan
 # =================================================
 # Bagian di bawah baris ini tidak perlu diubah-ubah
 
+# Muat library network OpenWrt
+. /lib/functions/network.sh
+
 # Selama script berjalan, lakukan hal ini:
 while [ true ]; do
 
+# Jika tidak digunakan untuk Load-Balance, maka:
 # Tentukan interface yang digunakan untuk menangkap sinyal wifi.id secara otomatis
 if [[ "$LB" = "OFF" ]]; then
-# Muat library network OpenWrt
-. /lib/functions/network.sh
 # Bersihkan cache terlebih dahulu
 network_flush_cache
 # Cari interface jaringan WAN yang digunakan

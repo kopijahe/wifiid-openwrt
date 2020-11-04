@@ -13,9 +13,9 @@ LB=OFF
 # Tentukan lokasi berkas login_file.txt
 # Jangan lupa untuk berikan izin eksekusi berkas dengan perintah:
 # chmod +x /etc/login_file.txt
-filelogintxt=/etc/login_file.txt
+filelogintxtwms=/etc/login_file.txt
 # Tentukan lokasi berkas sementara
-loginwifi=/tmp/login_file.txt
+loginwms=/tmp/login_file.txt
 
 # Jika menggunakan 2 script autologin
 # Ganti nama berkas login_file.txt di 2 variabel
@@ -28,13 +28,15 @@ lbinterface=wwan
 # =================================================
 # Bagian di bawah baris ini tidak perlu diubah-ubah
 
+# Muat library network OpenWrt
+. /lib/functions/network.sh
+
 # Selama script berjalan, lakukan hal ini:
 while [ true ]; do
 
+# Jika tidak digunakan untuk Load-Balance, maka:
 # Tentukan interface yang digunakan untuk menangkap sinyal wifi.id secara otomatis
 if [[ "$LB" = "OFF" ]]; then
-# Muat library network OpenWrt
-. /lib/functions/network.sh
 # Bersihkan cache terlebih dahulu
 network_flush_cache
 # Cari interface jaringan WAN yang digunakan
@@ -61,35 +63,9 @@ if [[ "$status" = "OK" ]]; then
 # Dan simpan hasilnya di /tmp/internet.status.wms untuk pengecekan
 echo "Sudah terkoneksi dengan Internet" | tee /tmp/internet.status.wms
 # Jika hasilnya tidak sama, berarti tidak terkoneksi dengan Internet, maka:
-# Cek dulu apakah hasil unduhan kosong?
-elif [[ "$status" = "" ]]; then
-# Beritahu pengguna bahwa hasil download kosong
-echo "Hasil unduhan kosong" | tee /tmp/last.login
-# Cari tahu PID dari proses udhcpc koneksi yang terblokir
-udhcpcpid=$(cat /var/run/udhcpc-$radiointerface.pid)
-# Dan minta penggantian IP ke server
-kill -SIGUSR2 $udhcpcpid && ifup $waninterface
-# Istirahat selama 20 detik sambil menunggu koneksi
-sleep 20
-# Gandakan berkas login_file.txt ke lokasi berkas sementara
-cp $filelogintxt $loginwms
-# Sesuaikan alamat IP dengan versi terbaru dari variabel iprouter
-sed -i "s/iprouter/$iprouter/g" $loginwms
-# Sesuaikan interface yang akan digunakan dengan variable radiointerface
-sed -i "s/curl/curl --interface $radiointerface/g" $loginwms
-# Beri izin eksekusi berkas sementara
-chmod +x $loginwms
-# Catat tanggal dan jam login terakhir,
-echo "Percobaan login terakhir:" | tee -a /tmp/last.login
-date | tee -a /tmp/last.login
-# Catat pula status percobaan login terakhir
-echo "Status percobaan login terakhir:" | tee -a  /tmp/last.login
-# Dan lakukan login, serta catat semua hasilnya di berkas /tmp/last.login untuk pengecekan
-$loginwwms | jsonfilter -e '@["message"]' | tee -a /tmp/internet.status /tmp/last.login | logger
-# Jika hasil unduhan tidak kosong, maka:
 else
 # Gandakan berkas login_file.txt ke lokasi berkas sementara
-cp "$filelogintxt" "$loginwms"
+cp $filelogintxtwms $loginwms
 # Buat variabel randomid yang terdiri dari 4 karakter angka dan huruf acak
 # Hal ini diperlukan karena sistem login WMS menambahkan 4 karakter acak
 # Setelah username pengguna setiap kali login
