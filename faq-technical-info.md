@@ -60,16 +60,7 @@ Penjelasan lebih lanjut mengenai cara kerja script, bisa merujuk ke dokumen [ini
 
 :question: _Bisakah autologin dipakai untuk 2 koneksi berbeda? Router saya bisa 2 frekuensi (2,4 GHz dan 5,8 Ghz), rencananya saya pakai 2 akun dan di loadbalance (misal pakai mwan di openwrt)..._
 
-:bulb: Bisa saja:
-
- > 1. Buat berkas autologin kedua dengan perintah ```cp /etc/autologin.sh /etc/autologin2.sh```
- > 2. Buka berkas autologin2.sh dengan perintah ```vi /etc/autologin2.sh```
- > 3. Tekan huruf ```i``` untuk memulai edit berkas autologin2.sh
- > 4. Ganti isi variabel loginwifi dengan nama berkas lain, misalnya menjadi ```loginwifi=/etc/login_file2.txt```
- > 5. Matikan dulu koneksi pertama, lalu lakukan login di koneksi kedua dan taruh hasil curl-nya di file login_file2.txt (dokumen [autologin.md](autologin.md), langkah no. 9-14)
- > 6. Edit berkas login_file.txt dengan perintah ```vi /etc/file_login.txt```, tambahkan parameter ```--interface <nama interface>``` setelah teks curl, misalnya jadi ```curl --interface wlan0 -H ....```, lalu simpan berkas
- > 7. Edit berkas login_file2.txt dengan perintah ```vi /etc/file_login2.txt```, tambahkan parameter ```--interface <nama interface>``` setelah teks curl, misalnya jadi ```curl --interface wlan1 -H ....```, lalu simpan berkas
- > 8. Tambahkan berkas autologin kedua di berkas ```/etc/rc.local```
+:bulb: Bisa saja:, lihat petunjuk singkatnya di [dokumen penjelasan cara kerja script.](scripts/README.md#load-balance)
 
 <br><br>
 
