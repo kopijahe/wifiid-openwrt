@@ -2,10 +2,14 @@
 
 Di sini saya akan berusaha menjelaskan logika di balik script autologin milik saya, siapa tahu anda ingin melihat cara kerjanya, atau berminat membuat alternatif lainnya sesuai kondisi jaringan di daerah.
 
+Setiap script juga memiliki dokumentasi internal penjelasan cara kerja jika ingin dipelajari lebih lanjut.
+
 ### login_file.txt
 Semua script bergantung kepada berkas ini, yang merupakan hasil ketika kita login hotspot yang direkam oleh browser (di sini saya pakai [Google Chrome](https://google.com/chrome), supaya hasilnya seragam dan mudah dibaca).
 
 Berkas ini mengandung perintah yang diperlukan untuk mengulangi login menggunakan `curl`.
+
+Karena `curl` yang dipakai oleh OpenWrt bawaannya tidak mendukung kompresi, maka baris yang mengandung `--compressed` harus dihapus.
 
 Berkas harus diberi izin eksekusi dengan perintah `chmod +x <nama file>` (biasanya: `chmod +x /etc/login_file.txt`) agar bisa dijalankan oleh sistem.
 
@@ -34,8 +38,25 @@ Pertama kita buat 4 karakter huruf dan angka baru secara acak dari `/dev/urandom
 
 Maka dari itu, saya atur supaya berkas asli dirubah saja 4 karakter tadi menjadi `kopijahe`, supaya selalu konsisten.
 
+Untuk berjaga-jaga, setiap kali login, nilai alamat IP milik router juga diperbarui oleh script.
+
 ### Script v2
 
 Script yang berakhiran v2 memuat logika tambahan untuk berjaga-jaga jika terdapat gangguan yang menyebabkan dilakukannya login secara berulang-ulang (setidaknya 6 kali berturut-turut) dalam waktu singkat, yang menyebabkan perubahan status akun menjadi `[Blocked IP]`. Jika terdeteksi perubahan status ini, maka script akan berusaha meminta alamat IP baru sebelum melakukan login kembali.
 
 Karena cara yang digunakan, script v2 tidak cocok untuk dipakai ketika perangkat autologin bukanlah perangkat yang menangkap langsung sinyal <span><span>@wifi.id (misal: Sinyal <span></span>@wifi.id ditangkap menggunakan CPE 210, lalu dipancarkan lagi menggunakan router openwrt).
+
+
+### Load-Balance
+
+Untuk pengguna load-balance, bisa menggunakan script ini dengan sedikit modifikasi agar berjalan dengan normal:
+
+Contoh 1: Seamless/Indihome + WMS (berarti ada 1 script berjalan)  
+1. Rubah variabel `LB=OFF` menjadi `LB=ON` di script  
+2. Rubah variabel `lbinterface` sesuai dengan interface yang dipakai, misal: `wwan`, `wwan1`, `wwan2`
+
+Contoh 2: WMS + <span></span>@wifi.id (berarti ada 2 script berjalan)  
+1. Download script yang dibutuhkan, rubah nama script kedua menjadi `autologin2.sh`
+2. Rubah nama `login_file.txt` di script `autologin2.sh` menjadi `login_file2.txt`
+2. Rubah variabel `LB=OFF` menjadi `LB=ON` di kedua script  
+3. Rubah variabel `lbinterface` sesuai dengan interface yang dipakai di kedua script, misal: berkas `autologin.sh` menggunakan `lbinterface=wwan` dan `autologin2.sh` menggunakan `lbinterface=wwan2`
