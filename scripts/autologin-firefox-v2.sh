@@ -1,4 +1,7 @@
-#!/bin/sh 
+#!/bin/sh
+#
+# Script untuk login otomatis di jaringan wifi.id
+# Oleh: KopiJahe (https://github.com/kopijahe)
 
 # Jika digunakan untuk Load-Balance,
 # bagian di bawah baris ini bisa diubah sesuai kebutuhan
