@@ -83,12 +83,13 @@ echo "Sudah terkoneksi dengan Internet" | tee /tmp/internet.status.wms
 
 # Jika hasilnya tidak sama, berarti tidak terkoneksi dengan Internet, maka:
 # Cek variabel kodestatus, status yang diketahui saat ini:
+# 6 = Couldn't resolve host: Bisa dikarenakan koneksi "bengong" atau hostname halaman landing belum diatur
 # 7 = Host is unreachable: Bisa dikarenakan koneksi "bengong" atau hostname halaman landing belum diatur
 # 28 = Operation timeout: Halaman cek status koneksi timeour setelah 10 detik
 # 47 = Maximum redirects followed: Dikarenakan halaman cek status koneksi diarahkan ulang ke halaman landing
 
-# kasus gagal login atau kodestatus 7
-elif [[ "$gagallogin" = "Gagal Login" ]] || [[ "$kodestatus" = '7' ]]; then
+# kasus gagal login atau kodestatus 6 dan 7
+elif [[ "$gagallogin" = "Gagal Login" ]] || [[ "$kodestatus" = '6' ]] || [[ "$kodestatus" = '7' ]]; then
 # Beritahu pengguna bahwa koneksi internet terputus
 echo "Koneksi Internet terputus"
 # Cari tahu PID dari proses udhcpc koneksi yang terblokir
