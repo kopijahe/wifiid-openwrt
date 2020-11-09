@@ -79,3 +79,11 @@ Untuk sinyal seamless<span></span>@wifi.id, bisa merujuk ke contoh berikut:
    ```
 
 ![pharos-seamless](pics/pharos/seamless-config.png)
+
+<br><br>
+<p align="center">
+	<b>Kirim dukungan donasi melalui:</b>
+</p>
+<p align="center">
+    <a href="https://trakteer.id/kopijahe"><img src="https://github.com/kopijahe/wifiid-openwrt/blob/master/pics/trakteer-button.svg" alt="Trakteer ✖ KopiJahe" width="225">
+</p>

@@ -53,3 +53,11 @@
 7. Halaman login akan muncul, lakukan login sesuai dengan voucher yang sudah dibeli
 
    ![interfaces](pics/09-login-page.png)
+
+<br><br>
+<p align="center">
+	<b>Kirim dukungan donasi melalui:</b>
+</p>
+<p align="center">
+    <a href="https://trakteer.id/kopijahe"><img src="https://github.com/kopijahe/wifiid-openwrt/blob/master/pics/trakteer-button.svg" alt="Trakteer ✖ KopiJahe" width="225">
+</p>
