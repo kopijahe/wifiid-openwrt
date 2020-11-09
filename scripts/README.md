@@ -6,7 +6,7 @@ Setiap script juga memiliki dokumentasi internal penjelasan cara kerja jika ingi
 
 ### Tutorial penggunaan script
 
-Untuk tutorial penggunaan script bergambar, bisa merujuk ke dokumen [autologin.md][../autologin.md] untuk jaringan <span</span>@wifi.id atau dokumen [autologin-wms.md](../autologin-wms.md) untuk jaringan Venue WMS.
+Untuk tutorial penggunaan script bergambar, bisa merujuk ke dokumen [autologin.md](../autologin.md) untuk jaringan <span</span>@wifi.id atau dokumen [autologin-wms.md](../autologin-wms.md) untuk jaringan Venue WMS.
 
 ### login_file.txt
 Semua script bergantung kepada berkas ini, yang merupakan hasil ketika kita login hotspot yang direkam oleh browser (di sini saya pakai [Google Chrome](https://google.com/chrome), supaya hasilnya seragam dan mudah dibaca).
@@ -64,3 +64,11 @@ Contoh 2: WMS + <span></span>@wifi.id (berarti ada 2 script berjalan)
 2. Rubah nama `login_file.txt` di script `autologin2.sh` menjadi `login_file2.txt`
 2. Rubah variabel `LB=OFF` menjadi `LB=ON` di kedua script  
 3. Rubah variabel `lbinterface` sesuai dengan interface yang dipakai di kedua script, misal: berkas `autologin.sh` menggunakan `lbinterface=wwan` dan `autologin2.sh` menggunakan `lbinterface=wwan2`
+
+<br><br>
+<p align="center">
+	<b>Kirim dukungan donasi melalui:</b>
+</p>
+<p align="center">
+    <a href="https://trakteer.id/kopijahe"><img src="https://github.com/kopijahe/wifiid-openwrt/blob/master/pics/trakteer-button.svg" alt="Trakteer ✖ KopiJahe" width="225">
+</p>
