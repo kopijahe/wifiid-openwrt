@@ -4,6 +4,10 @@ Di sini saya akan berusaha menjelaskan logika di balik script autologin milik sa
 
 Setiap script juga memiliki dokumentasi internal penjelasan cara kerja jika ingin dipelajari lebih lanjut.
 
+### Tutorial penggunaan script
+
+Untuk tutorial penggunaan script bergambar, bisa merujuk ke dokumen [autologin.md][../autologin.md] untuk jaringan <span</span>@wifi.id atau dokumen [autologin-wms.md](../autologin-wms.md) untuk jaringan Venue WMS.
+
 ### login_file.txt
 Semua script bergantung kepada berkas ini, yang merupakan hasil ketika kita login hotspot yang direkam oleh browser (di sini saya pakai [Google Chrome](https://google.com/chrome), supaya hasilnya seragam dan mudah dibaca).
 
