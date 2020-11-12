@@ -68,13 +68,6 @@ status=$(curl --interface $radiointerface -L --silent --max-redirs 1 --connect-t
 # Simpan juga kode status di variabel kodestatus
 kodestatus="$?"
 
-# Tentukan variabel status dari hasil unduhan berkas
-# dari: http://periksakoneksi.kopijahe.my.id/cek
-# dan simpan hasilnya di stdout
-status=$(curl --interface $radiointerface -L --silent --max-redirs 1 --connect-timeout 10  "http://periksakoneksi.kopijahe.my.id/cek")
-# Simpan juga kode status di variabel kodestatus
-kodestatus="$?"
-
 # Jika variabel status hasil unduhan tadi sama dengan "OK", maka
 if [[ "$status" = "OK" ]]; then
 # Beritahu pengguna bahwa sudah terkoneksi dengan Internet
