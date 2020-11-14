@@ -62,9 +62,9 @@ radiointerface=$(ifstatus $waninterface | jsonfilter -e '@["device"]')
 gagallogin=$(cat /tmp/last.login.wms | grep -o "Gagal Login")
 
 # Tentukan variabel status dari hasil unduhan berkas
-# dari: http://periksakoneksi.kopijahe.my.id/cek
+# dari: http://detectportal.firefox.com/success.txt
 # dan simpan hasilnya di stdout
-status=$(curl --interface $radiointerface -L --silent --max-redirs 1 --connect-timeout 10  "http://periksakoneksi.kopijahe.my.id/cek")
+status=$(curl --interface $radiointerface --silent --max-redirs 1 --connect-timeout 10  "http://detectportal.firefox.com/success.txt")
 # Simpan juga kode status di variabel kodestatus
 kodestatus="$?"
 
