@@ -68,13 +68,6 @@ status=$(curl --interface $radiointerface -L --silent --max-redirs 1 --connect-t
 # Simpan juga kode status di variabel kodestatus
 kodestatus="$?"
 
-# Tentukan variabel status dari hasil unduhan berkas
-# dari: http://detectportal.firefox.com/success.txt
-# dan simpan hasilnya di stdout
-status=$(curl --interface $radiointerface --silent --max-redirs 1 --connect-timeout 10  "http://detectportal.firefox.com/success.txt")
-# Simpan juga kode status di variabel kodestatus
-kodestatus="$?"
-
 # Jika variabel status hasil unduhan tadi sama dengan "success", maka
 if [[ "$status" = "success" ]]; then
 # Beritahu pengguna bahwa sudah terkoneksi dengan Internet
