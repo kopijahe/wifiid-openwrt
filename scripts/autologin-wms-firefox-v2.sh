@@ -64,7 +64,7 @@ gagallogin=$(cat /tmp/last.login.wms | grep -o "Gagal Login")
 # Tentukan variabel status dari hasil unduhan berkas
 # dari: http://detectportal.firefox.com/success.txt
 # dan simpan hasilnya di stdout
-status=$(curl --interface $radiointerface --silent --max-redirs 1 --connect-timeout 10  "http://detectportal.firefox.com/success.txt")
+status=$(curl --interface $radiointerface --silent --max-redirs 1 --retry 5 --connect-timeout 10  "http://detectportal.firefox.com/success.txt")
 # Simpan juga kode status di variabel kodestatus
 kodestatus="$?"
 
