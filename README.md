@@ -52,5 +52,7 @@ Pertanyaan anda belum tercantum di sini? Bisa langsung bertanya di [tab Issues](
 	<b>Kirim dukungan donasi melalui:</b>
 </p>
 <p align="center">
-    <a href="https://trakteer.id/kopijahe"><img src="https://github.com/kopijahe/wifiid-openwrt/blob/master/pics/trakteer-button.svg" alt="Trakteer ✖ KopiJahe" width="225">
+    <a href="https://trakteer.id/kopijahe"><img src="https://github.com/kopijahe/wifiid-openwrt/blob/master/pics/trakteer-button.png" alt="Trakteer ✖ KopiJahe" width="225">
+	<a href="https://saweria.co/kopijahe"><img src="https://github.com/kopijahe/wifiid-openwrt/blob/master/pics/saweria-button.png" alt="saweria ✖ KopiJahe" width="225">
+	
 </p>
