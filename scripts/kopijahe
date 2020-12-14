@@ -140,8 +140,6 @@ update() {
 	sh /tmp/kopijahe-update -i
 	# Matikan dulu semua proses autologin KopiJahe
 	killkopijahe
-	# Jalankan kembali autologin KopiJahe
-	sh /etc/rc.local
 	# Selesai
 	exit 0
 }
