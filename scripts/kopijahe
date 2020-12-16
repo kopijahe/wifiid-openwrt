@@ -15,7 +15,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="1.2.2"
+	ver="1.2.3"
 	# Beritahu pengguna versi aplikasi saat ini
 	echo "Versi aplikasi: $ver"
 }
@@ -144,8 +144,10 @@ update() {
 	curl --silent https://raw.githubusercontent.com/kopijahe/wifiid-openwrt/master/scripts/kopijahe -o /tmp/kopijahe-update
 	# Lakukan instalasi aplikasi
 	sh /tmp/kopijahe-update -i
-	# Matikan dulu semua proses autologin KopiJahe
-	killkopijahe
+	# Bersihkan sisa berkas update
+	rm /tmp/kopijahe-update
+	# Matikan dulu semua proses autologin KopiJahe, lalu jalankan kembali dengan versi baru
+	killkopijahe && sh /etc/rc.local
 	# Selesai
 	exit 0
 }
