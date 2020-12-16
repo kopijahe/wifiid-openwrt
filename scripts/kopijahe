@@ -771,7 +771,7 @@ while [[ "$advancedmode" = "" ]]; do
 	fi
 	
 	# Jika kode status login adalah 6, maka:
-	if [[ "$kodestatus" = "6" ]]
+	if [[ "$kodestatus" = "6" ]]; then
 		# Beritahu pengguna bahwa kemungkinan hostname belum diatur
 		echo "Hostname halaman login belum diatur"
 	fi
