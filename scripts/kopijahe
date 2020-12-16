@@ -146,8 +146,8 @@ update() {
 	sh /tmp/kopijahe-update -i
 	# Bersihkan sisa berkas update
 	rm /tmp/kopijahe-update
-	# Matikan dulu semua proses autologin KopiJahe, lalu jalankan kembali dengan versi baru
-	killkopijahe && sh /etc/rc.local
+	# Matikan dulu semua proses autologin KopiJahe
+	killkopijahe
 	# Selesai
 	exit 0
 }
