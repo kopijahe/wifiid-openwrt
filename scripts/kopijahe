@@ -15,7 +15,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="1.1.9"
+	ver="1.2.0"
 	# Beritahu pengguna versi aplikasi saat ini
 	echo "Versi aplikasi: $ver"
 }
@@ -254,8 +254,6 @@ releaseobtainnewip() {
 	# Hidupkan kembali perangkat yang digunakan
 	ifconfig "$wandevice" up
 	ifup "$waninterface"
-	# Tunggu 10 detik sebelum melanjutkan tugas selanjutnya sambil menunggu koneksi
-	sleep 10
 }
 
 captiveportalcheck() {
@@ -770,6 +768,12 @@ while [[ "$advancedmode" = "" ]]; do
 		opkg update
 		# Lalu unduh dan instal CURL
 		opkg install curl
+	fi
+	
+	# Jika server cek captive portal dan server login tidak bisa diakses, maka:
+	if [[ "$kodestatuslanding" = "7" ]] && [[ "$kodestatus" = "7" ]]; then
+		# Minta pembaruan IP terlebih dahulu
+		releaseobtainnewip
 	fi
 
 	# Jika hasil cek koneksi internet tidak berhasil, maka:
