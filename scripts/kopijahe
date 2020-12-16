@@ -15,7 +15,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="1.2.0"
+	ver="1.2.1"
 	# Beritahu pengguna versi aplikasi saat ini
 	echo "Versi aplikasi: $ver"
 }
@@ -770,12 +770,6 @@ while [[ "$advancedmode" = "" ]]; do
 		opkg install curl
 	fi
 	
-	# Jika server cek captive portal dan server login tidak bisa diakses, maka:
-	if [[ "$kodestatuslanding" = "7" ]] && [[ "$kodestatus" = "7" ]]; then
-		# Minta pembaruan IP terlebih dahulu
-		releaseobtainnewip
-	fi
-
 	# Jika hasil cek koneksi internet tidak berhasil, maka:
 	if [[ "$internetconnected" = "no" ]]; then
 		# Cek terlebih dahulu apakah login diblokir
@@ -791,9 +785,7 @@ while [[ "$advancedmode" = "" ]]; do
 			releaseobtainnewip
 			# Jika digunakan untuk load-balance, dan mendapat kode status 7, 28, atau 47 maka restart interface dan mwan3
 		elif [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].loadbalance)" = "yes" ]] && [[ "$kodestatus" = "7" ]] || [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].loadbalance)" = "yes" ]] && [[ "$kodestatus" = "28" ]] || [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].loadbalance)" = "yes" ]] && [[ "$kodestatus" = "47" ]]; then
-			ifup "$waninterface"
-			/etc/init.d/mwan3 restart
-			sleep 5
+			mwan3 ifup "$waninterface"			
 		# Jika digunakan untuk jaringan @wifi.id umum, maka:
 		elif [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "wifi.id" ]]; then
 			# Jalankan fungsi login_generic
