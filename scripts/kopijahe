@@ -15,7 +15,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="1.2.1"
+	ver="1.2.2"
 	# Beritahu pengguna versi aplikasi saat ini
 	echo "Versi aplikasi: $ver"
 }
@@ -78,7 +78,7 @@ osversioncheck() {
 	fi
 	
 	# Jika digunakan untuk STB, maka anggap versi os sama dengan LEDE 17.01
-	openwrt_board="$(cat /etc/os-release | grep OPENWRT_BOARD | awk -F'[=/]' '{print $2}' | awk -F'[".]' '{print $2}')"
+	openwrt_board="$(cat /etc/os-release | grep OPENWRT_BOARD | awk -F'["=/]' '{print $3}')"
 	if [[ "$openwrt_board" = "sunxi" ]]; then
 		export osversion="17"
 	fi
@@ -768,6 +768,12 @@ while [[ "$advancedmode" = "" ]]; do
 		opkg update
 		# Lalu unduh dan instal CURL
 		opkg install curl
+	fi
+	
+	# Jika kode status login adalah 6, maka:
+	if [[ "$kodestatus" = "6" ]]
+		# Beritahu pengguna bahwa kemungkinan hostname belum diatur
+		echo "Hostname halaman login belum diatur"
 	fi
 	
 	# Jika hasil cek koneksi internet tidak berhasil, maka:
