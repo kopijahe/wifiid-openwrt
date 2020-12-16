@@ -15,7 +15,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="1.1.8"
+	ver="1.1.9"
 	# Beritahu pengguna versi aplikasi saat ini
 	echo "Versi aplikasi: $ver"
 }
@@ -75,6 +75,12 @@ osversioncheck() {
 	if [[ "$osversion" = "14" ]] || [[ "$osversion" = "15" ]]; then
 		echo "Rilis openwrt di bawah versi 17.01 tidak didukung"
 		exit 1
+	fi
+	
+	# Jika digunakan untuk STB, maka anggap versi os sama dengan LEDE 17.01
+	openwrt_board="$(cat /etc/os-release | grep OPENWRT_BOARD | awk -F'[=/]' '{print $2}' | awk -F'[".]' '{print $2}')"
+	if [[ "$openwrt_board" = "sunxi" ]]; then
+		export osversion="17"
 	fi
 }
 
