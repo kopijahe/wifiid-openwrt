@@ -15,7 +15,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="1.2.6"
+	ver="1.2.7"
 	# Beritahu pengguna versi aplikasi saat ini
 	echo "Versi aplikasi: $ver"
 }
@@ -265,6 +265,8 @@ releaseobtainnewip() {
 		# Hidupkan interface
 		ifup "$waninterface"
 	fi
+	# Reset kode status, supaya tidak terjadi pengulangan
+	kodestatus=""
 }
 
 captiveportalcheck() {
