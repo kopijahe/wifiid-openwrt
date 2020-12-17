@@ -15,7 +15,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="1.2.5"
+	ver="1.2.6"
 	# Beritahu pengguna versi aplikasi saat ini
 	echo "Versi aplikasi: $ver"
 }
@@ -133,8 +133,8 @@ install() {
 killkopijahe() {
 	# Fungsi matikan aplikasi
 	advancedmode="true"
-	# Cari tahu PID dari semua proses kopijahe, lalu matikan
-	pgrep -f "kopijahe" | xargs kill
+	# Cari tahu PID dari semua proses kopijahe (kecuali yang menjalankan fungsi ini), lalu matikan
+	pgrep -f "kopijahe" | grep -v "^$$" | xargs kill
 }
 
 update() {
@@ -148,6 +148,8 @@ update() {
 	rm /tmp/kopijahe-update
 	# Matikan dulu semua proses autologin KopiJahe
 	killkopijahe
+	# Jalankan kembali proses autologin
+	sh /etc/rc.local
 	# Selesai
 	exit 0
 }
