@@ -15,7 +15,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="1.2.3"
+	ver="1.2.5"
 	# Beritahu pengguna versi aplikasi saat ini
 	echo "Versi aplikasi: $ver"
 }
@@ -251,11 +251,18 @@ releaseobtainnewip() {
 	kill -SIGUSR2 "$udhcpcpid"
 	# Matikan perangkat yang digunakan
 	ifconfig "$wandevice" down
-	# Tunggu 2 detik
-	sleep 2
 	# Hidupkan kembali perangkat yang digunakan
 	ifconfig "$wandevice" up
-	ifup "$waninterface"
+	
+	# Cek apakah digunakan untuk load-balance, jika iya, maka:
+	if [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].loadbalance)" = "yes" ]]; then
+		# Gunakan mwan3 untuk menghidupkan interface
+		mwan3 ifup "$waninterface"
+	# Jika tidak, maka:
+	else
+		# Hidupkan interface
+		ifup "$waninterface"
+	fi
 }
 
 captiveportalcheck() {
@@ -656,12 +663,13 @@ do
 			multiautologin
 			if [[ "$icpcprovider" = "kopijahe" ]] || [[ "$icpcprovider" = "firefox" ]] || [[ "$icpcprovider" = "google" ]] || [[ "$icpcprovider" = "apple" ]] || [[ "$icpcprovider" = "microsoft" ]]; then
 				uci add kopijahe autologin
-				uci set kopijahe.@autologin["$multiautologinnum"].cpcprovider="$cpcprovider"
+				uci set kopijahe.@autologin["$multiautologinnum"].cpcprovider="$icpcprovider"
 			else
 				echo "Penyedia layanan yang didukung:"
 				echo "\"kopijahe\" (default), \"firefox\", \"google\", \"apple\", \"microsoft\""
 				exit 1
 			fi
+			uci commit kopijahe
 			;;
 		f)
 			loginfiletxt="$OPTARG"
@@ -780,9 +788,9 @@ while [[ "$advancedmode" = "" ]]; do
 	
 	# Jika hasil cek koneksi internet tidak berhasil, maka:
 	if [[ "$internetconnected" = "no" ]]; then
-		# Cek terlebih dahulu apakah login diblokir
+		# Cek terlebih dahulu apakah login diblokir, atau mendapat kode status CURL 7
 		# Jika benar, maka:
-		if [[ "$loginblocked" = "yes" ]]; then
+		if [[ "$loginblocked" = "yes" ]] || [[ "$kodestatus" = "7" ]]; then
 			# Catat jam dan tanggal saat ini di berkas "/tmp/last.login.$waninterface"
 			date > "/tmp/last.login.$waninterface"
 			# Catat percobaan login terakhir di berkas "/tmp/last.login.$waninterface"
@@ -791,9 +799,6 @@ while [[ "$advancedmode" = "" ]]; do
 			echo "Koneksi $waninterface terputus, meminta alamat IP baru" | tee -a "/tmp/last.login.$waninterface" | logger
 			# Minta penggantian alamat IP
 			releaseobtainnewip
-			# Jika digunakan untuk load-balance, dan mendapat kode status 7, 28, atau 47 maka restart interface dan mwan3
-		elif [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].loadbalance)" = "yes" ]] && [[ "$kodestatus" = "7" ]] || [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].loadbalance)" = "yes" ]] && [[ "$kodestatus" = "28" ]] || [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].loadbalance)" = "yes" ]] && [[ "$kodestatus" = "47" ]]; then
-			mwan3 ifup "$waninterface"			
 		# Jika digunakan untuk jaringan @wifi.id umum, maka:
 		elif [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "wifi.id" ]]; then
 			# Jalankan fungsi login_generic
