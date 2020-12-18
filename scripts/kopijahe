@@ -15,7 +15,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="1.2.7"
+	ver="1.3"
 	# Beritahu pengguna versi aplikasi saat ini
 	echo "Versi aplikasi: $ver"
 }
@@ -29,6 +29,7 @@ bantuan() {
 	echo "-a: deteksi otomatis jaringan wifi.id atau wms dan turunannya (harus dalam keadaan terkoneksi namun logout dari jaringan)"
 	echo "-b: unduh versi script terbaru"
 	echo "-c: masukkan penyedia layanan cek captive portal dengan 2 tanda kutip"
+	echo "-d: masukkan URL halaman landing (bisa digunakan sebagai pengganti opsi \"-a\" jika deteksi otomatis tidak berhasil)"
 	echo "-f: masukkan berkas login_file.txt dengan 2 tanda kutip (misal: \"\etc\login_file.txt\")"
 	echo "-h: tampilkan halaman ini"
 	echo "-i: instalasi aplikasi autologin"
@@ -52,8 +53,11 @@ bantuan() {
 	echo ""
 	echo "Contoh penggunaan:"
 	echo ""
-	echo "Penggunaan untuk 1 autologin:"
+	echo "Penggunaan untuk 1 autologin (deteksi otomatis URL halaman landing):"
 	echo "kopijahe -l \"no\" -u \"halo@kopijahe.my.id\" -p \"en4kbang3t\" -v \"wifi.id\" -a"
+	echo ""
+	echo "Penggunaan untuk 1 autologin (masukkan manual URL halaman landing):"
+	echo "kopijahe -l \"no\" -u \"halo@kopijahe.my.id\" -p \"en4kbang3t\" -v \"wifi.id\" -d"
 	echo ""
 	echo "Penggunaan untuk 2 autologin:"
 	echo "kopijahe -m 1 -l \"yes\" -u \"halo@kopijahe.my.id\" -p \"en4kbang3t\" -v \"smartbisnis\" -a" 
@@ -182,13 +186,9 @@ detectwan() {
 	iprouter="$(ifstatus $waninterface |  jsonfilter -e '@["ipv4-address"][0].address')"
 }
 
-automaticsetup() {
-	# Fungsi deteksi otomatis
+setup() {
+	# Fungsi penyiapan berkas konfigurasi autologin
 	advancedmode="true"
-	detectwan
-	multiautologin
-	# Deteksi URL login dengan cara melihat jawaban redirect dari halaman periksa koneksi
-	deteksi="$(curl -I --silent --interface "$wandevice" --max-redirs 1 --connect-timeout 10  "http://periksakoneksi.kopijahe.my.id/cek" | grep "Location")"
 	# Deteksi tipe login (hasil "login" = wifi.id, hasil "wms" = wms), filter hasilnya agar tidak ada error
 	tipelogin="$(echo "$deteksi" | awk -F'[=&]' '{print $1}' | awk -F'[=/]' '{print $4}' | tr -dc "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")"
 	# Deteksi variabel gw_id, filter hasilnya agar tidak ada error
@@ -652,11 +652,15 @@ seamless_reconnect() {
 }
 
 # Fungsi mendapatkan parameter aplikasi
-while getopts :abc:f:hkil:m:p:stu:v:x flags
+while getopts :abc:df:hkil:m:p:stu:v:x flags
 do
 	case "${flags}" in
 		a)
-			automaticsetup
+			multiautologin
+			detectwan
+			# Deteksi URL login dengan cara melihat jawaban redirect dari halaman periksa koneksi
+			deteksi="$(curl -I --silent --interface "$wandevice" --max-redirs 1 --connect-timeout 10  "http://periksakoneksi.kopijahe.my.id/cek" | grep "Location")"
+			setup
 			;;
 		b)
 			update
@@ -674,6 +678,14 @@ do
 				exit 1
 			fi
 			uci commit kopijahe
+			;;
+		d)
+			multiautologin
+			detectwan
+			echo "Silahkan masukkan URL halaman landing:"
+			read -r urllanding
+			deteksi=" Location: $urllanding"
+			setup
 			;;
 		f)
 			loginfiletxt="$OPTARG"
