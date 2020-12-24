@@ -15,7 +15,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="1.3.1"
+	ver="1.3.2"
 	# Beritahu pengguna versi aplikasi saat ini
 	echo "Versi aplikasi: $ver"
 }
@@ -386,17 +386,6 @@ wificommunity() {
 			username2="$username@komunitas.$cfgkampus"
 		fi
 	fi
-
-	# Periksa apakah akun yang digunakan adalah akun violet, jika iya, maka:
-	if [[ "$(echo $username | awk -F'[&.]' '{print $2}')" = "violet" ]]; then
-		# Tidak perlu diberi tambahan akhiran
-		username2="$username"
-	# Jika tidak, maka:
-	else
-		# Beri tambahan akhiran "@spin2"
-		username2="$username@spin2"
-	fi
-	
 }
 
 login_generic() {
@@ -411,7 +400,17 @@ login_generic() {
 	wlanid="$(uci -q get kopijahe.@autologin["$multiautologinnum"].wlanid)"
 	session_id="$(uci -q get kopijahe.@autologin["$multiautologinnum"].sessionid)"
 	server_id="$(uci -q get kopijahe.@autologin["$multiautologinnum"].serverid)"
-	wificommunity
+
+	# Periksa apakah akun yang digunakan adalah akun violet, jika iya, maka:
+	if [[ "$(echo $username | awk -F'[&.]' '{print $2}')" = "violet" ]]; then
+		# Tidak perlu diberi tambahan akhiran
+		username2="$username"
+	# Jika tidak, maka:
+	else
+		# Beri tambahan akhiran "@spin2"
+		username2="$username@spin2"
+	fi
+
 	# Simpan jam dan tanggal saat ini
 	date > "/tmp/last.login.$waninterface"
 	
