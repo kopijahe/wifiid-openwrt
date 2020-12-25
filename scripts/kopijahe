@@ -142,6 +142,7 @@ killkopijahe() {
 }
 
 update() {
+	advancedmode="true"
 	# Fungsi pembaruan aplikasi autologin
 	# Unduh versi terbaru dari github
 	# dan letakkan hasilnya di folder /tmp terlebih dahulu
@@ -154,8 +155,6 @@ update() {
 	killkopijahe
 	# Jalankan kembali proses autologin
 	sh /etc/rc.local
-	# Selesai
-	exit 0
 }
 
 generaterandomid() {
