@@ -775,7 +775,7 @@ do
 			if [[ "$wifivariant" = "kampus" ]]; then
 				echo "Silahkan masukkan nama domain kampus anda dengan 2 tanda kutip (misal: \"ut.ac.id\")"
 				read -r kampus
-				uci set kopijahe@autologin["$multiautologinnum"].kampus="$kampus"
+				uci set kopijahe.@autologin["$multiautologinnum"].kampus="$kampus"
 				uci commit kopijahe
 			fi
 			uci set kopijahe.@autologin["$multiautologinnum"].wifivariant="$wifivariant"
