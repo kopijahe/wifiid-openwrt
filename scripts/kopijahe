@@ -15,7 +15,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="1.3.7"
+	ver="1.3.8"
 	# Beritahu pengguna versi aplikasi saat ini
 	echo "Versi aplikasi: $ver"
 }
@@ -457,7 +457,7 @@ login_generic() {
 		hasillogin="Login tidak berhasil, kode status CURL: $kodestatus"
 	fi
 	
-	echo "Percobaan login. Interface: $waninterface. Hasil: $hasillogin"  | tee -a "/tmp/last.login.$waninterface" | logger
+	echo "Percobaan login. Interface: $waninterface. Hasil: $hasillogin"  | tee -a "/tmp/last.login.$waninterface" | logger -t kopijahe
 }
 
 login_community() {
@@ -510,7 +510,7 @@ login_community() {
 		hasillogin="Login tidak berhasil, kode status CURL: $kodestatus"
 	fi
 	
-	echo "Percobaan login. Interface: $waninterface. Hasil: $hasillogin"  | tee -a "/tmp/last.login.$waninterface" | logger
+	echo "Percobaan login. Interface: $waninterface. Hasil: $hasillogin"  | tee -a "/tmp/last.login.$waninterface" | logger -t kopijahe
 }
 
 login_wms() {
@@ -561,7 +561,7 @@ login_wms() {
 		hasillogin="Login tidak berhasil, kode status CURL: $kodestatus"
 	fi
 	
-	echo "Percobaan login. Interface: $waninterface. Hasil: $hasillogin"  | tee -a "/tmp/last.login.$waninterface" | logger
+	echo "Percobaan login. Interface: $waninterface. Hasil: $hasillogin"  | tee -a "/tmp/last.login.$waninterface" | logger -t kopijahe
 }
 
 login_file() {
@@ -587,7 +587,7 @@ login_file() {
 	# Jika kode status hasil cek koneksi adalah 127, maka:
 	if [[ "$kodestatus" = "127" ]]; then
 		# Beritahu pengguna bahwa CURL belum terpasang
-		echo "CURL belum perpasang" | logger
+		echo "CURL belum perpasang" | logger -t kopijahe
 		# Lakukan pembaruan daftar aplikasi
 		opkg update
 		# Lalu unduh dan instal CURL
@@ -604,7 +604,7 @@ login_file() {
 			# Catat percobaan login terakhir di berkas "/tmp/last.login.$waninterface"
 			echo "Percobaan login terakhir:" >> "/tmp/last.login.$waninterface"
 			# Beritahu pengguna bahwa koneksi dengan internet terputus
-			echo "Koneksi $waninterface terputus, meminta alamat IP baru" | tee -a "/tmp/last.login.$waninterface" | logger
+			echo "Koneksi $waninterface terputus, meminta alamat IP baru" | tee -a "/tmp/last.login.$waninterface" | logger -t kopijahe
 			# Minta penggantian alamat IP
 			releaseobtainnewip
 			sleep 20
@@ -615,7 +615,7 @@ login_file() {
 			# Catat percobaan login terakhir di berkas "/tmp/last.login.$waninterface"
 			echo "Percobaan login terakhir:" >> "/tmp/last.login.$waninterface"
 			# Beritahu pengguna bahwa koneksi dengan internet terputus
-			echo "Koneksi $waninterface terputus, meminta alamat IP baru" | tee -a "/tmp/last.login.$waninterface" | logger
+			echo "Koneksi $waninterface terputus, meminta alamat IP baru" | tee -a "/tmp/last.login.$waninterface" | logger -t kopijahe
 			# Gandakan berkas tangkapan login CURL ke tempat proses
 			cp "$loginfiletxt" "$loginwifi"
 			# Proses berkas autologin
@@ -631,8 +631,8 @@ login_file() {
 			# Beri izin eksekusi berkas autologin
 			chmod +x "$loginwifi"
 			# Lakukan login, lalu simpan hasilnya di berkas "/tmp/last.login.$waninterface" dan beritahu pengguna melalui System Log
-			echo "Percobaan login interface: $waninterface" | logger
-			$loginwifi | jsonfilter -e '@["message"]' | tee -a "/tmp/last.login.$waninterface" | logger
+			echo "Percobaan login interface: $waninterface" | logger -t kopijahe
+			$loginwifi | jsonfilter -e '@["message"]' | tee -a "/tmp/last.login.$waninterface" | logger -t kopijahe
 		fi
 	fi
 	# Istirahat selama 10 detik sebelum coba mengecek koneksi kembali
@@ -659,7 +659,7 @@ seamless_reconnect() {
 		# Catat percobaan login terakhir di berkas "/tmp/last.login.$waninterface"
 		echo "Percobaan login terakhir:" >> "/tmp/last.login.$waninterface"
 		# Beritahu pengguna bahwa koneksi dengan internet terputus
-		echo "Koneksi $waninterface terputus, meminta alamat IP baru" | tee -a "/tmp/last.login.$waninterface" | logger
+		echo "Koneksi $waninterface terputus, meminta alamat IP baru" | tee -a "/tmp/last.login.$waninterface" | logger -t kopijahe
 		# Minta penggantian alamat IP
 		releaseobtainnewip
 		# Tambahan istirahat 10 detik sebelum mengecek ulang
@@ -812,7 +812,7 @@ while [[ "$advancedmode" = "" ]]; do
 	# Jika kode status hasil cek koneksi adalah 127, maka:
 	if [[ "$kodestatus" = "127" ]]; then
 		# Beritahu pengguna bahwa CURL belum terpasang
-		echo "CURL belum perpasang" | logger
+		echo "CURL belum perpasang" | logger -t kopijahe
 		# Lakukan pembaruan daftar aplikasi
 		opkg update
 		# Lalu unduh dan instal CURL
@@ -835,7 +835,7 @@ while [[ "$advancedmode" = "" ]]; do
 			# Catat percobaan login terakhir di berkas "/tmp/last.login.$waninterface"
 			echo "Percobaan login terakhir:" >> "/tmp/last.login.$waninterface"
 			# Beritahu pengguna bahwa koneksi dengan internet terputus
-			echo "Koneksi $waninterface terputus, meminta alamat IP baru" | tee -a "/tmp/last.login.$waninterface" | logger
+			echo "Koneksi $waninterface terputus, meminta alamat IP baru" | tee -a "/tmp/last.login.$waninterface" | logger -t kopijahe
 			# Minta penggantian alamat IP
 			releaseobtainnewip
 		# Jika digunakan untuk jaringan @wifi.id umum, maka:
