@@ -60,7 +60,7 @@ ipblocked=$(cat /tmp/last.login | grep -o "Blocked IP")
 # Tentukan variabel status dari hasil unduhan berkas
 # dari: http://periksakoneksi.kopijahe.my.id/cek
 # dan simpan hasilnya di stdout
-status=$(curl --interface $radiointerface -L --silent --max-redirs 1 --retry 5 --connect-timeout 10  "http://periksakoneksi.kopijahe.my.id/cek")
+status=$(curl --interface $radiointerface -L --silent --max-redirs 1 --retry 3 --connect-timeout 5  "http://periksakoneksi.kopijahe.my.id/cek")
 # Simpan juga kode status di variabel kodestatus
 kodestatus="$?"
 

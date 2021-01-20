@@ -56,7 +56,7 @@ radiointerface=$(ifstatus $waninterface | jsonfilter -e '@["device"]')
 # Tentukan variabel status dari hasil unduhan berkas
 # dari: http://periksakoneksi.kopijahe.my.id/cek
 # dan simpan hasilnya di stdout
-status=$(curl --interface $radiointerface --silent --max-redirs 1 --retry 5 --connect-timeout 10  "http://periksakoneksi.kopijahe.my.id/cek")
+status=$(curl --interface $radiointerface --silent --max-redirs 1 --retry 3 --connect-timeout 5  "http://periksakoneksi.kopijahe.my.id/cek")
 # Jika variabel status hasil unduhan tadi sama dengan "OK", maka
 if [[ "$status" = "OK" ]]; then
 # Beritahu pengguna bahwa sudah terkoneksi dengan Internet

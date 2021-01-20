@@ -60,7 +60,7 @@ ipblocked=$(cat /tmp/last.login | grep -o "Blocked IP")
 # Tentukan variabel status dari hasil unduhan berkas
 # dari: http://detectportal.firefox.com/success.txt
 # dan simpan hasilnya di stdout
-status=$(curl --interface $radiointerface --silent --max-redirs 1 --retry 5 --connect-timeout 10  "http://detectportal.firefox.com/success.txt")
+status=$(curl --interface $radiointerface --silent --max-redirs 1 --retry 3 --connect-timeout 5  "http://detectportal.firefox.com/success.txt")
 # Simpan juga kode status di variabel kodestatus
 kodestatus="$?"
 

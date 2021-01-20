@@ -55,7 +55,7 @@ radiointerface=$(ifstatus $waninterface | jsonfilter -e '@["device"]')
 # Tentukan variabel status dari hasil unduhan berkas
 # dari: http://detectportal.firefox.com/success.txt
 # dan simpan hasilnya di stdout
-status=$(curl --interface $radiointerface --silent --max-redirs 1 --retry 5 --connect-timeout 10  "http://detectportal.firefox.com/success.txt")
+status=$(curl --interface $radiointerface --silent --max-redirs 1 --retry 3 --connect-timeout 5  "http://detectportal.firefox.com/success.txt")
 # Jika variabel status hasil unduhan tadi sama dengan "success", maka
 if [[ "$status" = "success" ]]; then
 # Beritahu pengguna bahwa sudah terkoneksi dengan Internet
