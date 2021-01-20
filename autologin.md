@@ -1,3 +1,11 @@
+<p align="center">
+<h1>
+:construction: Script autologin ini tidak lagi diperbarui, silahkan gunakan script baru yang ada <a href="https://blog.kopijahe.my.id/posts/autologin-kopijahe/">di sini</a> jika tidak lagi  bisa autologin :construction:
+</h1>
+</p>
+
+___
+
 ### **Tutorial Login Otomatis di Jaringan @wifi.id**
 
 Kesal harus bolak-balik login ketika memakai jaringan @wifi.id di rumah?
