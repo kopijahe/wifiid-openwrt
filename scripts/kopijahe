@@ -15,7 +15,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="1.3.8"
+	ver="1.3.9"
 	# Beritahu pengguna versi aplikasi saat ini
 	echo "Versi aplikasi: $ver"
 }
@@ -44,7 +44,7 @@ bantuan() {
 	echo "-x: masuk ke mode debug (untuk keperluan analisa jika gagal autologin)"
 	echo ""
 	echo "Varian jaringan yang didukung:"
-	echo "\"wifi.id\", \"wms\", \"kampus\", \"smartbisnis\""
+	echo "\"wifi.id\", \"wms\", \"wms-lite\", \"kampus\", \"smartbisnis\""
 	echo ""
 	echo "Penyedia layanan cek captive portal yang didukung:"
 	echo "\"kopijahe\" (default), \"firefox\", \"google\", \"apple\", \"microsoft\""
@@ -172,6 +172,11 @@ update() {
 generaterandomid() {
 	# Buat 2 pasang karakter acak untuk keperluan login di jaringan WMS
 	randomid="$(head -4 /dev/urandom | tr -dc "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" | head -c4)"
+}
+
+generaterandomid2() {
+	# Buat 5 pasang angka acak untuk keperluan login di jaringan WMS Lite
+	randomid2="$(head -4 /dev/urandom | tr -dc "0123456789" | head -c10)"
 }
 
 detectwan() {
@@ -365,12 +370,14 @@ deviceclaimfailed() {
 testing() {
 	advancedmode="true"
 	generaterandomid
+	generaterandomid2
 	versi
 	
-	pidkopijahe="$(pgrep -f 'kopijahe')"
+	pidkopijahe="$(pgrep -f "kopijahe" | grep -v "^$$")"
 	
 	echo "$(uci show kopijahe)"
 	echo "random ID: $randomid"
+	echo "random ID2: $randomid2"
 	echo "PID autologin: $pidkopijahe"
 }
 
@@ -538,6 +545,17 @@ login_wms() {
 		curladditionalparameter='--silent'
 	fi
 	
+	# Cek apakah digunakan di jaringan WMS Lite, jika iya, maka:
+	if [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "wms-lite" ]]; then
+		# Buat 5 pasang angka random untuk keperluan login
+		generaterandomid2
+		# Tentukan akhiran username login untuk jaringan WMS Lite
+		username3="@wmslite.$randomid2"
+	else
+		# Tentukan akhiran username login untuk jaringan WMS
+		username3="@freeMS"
+	fi
+	
 	# Lakukan login sesuai dengan parameter konfigurasi autologin
 	login="$(curl $curladditionalparameter --interface "$wandevice" """$loginurl""?ipc=""$iprouter""&gw_id=""$gwid""&mac=""$clientmac""&redirect=&wlan=""$wlanid""" \
 	-H "authority: ""$server_id""" \
@@ -550,7 +568,7 @@ login_wms() {
 	-H "sec-fetch-mode: cors" \
 	-H "sec-fetch-dest: empty" \
 	-H "referer: https://""$server_id""/""$tipelogin""/?gw_id=""$gwid""&client_mac=""$clientmac""&wlan=""$wlanid""&sessionid=""$session_id""" \
-	--data-raw "username_=""$username2""&autologin_time=&username=""$username"".""$randomid""@freeMS&password=""$password""")"
+	--data-raw "username_=""$username2""&autologin_time=&username=""$username"".""$randomid""$username3""&password=""$password""")"
 	
 	kodestatus="$?"
 	
@@ -850,8 +868,8 @@ while [[ "$advancedmode" = "" ]]; do
 			login_community
 			# Istirahat selama 10 detik sebelum coba mengecek koneksi kembali
 			sleep 10
-		# Jika digunakan untuk jaringan WMS, maka:
-		elif [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "wms" ]]; then
+		# Jika digunakan untuk jaringan WMS atau WMS Lite, maka:
+		elif [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "wms" ]] || [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "wms-lite" ]]; then
 			# Jalankan fungsi login_wms
 			login_wms
 			# Istirahat selama 10 detik sebelum coba mengecek koneksi kembali
