@@ -15,7 +15,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="1.3.9"
+	ver="1.4.0"
 	# Beritahu pengguna versi aplikasi saat ini
 	echo "Versi aplikasi: $ver"
 }
@@ -403,6 +403,16 @@ wificommunity() {
 			# Jika bukan UT, maka gunakan format standard:
 			username2="$username@komunitas.$cfgkampus"
 		fi
+	# Jika WMS Lite, maka:
+	elif [[ "$wifivariant" = "wms-lite" ]]; then
+		# Buat 5 pasang angka random untuk keperluan login
+		generaterandomid2
+		# Tentukan akhiran username login untuk jaringan WMS Lite
+		username3="@wmslite.$randomid2"
+	# Jika WMS, maka:
+	elif [[ "$wifivariant" = "wms" ]]; then
+		# Tentukan akhiran username login untuk jaringan WMS
+		username3="@freeMS"
 	fi
 }
 
@@ -534,6 +544,7 @@ login_wms() {
 	gwid="$(uci -q get kopijahe.@autologin["$multiautologinnum"].gwid)"
 	wlanid="$(uci -q get kopijahe.@autologin["$multiautologinnum"].wlanid)"
 	session_id="$(uci -q get kopijahe.@autologin["$multiautologinnum"].sessionid)"
+	wificommunity
 	# Simpan jam dan tanggal saat ini
 	date > "/tmp/last.login.$waninterface"
 	
@@ -543,17 +554,6 @@ login_wms() {
 		curladditionalparameter='-k --silent'
 	else
 		curladditionalparameter='--silent'
-	fi
-	
-	# Cek apakah digunakan di jaringan WMS Lite, jika iya, maka:
-	if [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "wms-lite" ]]; then
-		# Buat 5 pasang angka random untuk keperluan login
-		generaterandomid2
-		# Tentukan akhiran username login untuk jaringan WMS Lite
-		username3="@wmslite.$randomid2"
-	else
-		# Tentukan akhiran username login untuk jaringan WMS
-		username3="@freeMS"
 	fi
 	
 	# Lakukan login sesuai dengan parameter konfigurasi autologin
