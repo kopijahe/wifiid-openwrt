@@ -15,7 +15,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="1.4.0"
+	ver="1.4.1"
 	# Beritahu pengguna versi aplikasi saat ini
 	echo "Versi aplikasi: $ver"
 }
@@ -544,6 +544,7 @@ login_wms() {
 	gwid="$(uci -q get kopijahe.@autologin["$multiautologinnum"].gwid)"
 	wlanid="$(uci -q get kopijahe.@autologin["$multiautologinnum"].wlanid)"
 	session_id="$(uci -q get kopijahe.@autologin["$multiautologinnum"].sessionid)"
+	wifivariant="$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)"
 	wificommunity
 	# Simpan jam dan tanggal saat ini
 	date > "/tmp/last.login.$waninterface"
