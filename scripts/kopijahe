@@ -397,11 +397,11 @@ wificommunity() {
 		if [[ "$cfgkampus" = "ut.ac.id" ]]; then
 			# Akun UT punya format berbeda dibandingkan dengan kampus lainnya
 			kampus="$(echo $cfgkampus | awk -F'[.]' '{print $1}')"
-			username2="$username@$cfgkampus@komunitas.$kampus"
+			username2="$username@$cfgkampus@com.$kampus"
 		# Jika bukan akun UT, maka:
 		else
 			# Jika bukan UT, maka gunakan format standard:
-			username2="$username@komunitas.$cfgkampus"
+			username2="$username@com.$cfgkampus"
 		fi
 	# Jika WMS Lite, maka:
 	elif [[ "$wifivariant" = "wms-lite" ]]; then
