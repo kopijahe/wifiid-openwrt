@@ -15,7 +15,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="1.4.1"
+	ver="1.4.2"
 	# Beritahu pengguna versi aplikasi saat ini
 	echo "Versi aplikasi: $ver"
 }
@@ -386,8 +386,8 @@ wificommunity() {
 	#
 	# Jika smartbisnis, maka:
 	if [[ "$wifivariant" = "smartbisnis" ]]; then
-		# Tentukan akhiran username "@komunitas.smartbisnis"
-		username2="$username@komunitas.smartbisnis"
+		# Tentukan akhiran username "@com.smartbisnis"
+		username2="$username@com.smartbisnis"
 	# Jika kampus:
 	elif [[ "$wifivariant" = "kampus" ]]; then
 		# Tentukan akhiran username sesuai dengan konfigurasi kampus yang tersimpan
