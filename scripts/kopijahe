@@ -15,7 +15,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="1.4.7"
+	ver="1.4.8"
 }
 
 bantuan() {
@@ -422,6 +422,28 @@ wificommunity() {
 	fi
 }
 
+hasil_login() {
+	# Fungsi output hasil login
+
+	# Filter hasil login hanya di bagian yang relevan saja
+	hasillogin="$(echo $login | jsonfilter -e '@["message"]')"
+
+	# Jika variabel hasillogin kosong, maka login tidak berhasil
+	if [[ "$hasillogin" = "" ]]; then
+		hasillogin="Login tidak berhasil, kode status CURL: $kodestatus"
+	fi
+	
+	# Jika digunakan di mode lanjutan, maka:
+	if [[ "$advancedmode" = "true" ]]; then
+		# Beritahu pengguna melalui layar terminal/stdout
+		echo "Percobaan login. Interface: $waninterface. Hasil: $hasillogin"
+	# Jika tidak, maka:
+	else
+		# Simpan hasilnya di berkas "/tmp/last.login.$waninterface" dan beritahu pengguna melalui System Log
+		echo "Percobaan login. Interface: $waninterface. Hasil: $hasillogin" | tee -a "/tmp/last.login.$waninterface" | logger -t "kopijahe $ver"
+	fi
+}
+
 login_generic() {
 	# Fungsi login umum jaringan @wifi.id
 	login_folder
@@ -473,15 +495,7 @@ login_generic() {
 	--data-raw "username=""$username2""&password=""$password""&landURL=")"
 	
 	kodestatus="$?"
-	
-	# Simpan hasilnya di berkas "/tmp/last.login.$waninterface" dan beritahu pengguna melalui System Log
-	hasillogin="$(echo $login | jsonfilter -e '@["message"]')"
-	# Jika variabel hasillogin kosong, maka login tidak berhasil
-	if [[ "$hasillogin" = "" ]]; then
-		hasillogin="Login tidak berhasil, kode status CURL: $kodestatus"
-	fi
-	
-	echo "Percobaan login. Interface: $waninterface. Hasil: $hasillogin"  | tee -a "/tmp/last.login.$waninterface" | logger -t "kopijahe $ver"
+	hasil_login
 }
 
 login_community() {
@@ -527,15 +541,7 @@ login_community() {
 	--data-raw "username=""$username2""&password=""$password""&landURL=")"
 	
 	kodestatus="$?"
-	
-	# Simpan hasilnya di berkas "/tmp/last.login.$waninterface" dan beritahu pengguna melalui System Log
-	hasillogin="$(echo $login | jsonfilter -e '@["message"]')"
-	# Jika variabel hasillogin kosong, maka login tidak berhasil
-	if [[ "$hasillogin" = "" ]]; then
-		hasillogin="Login tidak berhasil, kode status CURL: $kodestatus"
-	fi
-	
-	echo "Percobaan login. Interface: $waninterface. Hasil: $hasillogin"  | tee -a "/tmp/last.login.$waninterface" | logger -t "kopijahe $ver"
+	hasil_login
 }
 
 login_wms() {
@@ -581,15 +587,7 @@ login_wms() {
 	--data-raw "username_=""$username2""&autologin_time=&username=""$username"".""$randomid""$username3""&password=""$password""")"
 	
 	kodestatus="$?"
-	
-	# Simpan hasilnya di berkas "/tmp/last.login.$waninterface" dan beritahu pengguna melalui System Log
-	hasillogin="$(echo $login | jsonfilter -e '@["message"]')"
-	# Jika variabel hasillogin kosong, maka login tidak berhasil
-	if [[ "$hasillogin" = "" ]]; then
-		hasillogin="Login tidak berhasil, kode status CURL: $kodestatus"
-	fi
-	
-	echo "Percobaan login. Interface: $waninterface. Hasil: $hasillogin"  | tee -a "/tmp/last.login.$waninterface" | logger -t "kopijahe $ver"
+	hasil_login
 }
 
 login_file() {
@@ -712,6 +710,7 @@ manual_login() {
 	if [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "@wifi.id" ]] || [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "wifi.id" ]]; then
 		# Jalankan fungsi login_generic
 		login_generic
+		# Beritahu pengguna hasil login
 	# Jika digunakan untuk jaringan komunitas, maka:
 	elif [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "smartbisnis" ]] || [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "kampus" ]]; then
 		# Jalankan fungsi login_community
