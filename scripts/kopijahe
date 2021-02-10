@@ -15,7 +15,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="1.4.6"
+	ver="1.4.7"
 }
 
 bantuan() {
@@ -712,20 +712,14 @@ manual_login() {
 	if [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "@wifi.id" ]] || [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "wifi.id" ]]; then
 		# Jalankan fungsi login_generic
 		login_generic
-		# Istirahat selama 10 detik sebelum coba mengecek koneksi kembali
-		sleep 10
 	# Jika digunakan untuk jaringan komunitas, maka:
 	elif [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "smartbisnis" ]] || [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "kampus" ]]; then
 		# Jalankan fungsi login_community
 		login_community
-		# Istirahat selama 10 detik sebelum coba mengecek koneksi kembali
-		sleep 10
 	# Jika digunakan untuk jaringan WMS atau WMS Lite, maka:
 	elif [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "wms" ]] || [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "wms-lite" ]]; then
 		# Jalankan fungsi login_wms
 		login_wms
-		# Istirahat selama 10 detik sebelum coba mengecek koneksi kembali
-		sleep 10
 	fi
 }
 
