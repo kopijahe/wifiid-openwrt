@@ -15,7 +15,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="1.4.8"
+	ver="1.5.0"
 }
 
 bantuan() {
@@ -411,12 +411,13 @@ wificommunity() {
 		fi
 	# Jika WMS Lite, maka:
 	elif [[ "$wifivariant" = "wms-lite" ]]; then
-		# Buat 5 pasang angka random untuk keperluan login
+		generaterandomid
 		generaterandomid2
 		# Tentukan akhiran username login untuk jaringan WMS Lite
 		username3="@wmslite.$randomid2"
 	# Jika WMS, maka:
 	elif [[ "$wifivariant" = "wms" ]]; then
+		generaterandomid
 		# Tentukan akhiran username login untuk jaringan WMS
 		username3="@freeMS"
 	fi
@@ -444,114 +445,25 @@ hasil_login() {
 	fi
 }
 
-login_generic() {
-	# Fungsi login umum jaringan @wifi.id
-	login_folder
-	randommaccheck
-	versi
-	# Ambil parameter konfigurasi autologin
-	username="$(uci -q get kopijahe.@autologin["$multiautologinnum"].username)"
-	password="$(uci -q get kopijahe.@autologin["$multiautologinnum"].password)"
-	tipelogin="$(uci -q get kopijahe.@autologin["$multiautologinnum"].tipelogin)"
-	gwid="$(uci -q get kopijahe.@autologin["$multiautologinnum"].gwid)"
-	wlanid="$(uci -q get kopijahe.@autologin["$multiautologinnum"].wlanid)"
-	session_id="$(uci -q get kopijahe.@autologin["$multiautologinnum"].sessionid)"
-	server_id="$(uci -q get kopijahe.@autologin["$multiautologinnum"].serverid)"
-
-	# Periksa apakah akun yang digunakan adalah akun violet, jika iya, maka:
-	if [[ "$(echo $username | awk -F'[@]' '{print $2}')" = "violet" ]]; then
-		# Tidak perlu diberi tambahan akhiran
-		username2="$username"
-	# Jika tidak, maka:
-	else
-		# Beri tambahan akhiran "@spin2"
-		username2="$username@spin2"
-	fi
-
-	# Simpan jam dan tanggal saat ini
-	date > "/tmp/last.login.$waninterface"
-	
-	# Cek versi OS, jika menggunakan LEDE 17.01
-	# Maka perlu menggunakan tambahan parameter -k
-	if [[ "$osversion" = "17" ]]; then
-		curladditionalparameter='-k --silent'
-	else
-		curladditionalparameter='--silent'
-	fi
-	
-	# Lakukan login sesuai dengan parameter konfigurasi autologin
-	login="$(curl $curladditionalparameter --interface "$wandevice" """$loginurl""?ipc=""$iprouter""&gw_id=""$gwid""&mac=""$clientmac""&redirect=&wlan=""$wlanid""" \
-	-H "authority: ""$server_id""" \
-	-H "accept: application/json, text/javascript, */*; q=0.01" \
-	-H "x-requested-with: XMLHttpRequest" \
-	-H "user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4315.5 Safari/537.36" \
-	-H "content-type: application/x-www-form-urlencoded; charset=UTF-8" \
-	-H "origin: https://""$server_id""" \
-	-H "sec-fetch-site: same-origin" \
-	-H "sec-fetch-mode: cors" \
-	-H "sec-fetch-dest: empty" \
-	-H "referer: https://""$server_id""/""$tipelogin""/?gw_id=""$gwid""&client_mac=""$clientmac""&wlan=""$wlanid""&sessionid=""$session_id""" \
-	-H "accept-language: en-US,en;q=0.9,id-ID;q=0.8,id;q=0.7,zh-CN;q=0.6,zh;q=0.5,cs;q=0.4" \
-	--data-raw "username=""$username2""&password=""$password""&landURL=")"
-	
-	kodestatus="$?"
-	hasil_login
+dataraw() {
+	# Jika digunakan untuk jaringan @wifi.id umum, maka:
+	if [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "@wifi.id" ]] || [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "wifi.id" ]]; then
+		login_cred="username=""$username2""&password=""$password"""
+	# Jika digunakan untuk jaringan komunitas, maka:
+	elif [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "smartbisnis" ]] || [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "kampus" ]]; then
+		login_cred="username=""$username2""&password=""$password"""
+	# Jika digunakan untuk jaringan WMS atau WMS Lite, maka:
+	elif [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "wms" ]] || [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "wms-lite" ]]; then
+		login_cred="username_=""$username2""&autologin_time=&username=""$username"".""$randomid""$username3""&password=""$password"""
+	fi 
 }
 
-login_community() {
-	# Fungsi login komunitas @wifi.id
-	# Sementara ini hanya mendukung komunitas smartbisnis dan kampus saja
+login_wifi() {
+	# Fungsi login dari pengaturan yang disimpan
+	
 	login_folder
 	randommaccheck
 	versi
-	# Ambil parameter konfigurasi autologin
-	username="$(uci -q get kopijahe.@autologin["$multiautologinnum"].username)"
-	password="$(uci -q get kopijahe.@autologin["$multiautologinnum"].password)"
-	tipelogin="$(uci -q get kopijahe.@autologin["$multiautologinnum"].tipelogin)"
-	gwid="$(uci -q get kopijahe.@autologin["$multiautologinnum"].gwid)"
-	wlanid="$(uci -q get kopijahe.@autologin["$multiautologinnum"].wlanid)"
-	session_id="$(uci -q get kopijahe.@autologin["$multiautologinnum"].sessionid)"
-	server_id="$(uci -q get kopijahe.@autologin["$multiautologinnum"].serverid)"
-	wifivariant="$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)"
-	wificommunity
-	# Simpan jam dan tanggal saat ini
-	date > "/tmp/last.login.$waninterface"
-	
-	# Cek versi OS, jika menggunakan LEDE 17.01
-	# Maka perlu menggunakan tambahan parameter -k
-	if [[ "$osversion" = "17" ]]; then
-		curladditionalparameter='-k --silent'
-	else
-		curladditionalparameter='--silent'
-	fi
-	
-	# Lakukan login sesuai dengan parameter konfigurasi autologin
-	login="$(curl $curladditionalparameter --interface "$wandevice" """$loginurl""?ipc=""$iprouter""&gw_id=""$gwid""&mac=""$clientmac""&redirect=&wlan=""$wlanid""" \
-	-H "authority: ""$server_id""" \
-	-H "accept: application/json, text/javascript, */*; q=0.01" \
-	-H "x-requested-with: XMLHttpRequest" \
-	-H "user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4315.5 Safari/537.36" \
-	-H "content-type: application/x-www-form-urlencoded; charset=UTF-8" \
-	-H "origin: https://""$server_id""" \
-	-H "sec-fetch-site: same-origin" \
-	-H "sec-fetch-mode: cors" \
-	-H "sec-fetch-dest: empty" \
-	-H "referer: https://""$server_id""/""$tipelogin""/?gw_id=""$gwid""&client_mac=""$clientmac""&wlan=""$wlanid""&sessionid=""$session_id""" \
-	-H "accept-language: en-US,en;q=0.9,id-ID;q=0.8,id;q=0.7,zh-CN;q=0.6,zh;q=0.5,cs;q=0.4" \
-	--data-raw "username=""$username2""&password=""$password""&landURL=")"
-	
-	kodestatus="$?"
-	hasil_login
-}
-
-login_wms() {
-	# Fungsi login di jaringan WMS
-	# Tidak mendukung jaringan WMS yang hanya tekan "lanjutkan" saja
-	login_folder
-	generaterandomid
-	randommaccheck
-	versi
-	# Ambil parameter konfigurasi autologin
 	username="$(uci -q get kopijahe.@autologin["$multiautologinnum"].username)"
 	username2="$(echo "$username" | awk -F'[@]' '{print $1}')"
 	password="$(uci -q get kopijahe.@autologin["$multiautologinnum"].password)"
@@ -561,6 +473,8 @@ login_wms() {
 	session_id="$(uci -q get kopijahe.@autologin["$multiautologinnum"].sessionid)"
 	wifivariant="$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)"
 	wificommunity
+	dataraw
+	
 	# Simpan jam dan tanggal saat ini
 	date > "/tmp/last.login.$waninterface"
 	
@@ -584,16 +498,16 @@ login_wms() {
 	-H "sec-fetch-mode: cors" \
 	-H "sec-fetch-dest: empty" \
 	-H "referer: https://""$server_id""/""$tipelogin""/?gw_id=""$gwid""&client_mac=""$clientmac""&wlan=""$wlanid""&sessionid=""$session_id""" \
-	--data-raw "username_=""$username2""&autologin_time=&username=""$username"".""$randomid""$username3""&password=""$password""")"
+	--data-raw $login_cred)"
 	
 	kodestatus="$?"
 	hasil_login
 }
 
+
 login_file() {
 	# Fungsi login dari berkas tangkapan curl Google Chrome
 	# (untuk jaringan wifi selain yang didukung di atas)
-	advancedmode="true"
 	loginfromfile="true"
 	loginwifi=/tmp/login_file.txt
 	
@@ -695,31 +609,6 @@ seamless_reconnect() {
 	# Istirahat selama 10 detik sebelum coba mengecek koneksi kembali
 	sleep 10
 	done
-}
-
-manual_login() {
-	# Fungsi login manual
-	# Digunakan untuk mencoba login tanpa pengecekan kondisi jaringan
-	advancedmode="true"
-	multiautologin
-	detectwan
-	
-	# Cek tipe jaringan, lalu lakukan login
-	# 
-	# Jika digunakan untuk jaringan @wifi.id, maka:
-	if [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "@wifi.id" ]] || [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "wifi.id" ]]; then
-		# Jalankan fungsi login_generic
-		login_generic
-		# Beritahu pengguna hasil login
-	# Jika digunakan untuk jaringan komunitas, maka:
-	elif [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "smartbisnis" ]] || [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "kampus" ]]; then
-		# Jalankan fungsi login_community
-		login_community
-	# Jika digunakan untuk jaringan WMS atau WMS Lite, maka:
-	elif [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "wms" ]] || [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "wms-lite" ]]; then
-		# Jalankan fungsi login_wms
-		login_wms
-	fi
 }
 
 # Fungsi mendapatkan parameter aplikasi
@@ -836,7 +725,10 @@ do
 			set -x
 			;;
 		z)
-			manual_login
+			advancedmode="true"
+			multiautologin
+			detectwan
+			login_wifi
 			;; 
 		:)
 			echo "invalid"
@@ -893,22 +785,8 @@ while [[ "$advancedmode" = "" ]]; do
 			# Minta penggantian alamat IP
 			releaseobtainnewip
 		# Jika digunakan untuk jaringan @wifi.id umum, maka:
-		elif [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "@wifi.id" ]] || [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "wifi.id" ]]; then
-			# Jalankan fungsi login_generic
-			login_generic
-			# Istirahat selama 10 detik sebelum coba mengecek koneksi kembali
-			sleep 10
-		# Jika digunakan untuk jaringan komunitas, maka:
-		elif [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "smartbisnis" ]] || [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "kampus" ]]; then
-			# Jalankan fungsi login_community
-			login_community
-			# Istirahat selama 10 detik sebelum coba mengecek koneksi kembali
-			sleep 10
-		# Jika digunakan untuk jaringan WMS atau WMS Lite, maka:
-		elif [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "wms" ]] || [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "wms-lite" ]]; then
-			# Jalankan fungsi login_wms
-			login_wms
-			# Istirahat selama 10 detik sebelum coba mengecek koneksi kembali
+		else
+			login_wifi
 			sleep 10
 		fi
 	else
