@@ -15,7 +15,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="1.5.0"
+	ver="1.5.1"
 }
 
 bantuan() {
@@ -47,7 +47,7 @@ bantuan() {
 	echo "\"wifi.id\", \"wms\", \"wms-lite\", \"kampus\", \"smartbisnis\""
 	echo ""
 	echo "Penyedia layanan cek captive portal yang didukung:"
-	echo "\"kopijahe\" (default), \"firefox\", \"google\", \"apple\", \"microsoft\""
+	echo "\"kopijahe\" (default), \"firefox\", \"google\", \"apple\", \"microsoft\", \"xiaomi\", "
 	echo ""
 	echo "=========================================================================="
 	echo ""
@@ -94,11 +94,11 @@ osversioncheck() {
 }
 
 randommaccheck() {
-	# Jika tidak terdeteksi perangkat tidak memiliki MAC address tetap, maka:
+	# Jika tidak terdeteksi perangkat memiliki MAC address acak, maka:
 	if [[ "$detectrandommac" = "" ]]; then
 		# Tentukan MAC address dari berkas pengaturan
 		clientmac="$(uci -q get kopijahe.@autologin["$multiautologinnum"].clientmac)"
-	# Jika terdeteksi MAC address tidak tetap, maka:
+	# Jika terdeteksi MAC address acak, maka:
 	else
 		# Tentukan MAC address dari hasil ifconfig
 		clientmac="$(ifconfig $wandevice | grep HWaddr | awk -F'[ ]' '{print $10}')"
@@ -337,6 +337,11 @@ captiveportalcheck() {
 		cekkoneksi="$(curl --interface "$wandevice" -L --silent --retry $retry --max-redirs 1 --connect-timeout $timeout "http://www.msftconnecttest.com/connecttest.txt")"
 		kodestatuslanding="$?"
 		hasil="Microsoft Connect Test"
+	# Xiaomi: Layanan cek captive portal bawaan sistem operasi MIUI
+	elif [[ "$cpcprovider" = "xiaomi" ]]; then
+		cekkoneksi="$(curl --interface "$wandevice" -LI --silent --retry $retry --max-redirs 1 --connect-timeout $timeout "http://connect.rom.miui.com/generate_204" | grep -o "204")"
+		kodestatuslanding="$?"
+		hasil="204"
 	fi
 }
 
@@ -420,6 +425,10 @@ wificommunity() {
 		generaterandomid
 		# Tentukan akhiran username login untuk jaringan WMS
 		username3="@freeMS"
+	# Jika wifi.id, maka:
+	elif [[ "$wifivariant" = "wifi.id" ]] || [[ "$wifivariant" = "@wifi.id" ]]; then
+		# Tentukan akhiran username login untuk jaringan wifi.id
+		username3="@spin2"
 	fi
 }
 
@@ -763,12 +772,6 @@ while [[ "$advancedmode" = "" ]]; do
 		opkg update
 		# Lalu unduh dan instal CURL
 		opkg install curl
-	fi
-	
-	# Jika kode status login adalah 6, maka:
-	if [[ "$kodestatus" = "6" ]]; then
-		# Beritahu pengguna bahwa kemungkinan hostname belum diatur
-		echo "Hostname halaman login belum diatur"
 	fi
 	
 	# Jika hasil cek koneksi internet tidak berhasil, maka:
