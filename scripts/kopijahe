@@ -15,7 +15,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="1.5.1"
+	ver="1.5.2"
 }
 
 bantuan() {
@@ -427,8 +427,15 @@ wificommunity() {
 		username3="@freeMS"
 	# Jika wifi.id, maka:
 	elif [[ "$wifivariant" = "wifi.id" ]] || [[ "$wifivariant" = "@wifi.id" ]]; then
-		# Tentukan akhiran username login untuk jaringan wifi.id
-		username3="@spin2"
+		# Periksa apakah akun yang digunakan adalah akun violet, jika iya, maka:
+		if [[ "$(echo $username | awk -F'[@]' '{print $2}')" = "violet" ]]; then
+			# Tidak perlu diberi tambahan akhiran
+			username2="$username"
+		# Jika tidak, maka:
+		else
+			# Beri tambahan akhiran "@spin2"
+			username2="$username@spin2"
+		fi
 	fi
 }
 
