@@ -184,6 +184,19 @@ generaterandomid2() {
 	randomid2="$(head -4 /dev/urandom | tr -dc "0123456789" | head -c10)"
 }
 
+detecturl() {
+	# Fungsi deteksi URL halaman login
+	
+	# Deteksi URL login dengan cara melihat jawaban redirect dari halaman periksa koneksi
+	deteksi="$(curl -I --silent --interface "$wandevice" --max-redirs 1 --connect-timeout 10  "http://periksakoneksi.kopijahe.my.id/cek" | grep "Location")"
+	
+	# Jika gagal mendeteksi menggunakan teknik di atas, maka:
+	if [[ "$deteksi" = "" ]]; then
+		# Deteksi URL login dengan cara melihat URL landing di halaman redirect
+		deteksi="$(curl -I --silent --interface "$wandevice" --max-redirs 1 --connect-timeout 10  "http://periksakoneksi.kopijahe.my.id/cek" | grep URL | awk -F'[;]' '{print $2}' | head -c -3)"
+	fi
+}
+
 detectwan() {
 	# Deteksi perangkat jaringan WAN yang akan digunakan untuk login
 	# Cek terlebih dahulu apakah menggunakan load-balance atau tidak, jika iya, maka:
@@ -634,8 +647,7 @@ do
 		a)
 			multiautologin
 			detectwan
-			# Deteksi URL login dengan cara melihat jawaban redirect dari halaman periksa koneksi
-			deteksi="$(curl -I --silent --interface "$wandevice" --max-redirs 1 --connect-timeout 10  "http://periksakoneksi.kopijahe.my.id/cek" | grep "Location")"
+			detecturl
 			setup
 			;;
 		b)
