@@ -15,7 +15,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="1.5.3"
+	ver="1.5.4"
 }
 
 bantuan() {
@@ -184,19 +184,6 @@ generaterandomid2() {
 	randomid2="$(head -4 /dev/urandom | tr -dc "0123456789" | head -c10)"
 }
 
-detecturl() {
-	# Fungsi deteksi URL halaman login
-	
-	# Deteksi URL login dengan cara melihat jawaban redirect dari halaman periksa koneksi
-	deteksi="$(curl -I --silent --interface "$wandevice" --max-redirs 1 --connect-timeout 10  "http://periksakoneksi.kopijahe.my.id/cek" | grep "Location")"
-	
-	# Jika gagal mendeteksi menggunakan teknik di atas, maka:
-	if [[ "$deteksi" = "" ]]; then
-		# Deteksi URL login dengan cara melihat URL landing di halaman redirect
-		deteksi="$(curl -I --silent --interface "$wandevice" --max-redirs 1 --connect-timeout 10  "http://periksakoneksi.kopijahe.my.id/cek" | grep URL | awk -F'[;]' '{print $2}' | head -c -3)"
-	fi
-}
-
 detectwan() {
 	# Deteksi perangkat jaringan WAN yang akan digunakan untuk login
 	# Cek terlebih dahulu apakah menggunakan load-balance atau tidak, jika iya, maka:
@@ -220,6 +207,20 @@ detectwan() {
 	iprouter="$(ifstatus $waninterface |  jsonfilter -e '@["ipv4-address"][0].address')"
 }
 
+detecturl() {
+	# Fungsi deteksi URL halaman login
+	
+	# Deteksi URL login dengan cara melihat jawaban redirect dari halaman periksa koneksi
+	deteksi="$(curl -I --silent --interface "$wandevice" --max-redirs 1 --connect-timeout 10  "http://periksakoneksi.kopijahe.my.id/cek" | grep "Location")"
+	
+	# Jika gagal mendeteksi menggunakan teknik di atas, maka:
+	if [[ "$deteksi" = "" ]]; then
+		# Deteksi URL login dengan cara melihat URL landing di halaman redirect
+		urllanding="$(curl -I --silent --interface "$wandevice" --max-redirs 1 --connect-timeout 10  "http://periksakoneksi.kopijahe.my.id/cek" | grep URL | awk -F'[;]' '{print $2}' | head -c -3)"
+		deteksi=" Location: $urllanding"
+	fi
+}
+
 setup() {
 	# Fungsi penyiapan berkas konfigurasi autologin
 	advancedmode="true"
@@ -235,8 +236,6 @@ setup() {
 	session_id="$(echo "$deteksi" | awk -F'[=&]' '{print $8}' | tr -dc "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-")"
 	# Deteksi variabel server_id, filter hasilnya agar tidak ada error
 	server_id="$(echo "$deteksi" | awk -F'[/]' '{print $3}' | tr -dc "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-\.")"
-	# Buat konfigurasi baru
-	uci add kopijahe autologin
 	# Masukkan konfigurasi sesuai dengan hasil di atas dan sesuai dengan nomor konfigurasi multi-autologin
 	uci set kopijahe.@autologin["$multiautologinnum"].tipelogin="$tipelogin"
 	uci set kopijahe.@autologin["$multiautologinnum"].gwid="$gwid"
@@ -659,7 +658,6 @@ do
 			advancedmode="true"
 			multiautologin
 			if [[ "$icpcprovider" = "kopijahe" ]] || [[ "$icpcprovider" = "firefox" ]] || [[ "$icpcprovider" = "google" ]] || [[ "$icpcprovider" = "apple" ]] || [[ "$icpcprovider" = "microsoft" ]]; then
-				uci add kopijahe autologin
 				uci set kopijahe.@autologin["$multiautologinnum"].cpcprovider="$icpcprovider"
 			else
 				echo "Penyedia layanan yang didukung:"
@@ -694,7 +692,6 @@ do
 			advancedmode="true"
 			multiautologin
 			if [[ "$loadbalance" = "yes" ]] || [[ "$loadbalance" = "no" ]]; then
-				uci add kopijahe autologin
 				uci set kopijahe.@autologin["$multiautologinnum"].loadbalance="$loadbalance"
 				uci commit kopijahe
 			else 
@@ -716,7 +713,6 @@ do
 			password="$OPTARG"
 			advancedmode="true"
 			multiautologin
-			uci add kopijahe autologin
 			uci set kopijahe.@autologin["$multiautologinnum"].password="$password"
 			uci commit kopijahe
 			;;
@@ -730,7 +726,6 @@ do
 			username="$OPTARG"
 			advancedmode="true"
 			multiautologin
-			uci add kopijahe autologin
 			uci set kopijahe.@autologin["$multiautologinnum"].username="$username"
 			uci commit kopijahe
 			;;
