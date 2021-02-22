@@ -15,7 +15,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="1.5.2"
+	ver="1.5.3"
 }
 
 bantuan() {
@@ -537,6 +537,7 @@ login_wifi() {
 login_file() {
 	# Fungsi login dari berkas tangkapan curl Google Chrome
 	# (untuk jaringan wifi selain yang didukung di atas)
+	advancedmode="true"
 	loginfromfile="true"
 	loginwifi=/tmp/login_file.txt
 	
