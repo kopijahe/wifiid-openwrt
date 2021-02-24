@@ -15,7 +15,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="1.5.6"
+	ver="1.5.7"
 }
 
 bantuan() {
@@ -436,7 +436,13 @@ wificommunity() {
 	elif [[ "$wifivariant" = "wms" ]]; then
 		generaterandomid
 		# Tentukan akhiran username login untuk jaringan WMS
-		wmsid="$(echo $wlanid | awk -F'[/-]' '{print $3}')"
+		
+		if [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wmsid)" = "" ]]; then
+			wmsid="$(echo $wlanid | awk -F'[/-]' '{print $3}')"
+		else
+			wmsid="$(uci -q get kopijahe.@autologin["$multiautologinnum"].wmsid)"
+		fi
+		
 		username3="@wms.$wmsid.000"
 	# Jika wifi.id, maka:
 	elif [[ "$wifivariant" = "wifi.id" ]] || [[ "$wifivariant" = "@wifi.id" ]]; then
