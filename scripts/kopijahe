@@ -179,11 +179,6 @@ generaterandomid() {
 	randomid="$(head -4 /dev/urandom | tr -dc "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" | head -c4)"
 }
 
-generaterandomid2() {
-	# Buat 5 pasang angka acak untuk keperluan login di jaringan WMS Lite
-	randomid2="$(head -4 /dev/urandom | tr -dc "0123456789" | head -c10)"
-}
-
 detectwan() {
 	# Deteksi perangkat jaringan WAN yang akan digunakan untuk login
 	# Cek terlebih dahulu apakah menggunakan load-balance atau tidak, jika iya, maka:
@@ -407,7 +402,6 @@ testing() {
 	echo "Versi aplikasi: $ver"
 	echo "$(uci show kopijahe)"
 	echo "random ID: $randomid"
-	echo "random ID2: $randomid2"
 	echo "PID autologin: $pidkopijahe"
 }
 
