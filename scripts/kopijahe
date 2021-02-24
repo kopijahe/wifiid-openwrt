@@ -15,7 +15,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="1.5.5"
+	ver="1.5.6"
 }
 
 bantuan() {
@@ -224,18 +224,18 @@ detecturl() {
 setup() {
 	# Fungsi penyiapan berkas konfigurasi autologin
 	advancedmode="true"
-	# Deteksi tipe login (hasil "login" = wifi.id, hasil "wms" = wms), filter hasilnya agar tidak ada error
-	tipelogin="$(echo "$deteksi" | awk -F'[=&]' '{print $1}' | awk -F'[=/]' '{print $4}' | tr -dc "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")"
-	# Deteksi variabel gw_id, filter hasilnya agar tidak ada error
-	gwid="$(echo "$deteksi" | awk -F'[=&]' '{print $2}' | tr -dc "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-")"
-	# Deteksi MAC address yang digunakan, filter hasilnya agar tidak ada error
-	clientmac="$(echo "$deteksi" | awk -F'[=&]' '{print $4}' | tr -dc "abcdefABCDEF0123456789:")"
-	# Deteksi variabel wlan_id, filter hasilnya agar tidak ada error
-	wlanid="$(echo "$deteksi" | awk -F'[=&]' '{print $6}' | tr -dc "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-\/@:.")"
-	# Deteksi variabel session_id, filter hasilnya agar tidak ada error
-	session_id="$(echo "$deteksi" | awk -F'[=&]' '{print $8}' | tr -dc "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-")"
-	# Deteksi variabel server_id, filter hasilnya agar tidak ada error
-	server_id="$(echo "$deteksi" | awk -F'[/]' '{print $3}' | tr -dc "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-\.")"
+	# Deteksi tipe login (hasil "login" = wifi.id, hasil "wms" = wms)
+	tipelogin="$(echo "$deteksi" | awk -F'[=&]' '{print $1}' | awk -F'[=/]' '{print $4}')"
+	# Deteksi variabel gw_id
+	gwid="$(echo "$deteksi" | awk -F'[=&]' '{print $2}')"
+	# Deteksi MAC address yang digunakan
+	clientmac="$(echo "$deteksi" | awk -F'[=&]' '{print $4}')"
+	# Deteksi variabel wlan_id
+	wlanid="$(echo "$deteksi" | awk -F'[=&]' '{print $6}')"
+	# Deteksi variabel session_id
+	session_id="$(echo "$deteksi" | awk -F'[=&]' '{print $8}')"
+	# Deteksi variabel server_id
+	server_id="$(echo "$deteksi" | awk -F'[/]' '{print $3}')"
 	# Masukkan konfigurasi sesuai dengan hasil di atas dan sesuai dengan nomor konfigurasi multi-autologin
 	uci set kopijahe.@autologin["$multiautologinnum"].tipelogin="$tipelogin"
 	uci set kopijahe.@autologin["$multiautologinnum"].gwid="$gwid"
@@ -436,7 +436,8 @@ wificommunity() {
 	elif [[ "$wifivariant" = "wms" ]]; then
 		generaterandomid
 		# Tentukan akhiran username login untuk jaringan WMS
-		username3="@freeMS"
+		wmsid="$(echo $wlanid | awk -F'[/-]' '{print $3}')"
+		username3="@wms.$wmsid.000"
 	# Jika wifi.id, maka:
 	elif [[ "$wifivariant" = "wifi.id" ]] || [[ "$wifivariant" = "@wifi.id" ]]; then
 		# Periksa apakah akun yang digunakan adalah akun violet, jika iya, maka:
