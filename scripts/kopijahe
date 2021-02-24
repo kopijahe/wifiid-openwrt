@@ -392,7 +392,6 @@ deviceclaimfailed() {
 testing() {
 	advancedmode="true"
 	generaterandomid
-	generaterandomid2
 	versi
 	
 	pidkopijahe="$(pgrep -f "kopijahe" | grep -v "^$$")"
@@ -429,14 +428,14 @@ wificommunity() {
 	# Jika WMS Lite, maka:
 	elif [[ "$wifivariant" = "wms-lite" ]]; then
 		generaterandomid
-		generaterandomid2
 		# Tentukan akhiran username login untuk jaringan WMS Lite
+		wmsid="$(uci -q get kopijahe.@autologin["$multiautologinnum"].wmsid)"
 		username3="@wmslite.$randomid2.000"
 	# Jika WMS, maka:
 	elif [[ "$wifivariant" = "wms" ]]; then
 		generaterandomid
-		# Tentukan akhiran username login untuk jaringan WMS
 		
+		# Tentukan akhiran username login untuk jaringan WMS
 		if [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wmsid)" = "" ]]; then
 			wmsid="$(echo $wlanid | awk -F'[/-]' '{print $3}')"
 		else
