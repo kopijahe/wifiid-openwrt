@@ -15,7 +15,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="1.5.9"
+	ver="1.6.0"
 }
 
 bantuan() {
@@ -434,22 +434,16 @@ wificommunity() {
 			username2="$username@com.$cfgkampus"
 		fi
 	# Jika WMS Lite, maka:
-	elif [[ "$wifivariant" = "wms-lite" ]]; then
+	elif [[ "$wifivariant" = "wms-lite" ]] || [[ "$wifivariant" = "wmslite" ]]; then
 		generaterandomid
 		# Tentukan akhiran username login untuk jaringan WMS Lite
 		wmsid="$(uci -q get kopijahe.@autologin["$multiautologinnum"].wmsid)"
-		username3="@wmslite.$randomid2.000"
+		username3="@wmslite.$wmsid.000"
 	# Jika WMS, maka:
 	elif [[ "$wifivariant" = "wms" ]]; then
 		generaterandomid
-		
 		# Tentukan akhiran username login untuk jaringan WMS
-		if [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wmsid)" = "" ]]; then
-			wmsid="$(echo $wlanid | awk -F'[/-]' '{print $3}')"
-		else
-			wmsid="$(uci -q get kopijahe.@autologin["$multiautologinnum"].wmsid)"
-		fi
-		
+		wmsid="$(uci -q get kopijahe.@autologin["$multiautologinnum"].wmsid)"	
 		username3="@wms.$wmsid.000"
 	# Jika wifi.id, maka:
 	elif [[ "$wifivariant" = "wifi.id" ]] || [[ "$wifivariant" = "@wifi.id" ]]; then
@@ -684,7 +678,7 @@ do
 			multiautologin
 			detectwan
 			echo "Silahkan masukkan URL halaman landing:"
-			read -r urllanding
+			read -r "urllanding"
 			deteksi=" Location: $urllanding"
 			setup
 			;;
@@ -714,8 +708,8 @@ do
 			fi
 			if [[ "$loadbalance" = "yes" ]]; then
 				echo "Silahkan tentukan interface yang digunakan (misal: wwan, wwan1):"
-				read -r lbinterface
-				waninterface="$(echo "$lbinterface" | tr -dc "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")"
+				read -r "lbinterface"
+				waninterface="$(echo "$lbinterface" | tr -dc "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_")"
 				uci set kopijahe.@autologin["$multiautologinnum"].waninterface="$waninterface"
 				uci commit kopijahe
 			fi
@@ -752,7 +746,7 @@ do
 			multiautologin
 			if [[ "$wifivariant" = "kampus" ]]; then
 				echo "Silahkan masukkan nama domain kampus anda dengan 2 tanda kutip (misal: \"ut.ac.id\")"
-				read -r kampus
+				read -r "kampus"
 				uci set kopijahe.@autologin["$multiautologinnum"].kampus="$kampus"
 				uci commit kopijahe
 			fi
