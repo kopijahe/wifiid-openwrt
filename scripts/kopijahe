@@ -15,7 +15,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="1.6.0"
+	ver="1.6.1"
 }
 
 bantuan() {
@@ -141,11 +141,15 @@ install() {
 	# Beritahu pengguna bahwa proses instalasi dimulai
 	advancedmode="true"
 	multiautologin
+	versi
 	echo "Memasang Autologin KopiJahe..."
 	# Kopi berkas ke folder /usr/bin/
 	cp -f "$0" /usr/bin/kopijahe
 	# Beri izin eksekusi
 	chmod +x /usr/bin/kopijahe
+	# Beritahu pengguna versi autologin saat ini
+	echo "Versi aplikasi autologin saat ini: $ver"
+	
 	# Cek apakah curl sudah tersedia di sistem
 	checkcurl="$(curl --version)"
 	# Jika hasil cek kosong, berarti curl belum tersedia, maka:
@@ -775,7 +779,7 @@ done
 # Cek versi sistem operasi terlebih dahulu
 osversioncheck
 # Cek juga apakah perangkat tidak punya MAC tetap
-detectrandommac="$(logread | grep 'generated random MAC address')"
+detectrandommac="$(dmesg | grep 'generated random MAC address')"
 
 # Fungsi autologin
 # Deteksi apakah variabel advancedmode hidup, jika tidak, maka lakukan autologin:
