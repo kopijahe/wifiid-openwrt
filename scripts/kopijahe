@@ -15,7 +15,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="1.6.1"
+	ver="1.6.2"
 }
 
 bantuan() {
@@ -801,11 +801,19 @@ while [[ "$advancedmode" = "" ]]; do
 		opkg install curl
 	fi
 	
+	# Jika kode status hasil cek koneksi adalah 6, maka:
+	if [[ "$kodestatus" = "6" ]]; then
+		# Beritahu pengguna bahwa hostname server login belum diisi
+		echo "Hostname server landing belum diisi" | logger -t "kopijahe $ver"
+		# Lalu tutup aplikasi agar tidak looping
+		exit 1
+	fi
+	
 	# Jika hasil cek koneksi internet tidak berhasil, maka:
 	if [[ "$internetconnected" = "no" ]]; then
-		# Cek terlebih dahulu apakah login diblokir
+		# Cek terlebih dahulu apakah login diblokir, atau mendapat kode status CURL 7
 		# Jika benar, maka:
-		if [[ "$loginblocked" = "yes" ]]; then
+		if [[ "$loginblocked" = "yes" ]] || [[ "$kodestatus" = "7" ]]; then
 			# Catat jam dan tanggal saat ini di berkas "/tmp/last.login.$waninterface"
 			date > "/tmp/last.login.$waninterface"
 			# Catat percobaan login terakhir di berkas "/tmp/last.login.$waninterface"
