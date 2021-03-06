@@ -15,7 +15,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="1.6.2"
+	ver="1.6.3"
 }
 
 bantuan() {
@@ -306,9 +306,14 @@ releaseobtainnewip() {
 	if [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].loadbalance)" = "yes" ]]; then
 		# Gunakan mwan3 untuk menghidupkan interface
 		mwan3 ifup "$waninterface"
+		# Jika ternyata mwan3 tidak terpasang, maka:
+		if [[ "$?" = "127" ]]; then
+			# Hidupkan interface tanpa menggunakan mwan3
+			ifup "$waninterface"
+		fi
 	# Jika tidak, maka:
 	else
-		# Hidupkan interface
+		# Hidupkan interface tanpa menggunakan mwan3
 		ifup "$waninterface"
 	fi
 	# Reset kode status, supaya tidak terjadi pengulangan
@@ -410,7 +415,10 @@ testing() {
 	pidkopijahe="$(pgrep -f "kopijahe" | grep -v "^$$")"
 	
 	echo "Versi aplikasi: $ver"
-	echo "$(uci show kopijahe)"
+	echo "" 
+	echo "Pengaturan autologin:"
+	uci show kopijahe
+	echo ""
 	echo "random ID: $randomid"
 	echo "PID autologin: $pidkopijahe"
 }
@@ -463,6 +471,19 @@ wificommunity() {
 	fi
 }
 
+dataraw() {
+	# Jika digunakan untuk jaringan @wifi.id umum, maka:
+	if [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "@wifi.id" ]] || [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "wifi.id" ]]; then
+		login_cred="username=""$username2""&password=""$password"""
+	# Jika digunakan untuk jaringan komunitas, maka:
+	elif [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "smartbisnis" ]] || [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "kampus" ]]; then
+		login_cred="username=""$username2""&password=""$password"""
+	# Jika digunakan untuk jaringan WMS atau WMS Lite, maka:
+	elif [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "wms" ]] || [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "wms-lite" ]]; then
+		login_cred="username_=""$username2""&autologin_time=&username=""$username"".""$randomid""$username3""&password=""$password"""
+	fi 
+}
+
 hasil_login() {
 	# Fungsi output hasil login
 
@@ -483,19 +504,6 @@ hasil_login() {
 		# Simpan hasilnya di berkas "/tmp/last.login.$waninterface" dan beritahu pengguna melalui System Log
 		echo "Percobaan login. Interface: $waninterface. Hasil: $hasillogin" | tee -a "/tmp/last.login.$waninterface" | logger -t "kopijahe $ver"
 	fi
-}
-
-dataraw() {
-	# Jika digunakan untuk jaringan @wifi.id umum, maka:
-	if [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "@wifi.id" ]] || [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "wifi.id" ]]; then
-		login_cred="username=""$username2""&password=""$password"""
-	# Jika digunakan untuk jaringan komunitas, maka:
-	elif [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "smartbisnis" ]] || [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "kampus" ]]; then
-		login_cred="username=""$username2""&password=""$password"""
-	# Jika digunakan untuk jaringan WMS atau WMS Lite, maka:
-	elif [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "wms" ]] || [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "wms-lite" ]]; then
-		login_cred="username_=""$username2""&autologin_time=&username=""$username"".""$randomid""$username3""&password=""$password"""
-	fi 
 }
 
 login_wifi() {
@@ -811,18 +819,18 @@ while [[ "$advancedmode" = "" ]]; do
 	
 	# Jika hasil cek koneksi internet tidak berhasil, maka:
 	if [[ "$internetconnected" = "no" ]]; then
-		# Cek terlebih dahulu apakah login diblokir, atau mendapat kode status CURL 7
+		# Cek terlebih dahulu apakah login diblokir
 		# Jika benar, maka:
-		if [[ "$loginblocked" = "yes" ]] || [[ "$kodestatus" = "7" ]]; then
+		if [[ "$loginblocked" = "yes" ]]; then
 			# Catat jam dan tanggal saat ini di berkas "/tmp/last.login.$waninterface"
 			date > "/tmp/last.login.$waninterface"
 			# Catat percobaan login terakhir di berkas "/tmp/last.login.$waninterface"
 			echo "Percobaan login terakhir:" >> "/tmp/last.login.$waninterface"
 			# Beritahu pengguna bahwa koneksi dengan internet terputus
-			echo "Koneksi $waninterface terputus, meminta alamat IP baru" | tee -a "/tmp/last.login.$waninterface" | logger -t "kopijahe $ver"
+			echo "Login di interface $waninterface diblokir, alasan: $hasillogin" | tee -a "/tmp/last.login.$waninterface" | logger -t "kopijahe $ver"
 			# Minta penggantian alamat IP
 			releaseobtainnewip
-		# Jika digunakan untuk jaringan @wifi.id umum, maka:
+		# Jika login sebelumnya tidak diblokir, maka:
 		else
 			login_wifi
 			sleep 10
