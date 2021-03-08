@@ -15,7 +15,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="1.6.5"
+	ver="1.6.6"
 }
 
 bantuan() {
@@ -830,7 +830,10 @@ while [[ "$advancedmode" = "" ]]; do
 	
 	# Jika hasil cek koneksi internet tidak berhasil, maka:
 	if [[ "$internetconnected" = "no" ]]; then
-		# Cek terlebih dahulu apakah IP diblokir,
+		# Cek dulu varian jaringan yang digunakan:
+		wifivariant="$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)"
+		
+		# Cek apakah IP diblokir,
 		# Jika benar, maka:
 		if [[ "$ipblocked" = "yes" ]]; then
 			# Catat jam dan tanggal saat ini di berkas "/tmp/last.login.$waninterface"
