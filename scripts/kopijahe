@@ -15,7 +15,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="1.6.4"
+	ver="1.6.5"
 }
 
 bantuan() {
@@ -276,12 +276,23 @@ login_folder() {
 	fi
 }
 
-loginblocked() {
+loginblock() {
 	# Fungsi cek blokir login
 	# Buat berkas "/tmp/last.login.$waninterface" untuk menghindari error
 	touch "/tmp/last.login.$waninterface"
-	# Jika di dalam berkas ditemukan hasil "Bloked IP" atau "Gagal Login", maka:
-	if [[ "$(cat "/tmp/last.login.$waninterface" | grep -o "Blocked IP")" = "Blocked IP" ]] || [[ "$(cat "/tmp/last.login.$waninterface" | grep -o "Gagal Login")" = "Gagal Login" ]]; then
+	
+	# Jika di dalam berkas ditemukan hasil "Bloked IP", maka:
+	if [[ "$(cat "/tmp/last.login.$waninterface" | grep -o "Blocked IP")" = "Blocked IP" ]]; then
+		# Tentukan bahwa IP diblokir
+		ipblocked=yes
+	# Jika tidak ditemukan, maka:
+	else
+		# Tentukan bahwa IP tidak diblokir
+		ipblocked=no
+	fi
+	
+	# Jika di dalam berkas ditemukan hasil "Gagal Login", maka:
+	if [[ "$(cat "/tmp/last.login.$waninterface" | grep -o "Gagal Login")" = "Gagal Login" ]]; then
 		# Tentukan bahwa login diblokir
 		loginblocked=yes
 	# Jika tidak ditemukan, maka:
@@ -568,7 +579,7 @@ login_file() {
 	while [[ "$loginfromfile" = "true" ]]; do
 	detectwan
 	captiveportalcheck
-	loginblocked
+	loginblock
 	detectinternetconnection
 	generaterandomid
 	deviceclaimfailed
@@ -795,7 +806,7 @@ while [[ "$advancedmode" = "" ]]; do
 	multiautologin
 	detectwan
 	captiveportalcheck
-	loginblocked
+	loginblock
 	detectinternetconnection
 	deviceclaimfailed
 	
@@ -819,9 +830,9 @@ while [[ "$advancedmode" = "" ]]; do
 	
 	# Jika hasil cek koneksi internet tidak berhasil, maka:
 	if [[ "$internetconnected" = "no" ]]; then
-		# Cek terlebih dahulu apakah login diblokir
+		# Cek terlebih dahulu apakah IP diblokir,
 		# Jika benar, maka:
-		if [[ "$loginblocked" = "yes" ]] && [[ "$wifivariant" != "smartbisnis" ]]; then
+		if [[ "$ipblocked" = "yes" ]]; then
 			# Catat jam dan tanggal saat ini di berkas "/tmp/last.login.$waninterface"
 			date > "/tmp/last.login.$waninterface"
 			# Catat percobaan login terakhir di berkas "/tmp/last.login.$waninterface"
@@ -830,6 +841,21 @@ while [[ "$advancedmode" = "" ]]; do
 			echo "Login di interface $waninterface diblokir, alasan: $hasillogin" | tee -a "/tmp/last.login.$waninterface" | logger -t "kopijahe $ver"
 			# Minta penggantian alamat IP
 			releaseobtainnewip
+		# Cek apakah login diblokir dan tidak menggunakan akun smartbisnis,
+		# Jika benar, maka:
+		elif [[ "$loginblocked" = "yes" ]] && [[ "$wifivariant" != "smartbisnis" ]]; then
+			# Catat jam dan tanggal saat ini di berkas "/tmp/last.login.$waninterface"
+			date > "/tmp/last.login.$waninterface"
+			# Catat percobaan login terakhir di berkas "/tmp/last.login.$waninterface"
+			echo "Percobaan login terakhir:" >> "/tmp/last.login.$waninterface"
+			# Beritahu pengguna bahwa koneksi dengan internet terputus
+			echo "Login di interface $waninterface diblokir, alasan: $hasillogin" | tee -a "/tmp/last.login.$waninterface" | logger -t "kopijahe $ver"
+			# Minta penggantian alamat IP
+			releaseobtainnewip
+		# Jika menggunakan login diblokir dan menggunakan akun smartbisnis, maka:
+		elif [[ "$loginblocked" = "yes" ]] && [[ "$wifivariant" = "smartbisnis" ]]; then
+			# Coba lagi 10 detik kemudian
+			sleep 10
 		# Jika login sebelumnya tidak diblokir, maka:
 		else
 			login_wifi
