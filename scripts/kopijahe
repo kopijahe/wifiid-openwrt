@@ -15,7 +15,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="1.6.6"
+	ver="1.6.7"
 }
 
 bantuan() {
@@ -510,6 +510,8 @@ hasil_login() {
 	if [[ "$advancedmode" = "true" ]]; then
 		# Beritahu pengguna melalui layar terminal/stdout
 		echo "Percobaan login. Interface: $waninterface. Hasil: $hasillogin"
+		# Simpan juga hasilnya di berkas "/tmp/last.login.$waninterface" dan beritahu pengguna melalui System Log
+		echo "Percobaan login. Interface: $waninterface. Hasil: $hasillogin" | tee -a "/tmp/last.login.$waninterface" | logger -t "kopijahe $ver"
 	# Jika tidak, maka:
 	else
 		# Simpan hasilnya di berkas "/tmp/last.login.$waninterface" dan beritahu pengguna melalui System Log
@@ -688,11 +690,11 @@ do
 			icpcprovider="$OPTARG"
 			advancedmode="true"
 			multiautologin
-			if [[ "$icpcprovider" = "kopijahe" ]] || [[ "$icpcprovider" = "firefox" ]] || [[ "$icpcprovider" = "google" ]] || [[ "$icpcprovider" = "apple" ]] || [[ "$icpcprovider" = "microsoft" ]]; then
+			if [[ "$icpcprovider" = "kopijahe" ]] || [[ "$icpcprovider" = "firefox" ]] || [[ "$icpcprovider" = "google" ]] || [[ "$icpcprovider" = "apple" ]] || [[ "$icpcprovider" = "microsoft" ]] || [[ "$icpcprovider" = "xiaomi" ]]; then
 				uci set kopijahe.@autologin["$multiautologinnum"].cpcprovider="$icpcprovider"
 			else
 				echo "Penyedia layanan yang didukung:"
-				echo "\"kopijahe\" (default), \"firefox\", \"google\", \"apple\", \"microsoft\""
+				echo "\"kopijahe\" (default), \"firefox\", \"google\", \"apple\", \"microsoft\", \"xiaomi\""
 				exit 1
 			fi
 			uci commit kopijahe
@@ -768,8 +770,8 @@ do
 			advancedmode="true"
 			multiautologin
 			if [[ "$wifivariant" = "kampus" ]]; then
-				echo "Silahkan masukkan nama domain kampus anda dengan 2 tanda kutip (misal: \"ut.ac.id\")"
-				read -r "kampus"
+				echo "Silahkan masukkan nama kampus anda (misal: \"ut.ac.id\", \"unsiq\", \"trisakti\", )"
+				read -r kampus
 				uci set kopijahe.@autologin["$multiautologinnum"].kampus="$kampus"
 				uci commit kopijahe
 			fi
