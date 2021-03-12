@@ -15,7 +15,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="1.6.9"
+	ver="1.7.0"
 }
 
 bantuan() {
@@ -108,6 +108,23 @@ randommaccheck() {
 	else
 		# Tentukan MAC address dari hasil ifconfig
 		clientmac="$(ifconfig $wandevice | grep HWaddr | awk -F'[ ]' '{print $10}')"
+	fi
+}
+
+mwan3check() {
+	# Fungsi cek mwan3
+	# Untuk mengecek apakah mwan3 terpasang atau tidak
+	
+	checkmwan3="$(mwan3 --help)"
+	
+	# Jika perintah sebelumnya menghasilkan kode 127, maka
+	if [[ "$?" = "127" ]]; then
+		# Tentukan bahwa mwan3 tidak terpasang
+		checkmwan3="no"
+	# Jika tidak, maka:
+	else
+		# Tentukan bahwa mwan3 terpasang
+		checkmwan3="ok"
 	fi
 }
 
@@ -313,15 +330,11 @@ releaseobtainnewip() {
 	# Hidupkan kembali perangkat yang digunakan
 	ifconfig "$wandevice" up
 	
-	# Cek apakah digunakan untuk load-balance, jika iya, maka:
-	if [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].loadbalance)" = "yes" ]]; then
+	# Cek apakah digunakan untuk load-balance dan mwan3 terpasang, jika benar, maka:
+	mwan3check
+	if [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].loadbalance)" = "yes" ]] && [[ "$checkmwan3" = "ok" ]]; then
 		# Gunakan mwan3 untuk menghidupkan interface
 		mwan3 ifup "$waninterface"
-		# Jika ternyata mwan3 tidak terpasang, maka:
-		if [[ "$?" = "127" ]]; then
-			# Hidupkan interface tanpa menggunakan mwan3
-			ifup "$waninterface"
-		fi
 	# Jika tidak, maka:
 	else
 		# Hidupkan interface tanpa menggunakan mwan3
@@ -548,7 +561,7 @@ login_wifi() {
 	fi
 	
 	# Lakukan login sesuai dengan parameter konfigurasi autologin
-	login="$(curl $curladditionalparameter --interface "$wandevice" """$loginurl""?ipc=""$iprouter""&gw_id=""$gwid""&mac=""$clientmac""&redirect=&wlan=""$wlanid""" \
+	login="$(curl --interface $wandevice $curladditionalparameter """$loginurl""?ipc=""$iprouter""&gw_id=""$gwid""&mac=""$clientmac""&redirect=&wlan=""$wlanid""" \
 	-H "authority: ""$server_id""" \
 	-H "accept: application/json, text/javascript, */*; q=0.01" \
 	-H "x-requested-with: XMLHttpRequest" \
@@ -672,6 +685,11 @@ seamless_reconnect() {
 	sleep 10
 	done
 }
+
+# Cek versi sistem operasi terlebih dahulu
+osversioncheck
+# Cek juga apakah perangkat tidak punya MAC tetap
+detectrandommac="$(dmesg | grep 'generated random MAC address')"
 
 # Fungsi mendapatkan parameter aplikasi
 while getopts :abc:df:hkil:m:p:stu:v:xz flags
@@ -797,11 +815,6 @@ do
 			;;
 	esac
 done
-
-# Cek versi sistem operasi terlebih dahulu
-osversioncheck
-# Cek juga apakah perangkat tidak punya MAC tetap
-detectrandommac="$(dmesg | grep 'generated random MAC address')"
 
 # Fungsi autologin
 # Deteksi apakah variabel advancedmode hidup, jika tidak, maka lakukan autologin:
