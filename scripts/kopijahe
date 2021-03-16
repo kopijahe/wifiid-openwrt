@@ -15,7 +15,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="1.7.0"
+	ver="1.7.1"
 }
 
 bantuan() {
@@ -38,6 +38,7 @@ bantuan() {
 	echo "-t: tes dan tampilkan semua konfigurasi aplikasi"
 	echo "-u: masukkan username yang digunakan untuk login dengan 2 tanda kutip"
 	echo "-m: multi-autologin, masukkan angka jumlah autologin akan yang digunakan"
+	echo "-o: lakukan logout secara manual (supaya akun tidak tersangkut)"
 	echo "-p: masukkan password yang digunakan untuk login dengan 2 tanda kutip"
 	echo "-v: masukkan varian jaringan wifi yang digunakan dengan 2 tanda kutip"
 	echo "-x: masuk ke mode debug (untuk keperluan analisa jika gagal autologin)"
@@ -532,6 +533,63 @@ hasil_login() {
 	fi
 }
 
+hasil_logout() {
+	# Fungsi output hasil login
+
+	# Filter hasil login hanya di bagian yang relevan saja
+	hasillogout="$(echo $logout | awk -F'[<>]' '{print $5}')"
+
+	# Jika variabel hasillogin kosong, maka login tidak berhasil
+	if [[ "$hasillogout" = "" ]]; then
+		hasillogout="Logout tidak berhasil, kode status CURL: $kodestatus"
+	fi
+	
+	# Jika digunakan di mode lanjutan, maka:
+	if [[ "$advancedmode" = "true" ]]; then
+		# Beritahu pengguna melalui layar terminal/stdout
+		echo "Percobaan logout. Interface: $waninterface. Hasil: $hasillogout"
+	fi
+	
+	# Dan beritahu pengguna melalui System Log
+	echo "Percobaan logout. Interface: $waninterface. Hasil: $hasillogout" | logger -t "kopijahe $ver"
+}
+
+logout_wifi() {
+	# Fungsi login dari pengaturan yang disimpan
+	
+	multiautologin
+	detectwan
+	login_folder
+	versi
+		
+	# Simpan jam dan tanggal saat ini
+	date > "/tmp/last.login.$waninterface"
+	
+	# Cek versi OS, jika menggunakan LEDE 17.01
+	# Maka perlu menggunakan tambahan parameter -k
+	if [[ "$osversion" = "17" ]]; then
+		curladditionalparameter='-k --silent'
+	else
+		curladditionalparameter='--silent'
+	fi
+	
+	# Lakukan login sesuai dengan parameter konfigurasi autologin
+	logout="$(curl --interface $wandevice $curladditionalparameter """https://$server_id/authnew/logout/logoutx.php""" \
+	-H "authority: ""$server_id""" \
+	-H "accept: application/json, text/javascript, */*; q=0.01" \
+	-H "x-requested-with: XMLHttpRequest" \
+	-H "user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4315.5 Safari/537.36" \
+	-H "content-type: application/x-www-form-urlencoded; charset=UTF-8" \
+	-H "origin: https://logout.wifi.id" \
+	-H "sec-fetch-site: same-site" \
+	-H "sec-fetch-mode: cors" \
+	-H "sec-fetch-dest: empty" \
+	-H "referer: https://logout.wifi.id/")"
+	
+	kodestatus="$?"
+	hasil_logout
+}
+
 login_wifi() {
 	# Fungsi login dari pengaturan yang disimpan
 	
@@ -692,7 +750,7 @@ osversioncheck
 detectrandommac="$(dmesg | grep 'generated random MAC address')"
 
 # Fungsi mendapatkan parameter aplikasi
-while getopts :abc:df:hkil:m:p:stu:v:xz flags
+while getopts :abc:df:hkil:m:op:stu:v:xz flags
 do
 	case "${flags}" in
 		a)
@@ -759,6 +817,10 @@ do
 			;;
 		m)
 			inputmultiautologin="$OPTARG"
+			;;
+		o)
+			advancedmode="true"
+			logout_wifi
 			;;
 		p)
 			password="$OPTARG"
@@ -858,6 +920,8 @@ while [[ "$advancedmode" = "" ]]; do
 			echo "Percobaan login terakhir:" >> "/tmp/last.login.$waninterface"
 			# Beritahu pengguna bahwa koneksi dengan internet terputus
 			echo "Login di interface $waninterface diblokir, alasan: $hasillogin" | tee -a "/tmp/last.login.$waninterface" | logger -t "kopijahe $ver"
+			# Logout terlebih dahulu supaya akun tidak tersangkut di server
+			logout_wifi
 			# Minta penggantian alamat IP
 			releaseobtainnewip
 		# Cek apakah login diblokir dan tidak menggunakan akun smartbisnis,
@@ -869,6 +933,8 @@ while [[ "$advancedmode" = "" ]]; do
 			echo "Percobaan login terakhir:" >> "/tmp/last.login.$waninterface"
 			# Beritahu pengguna bahwa koneksi dengan internet terputus
 			echo "Login di interface $waninterface diblokir, alasan: $hasillogin" | tee -a "/tmp/last.login.$waninterface" | logger -t "kopijahe $ver"
+			# Logout terlebih dahulu supaya akun tidak tersangkut di server
+			logout_wifi
 			# Minta penggantian alamat IP
 			releaseobtainnewip
 		# Jika login sebelumnya tidak diblokir, maka:
