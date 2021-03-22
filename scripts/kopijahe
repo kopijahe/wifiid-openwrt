@@ -127,6 +127,17 @@ mwan3check() {
 		# Tentukan bahwa mwan3 terpasang
 		checkmwan3="ok"
 	fi
+	
+	# Cek juga apakah mwan3 yang terpasang memiliki fungsi "use" atau tidak
+	checkmwan3use="$(mwan3 use)"
+	
+	if [[ "$checkmwan3use" = "no command specified for mwan3 use" ]]; then
+		# Tentukan bahwa mwan3 memiliki fungsi "use"
+		checkmwan3use="ok"
+	else
+		# Tentukan bahwa mwan3 tidak memiliki fungsi "use"
+		checkmwan3use="no"	
+	fi
 }
 
 multiautologin() {
@@ -141,12 +152,12 @@ multiautologin() {
 		# yang akan dipakai
 		inputmultiautologin="1"
 	fi
+	
 	# Karena urutan konfigurasi dimulai dari angka 0
 	# maka, kurangi hasil dari input pengguna
 	multiautologincfg="$((inputmultiautologin-1))"
-	
+	detectconfig
 	if [[ "$(uci -q get kopijahe.@autologin[$multiautologincfg].multi_autologin)" = "" ]]; then
-		uci add kopijahe autologin
 		uci set kopijahe.@autologin["$multiautologincfg"].multi_autologin="$multiautologincfg"
 		uci commit kopijahe
 	fi
@@ -241,6 +252,17 @@ detecturl() {
 		# Deteksi URL login dengan cara melihat URL landing di halaman redirect
 		urllanding="$(curl -I --silent --interface "$wandevice" --max-redirs 1 --connect-timeout 10  "http://periksakoneksi.kopijahe.my.id/cek" | grep URL | awk -F'[;]' '{print $2}' | head -c -3)"
 		deteksi=" Location: $urllanding"
+	fi
+}
+
+detectconfig() {
+	# Fungsi cek pengaturan
+	
+	# Cek apakah belum ada pengaturan autologin sebelumnya
+	# Jika benar, maka:
+	if [[ "$(uci show kopijahe)" = "" ]]; then
+		# Tambahkan pengaturan baru
+		uci add kopijahe autologin
 	fi
 }
 
