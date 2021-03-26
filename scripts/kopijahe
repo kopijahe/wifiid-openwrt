@@ -15,7 +15,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="1.7.1"
+	ver="1.7.2"
 }
 
 bantuan() {
@@ -116,7 +116,7 @@ mwan3check() {
 	# Fungsi cek mwan3
 	# Untuk mengecek apakah mwan3 terpasang atau tidak
 	
-	checkmwan3="$(mwan3 --help)"
+	checkmwan3="$(mwan3 --help 2> /dev/null)"
 	
 	# Jika perintah sebelumnya menghasilkan kode 127, maka
 	if [[ "$?" = "127" ]]; then
@@ -535,7 +535,7 @@ hasil_login() {
 	# Fungsi output hasil login
 
 	# Filter hasil login hanya di bagian yang relevan saja
-	hasillogin="$(echo $login | jsonfilter -e '@["message"]')"
+	hasillogin="$(echo $login | jsonfilter -e '@["message"]' 2> /dev/null)"
 
 	# Jika variabel hasillogin kosong, maka login tidak berhasil
 	if [[ "$hasillogin" = "" ]]; then
@@ -727,7 +727,7 @@ login_file() {
 			chmod +x "$loginwifi"
 			# Lakukan login, lalu simpan hasilnya di berkas "/tmp/last.login.$waninterface" dan beritahu pengguna melalui System Log
 			echo "Percobaan login interface: $waninterface" | logger -t "kopijahe $ver"
-			$loginwifi | jsonfilter -e '@["message"]' | tee -a "/tmp/last.login.$waninterface" | logger -t "kopijahe $ver"
+			$loginwifi | jsonfilter -e '@["message"]' 2> /dev/null | tee -a "/tmp/last.login.$waninterface" | logger -t "kopijahe $ver"
 		fi
 	fi
 	# Istirahat selama 10 detik sebelum coba mengecek koneksi kembali
