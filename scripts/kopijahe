@@ -3,6 +3,7 @@
 # Script untuk login otomatis di jaringan wifi.id dan WMS
 # Oleh: KopiJahe (https://kopijahe.my.id)
 
+# shellcheck disable=SC1091
 # Muat library network OpenWrt
 . /lib/functions/network.sh
 
@@ -15,7 +16,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="1.7.4"
+	ver="1.7.5"
 }
 
 bantuan() {
@@ -158,11 +159,13 @@ multiautologin() {
 	# maka, kurangi hasil dari input pengguna
 	multiautologincfg="$((inputmultiautologin-1))"
 	detectconfig
+	# shellcheck disable=SC2102
 	if [ "$(uci -q get kopijahe.@autologin[$multiautologincfg].multi_autologin)" = "" ]; then
-		uci set kopijahe.@autologin["$multiautologincfg"].multi_autologin="$multiautologincfg"
+		uci set "kopijahe.@autologin[$multiautologincfg].multi_autologin=$multiautologincfg"
 		uci commit kopijahe
 	fi
 	
+	# shellcheck disable=SC2102
 	multiautologinnum="$(uci -q get kopijahe.@autologin[$multiautologincfg].multi_autologin)"
 }
 
@@ -986,6 +989,10 @@ while [ "$advancedmode" = "" ]; do
 			logout_wifi
 			# Minta penggantian alamat IP
 			releaseobtainnewip
+		# Jika interface tidak terdeteksi, maka:
+		elif [ "$kodestatus" = "45" ]; then
+			# Coba refresh interface sebelum mencoba kembali
+			refreshinterface
 		# Jika login sebelumnya tidak diblokir, maka:
 		else
 			login_wifi
