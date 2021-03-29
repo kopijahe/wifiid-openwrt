@@ -16,7 +16,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="1.7.5"
+	ver="1.7.6"
 }
 
 bantuan() {
@@ -89,7 +89,9 @@ osversioncheck() {
 		exit 1
 	fi
 	
-	# Jika digunakan untuk STB, maka anggap versi os sama dengan LEDE 17.01
+	# Jika digunakan untuk STB (board sunxi), maka anggap versi os sama dengan LEDE 17.01
+	# Karena rata-rata STB apabila di-reboot, maka jam akan terpaut jauh daripada dunia nyata
+	# Cek board OpenWrt
 	openwrt_board="$(grep OPENWRT_BOARD /etc/os-release | awk -F'["=/]' '{print $3}')"
 	
 	# Jika tidak menggunakan parameter OPENWRT_BOARD, coba parameter LEDE_BOARD
@@ -97,8 +99,10 @@ osversioncheck() {
 		openwrt_board="$(grep LEDE_BOARD /etc/os-release | awk -F'["=/]' '{print $3}')"
 	fi 
 	
+	# Jika digunakan untuk STB (board sunxi), maka anggap versi os sama dengan LEDE 17.01
 	if [ "$openwrt_board" = "sunxi" ]; then
-		export osversion="17"
+		osversion="17"
+		export osversion
 	fi
 }
 
@@ -139,6 +143,17 @@ mwan3check() {
 	else
 		# Tentukan bahwa mwan3 tidak memiliki fungsi "use"
 		checkmwan3use="no"	
+	fi
+}
+
+detectconfig() {
+	# Fungsi cek pengaturan
+	
+	# Cek apakah belum ada pengaturan autologin sebelumnya
+	# Jika benar, maka:
+	if [ "$advancedmode" = "true" ] && [ "$(uci show kopijahe)" = "" ]; then
+		# Tambahkan pengaturan baru
+		uci add kopijahe autologin
 	fi
 }
 
@@ -256,17 +271,6 @@ detecturl() {
 		# Deteksi URL login dengan cara melihat URL landing di halaman redirect
 		urllanding="$(curl -I --silent --interface "$wandevice" --max-redirs 1 --connect-timeout 10  "http://periksakoneksi.kopijahe.my.id/cek" | grep URL | awk -F'[;]' '{print $2}' | head -c -3)"
 		deteksi=" Location: $urllanding"
-	fi
-}
-
-detectconfig() {
-	# Fungsi cek pengaturan
-	
-	# Cek apakah belum ada pengaturan autologin sebelumnya
-	# Jika benar, maka:
-	if [ "$advancedmode" = "true" ] && [ "$(uci show kopijahe)" = "" ]; then
-		# Tambahkan pengaturan baru
-		uci add kopijahe autologin
 	fi
 }
 
@@ -925,7 +929,6 @@ do
 			exit 1
 			;;
 		*)
-			autologin
 			;;
 	esac
 done
