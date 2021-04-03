@@ -16,7 +16,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="1.7.6"
+	ver="1.7.7"
 }
 
 bantuan() {
@@ -42,6 +42,7 @@ bantuan() {
 	echo "-o: lakukan logout secara manual (supaya akun tidak tersangkut)"
 	echo "-p: masukkan password yang digunakan untuk login dengan 2 tanda kutip"
 	echo "-v: masukkan varian jaringan wifi yang digunakan dengan 2 tanda kutip"
+	echo "-w: masukkan lama waktu pengulangan dalam satuan detik (default: 10 detik)"
 	echo "-x: masuk ke mode debug (untuk keperluan analisa jika gagal autologin)"
 	echo "-z: lakukan login secara manual (untuk keperluan analisa jika gagal autologin)"
 	echo ""
@@ -454,12 +455,7 @@ captiveportalcheck() {
 		kodestatuslanding="$?"
 		hasil="204"
 	fi
-}
-
-detectinternetconnection() {
-	# Fungsi deteksi koneksi internet
-	# Hanya berfungsi jika dipanggil setelah fungsi captiveportalcheck
-	#
+	
 	# Jika hasil cek koneksi sesuai dengan hasil yang diharapkan, maka:
 	if [ "$cekkoneksi" = "$hasil" ]; then
 		# Tentukan bahwa terkoneksi dengan internet
@@ -469,6 +465,22 @@ detectinternetconnection() {
 		# Tentukan bahwa tidak terkoneksi dengan internet
 		internetconnected="no"
 	fi
+}
+
+sleeptimer() {
+	# Fungsi pengaturan waktu pengulangan autologin
+	
+	sleeptime="$(uci -q get kopijahe.@autologin["$multiautologinnum"].sleeptime)"
+	
+	# Jika konfigurasi tidak ditemukan, maka:
+	if [ "$sleeptime" = "" ]; then
+		# Masukkan konfigurasi bawaan pengulangan setiap 10 detik 
+		uci set "kopijahe.@autologin[$multiautologinnum].sleeptime=10"
+		# Simpan konfigurasi
+		uci commit kopijahe
+		# Tentukan variabel sleeptime ke 10 detik
+		sleeptime="10"
+	fi	
 }
 
 deviceclaimfailed() {
@@ -573,7 +585,7 @@ hasil_login() {
 
 	# Jika variabel hasillogin kosong, maka login tidak berhasil
 	if [ "$hasillogin" = "" ]; then
-		hasillogin="Login tidak berhasil, kode status CURL: $kodestatus"
+		hasillogin="Login tidak berhasil, kode status CURL: $kodestatuslanding & $kodestatus"
 	fi
 	
 	# Jika digunakan di mode lanjutan, maka:
@@ -709,7 +721,6 @@ login_file() {
 	detectwan
 	captiveportalcheck
 	loginblock
-	detectinternetconnection
 	generaterandomid
 	deviceclaimfailed
 	
@@ -778,7 +789,6 @@ seamless_reconnect() {
 	multiautologin
 	detectwan
 	captiveportalcheck
-	detectinternetconnection
 	deviceclaimfailed
 	
 	# Jika hasil cek koneksi internet tidak berhasil, maka:
@@ -806,7 +816,7 @@ osversioncheck
 detectrandommac="$(dmesg | grep 'generated random MAC address')"
 
 # Fungsi mendapatkan parameter aplikasi
-while getopts :abc:df:hkil:m:op:stu:v:xz flags
+while getopts :abc:df:hkil:m:op:stu:v:w:xz flags
 do
 	case "${flags}" in
 		a)
@@ -915,6 +925,14 @@ do
 			uci set kopijahe.@autologin["$multiautologinnum"].wifivariant="$wifivariant"
 			uci commit kopijahe
 			;;
+		w)
+			isleeptime="$OPTARG"
+			sleeptime="$(echo "$isleeptime" | tr -dc "0123456789")"
+			advancedmode="true"
+			multiautologin
+			uci set "kopijahe.@autologin[$multiautologinnum].sleeptime=$sleeptime"
+			uci commit kopijahe
+			;;
 		x)
 			set -x
 			;;
@@ -940,8 +958,8 @@ while [ "$advancedmode" = "" ]; do
 	detectwan
 	captiveportalcheck
 	loginblock
-	detectinternetconnection
 	deviceclaimfailed
+	sleeptimer
 	
 	# Jika kode status hasil cek koneksi adalah 127, maka:
 	if [ "$kodestatus" = "127" ]; then
@@ -999,10 +1017,10 @@ while [ "$advancedmode" = "" ]; do
 		# Jika login sebelumnya tidak diblokir, maka:
 		else
 			login_wifi
-			sleep 10
+			sleep "$sleeptime"
 		fi
 	else
-		# Istirahat selama 10 detik sebelum coba mengecek koneksi kembali
-		sleep 10
+		# Istirahat sebelum coba mengecek koneksi kembali
+		sleep "$sleeptime"
 	fi
 done
