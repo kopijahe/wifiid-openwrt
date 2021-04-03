@@ -16,7 +16,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="1.7.7"
+	ver="1.7.8"
 }
 
 bantuan() {
@@ -457,7 +457,7 @@ captiveportalcheck() {
 	fi
 	
 	# Jika hasil cek koneksi sesuai dengan hasil yang diharapkan, maka:
-	if [ "$cekkoneksi" = "$hasil" ]; then
+	if [ "$cekkoneksi" = "$hasil" ] || [ "$kodestatuslanding" = "0" ]; then
 		# Tentukan bahwa terkoneksi dengan internet
 		internetconnected="yes"
 	# Jika hasilnya tidak sama, maka:
