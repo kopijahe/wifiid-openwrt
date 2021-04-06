@@ -17,7 +17,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="1.8.3"
+	ver="1.8.4"
 }
 
 bantuan() {
@@ -85,7 +85,7 @@ detectconfig() {
 	
 	# Cek apakah belum ada pengaturan autologin sebelumnya
 	# Jika benar, maka:
-	if [[ "$advancedmode" = "true" ]] && [[ "$(uci show kopijahe)" = "" ]]; then
+	if [[ "$advancedmode" = "true" ]] && [[ "$(uci -q show kopijahe.@autologin[$multiautologincfg])" = "" ]]; then
 		# Tambahkan pengaturan baru
 		uci add kopijahe autologin
 	fi
