@@ -17,7 +17,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="1.8.5"
+	ver="1.8.6"
 }
 
 bantuan() {
@@ -85,6 +85,7 @@ detectconfig() {
 	
 	# Cek apakah belum ada pengaturan autologin sebelumnya
 	# Jika benar, maka:
+	# shellcheck disable=SC2102
 	if [[ "$advancedmode" = "true" ]] && [[ "$(uci -q show kopijahe.@autologin[$multiautologincfg])" = "" ]]; then
 		# Tambahkan pengaturan baru
 		uci add kopijahe autologin
@@ -696,7 +697,7 @@ login_wifi() {
 	fi
 	
 	# Lakukan login sesuai dengan parameter konfigurasi autologin
-	login="$(curl --interface "$wandevice" $curladditionalparameter """$loginurl""?ipc=""$iprouter""&gw_id=""$gwid""&mac=""$clientmac""&redirect=&wlan=""$wlanid""" \
+	login="$(curl --interface "$wandevice" $curladditionalparameter """$loginurl""?ipc=""$iprouter""&gw_id=""$gwid""&client_mac=""$clientmac""&redirect=&wlan=""$wlanid""" \
 	-H "authority: ""$server_id""" \
 	-H "accept: application/json, text/javascript, */*; q=0.01" \
 	-H "x-requested-with: XMLHttpRequest" \
@@ -726,21 +727,20 @@ login_file() {
 	sed -i "s/exit 0/sleep 10 \&\& kopijahe \-f $loginfiletxt \&\nexit 0/" "/etc/rc.local"
 
 	while [[ "$loginfromfile" = "true" ]]; do
+	# Cek nomor pengaturan terlebih dahulu
+	multiautologin
+	# Deteksi antarmuka jaringan yang dipakai
 	detectwan
-	captiveportalcheck
-	loginblock
-	generaterandomid
+	# Cek kondisi antarmuka jaringan yang dipakai
 	deviceclaimfailed
-	
-	# Jika kode status hasil cek koneksi adalah 127, maka:
-	if [[ "$kodestatus" = "127" ]]; then
-		# Beritahu pengguna bahwa CURL belum terpasang
-		echo "CURL belum perpasang" | logger -t "kopijahe $ver"
-		# Lakukan pembaruan daftar aplikasi
-		opkg update
-		# Lalu unduh dan instal CURL
-		opkg install curl
-	fi
+	# Deteksi status koneksi
+	captiveportalcheck
+	# Cek apakah login sebelumnya diblokir atau tidak
+	loginblock
+	# Buat 4 karakter acak untuk keperluan login WMS
+	generaterandomid
+	# Cek pengaturan waktu pengulangan
+	sleeptimer
 
 	# Jika hasil cek koneksi internet tidak berhasil, maka:
 	if [[ "$internetconnected" = "no" ]]; then
@@ -755,7 +755,7 @@ login_file() {
 			echo "Koneksi $waninterface terputus, meminta alamat IP baru" | tee -a "/tmp/last.login.$waninterface" | logger -t "kopijahe $ver"
 			# Minta penggantian alamat IP
 			releaseobtainnewip
-			sleep 20
+			sleep "$sleeptime"
 		# Jika tidak, maka:
 		else
 			# Catat jam dan tanggal saat ini di berkas "/tmp/last.login.$waninterface"
@@ -783,8 +783,8 @@ login_file() {
 			$loginwifi | jsonfilter -e '@["message"]' 2> /dev/null | tee -a "/tmp/last.login.$waninterface" | logger -t "kopijahe $ver"
 		fi
 	fi
-	# Istirahat selama 10 detik sebelum coba mengecek koneksi kembali
-	sleep 10
+	# Istirahat sebelum coba mengecek koneksi kembali
+	sleep "$sleeptime"
 	done
 }
 
