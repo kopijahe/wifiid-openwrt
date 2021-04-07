@@ -17,7 +17,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="1.8.4"
+	ver="1.8.5"
 }
 
 bantuan() {
@@ -305,7 +305,7 @@ setup() {
 	# Jika digunakan di jaringan WMS, maka tentukan variabel wms_id
 	if [[ "$tipelogin" = "wms" ]]; then
 		url_landing="$(echo "$deteksi" | awk -F'[ ]' '{print $2}')"
-		wms_id="$(echo "$url_landing" | xargs curl --silent -L | grep username_hidden | awk -F'[.]' '{print $4}' | tr -dc "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")"
+		wms_id="$(echo "$url_landing" | xargs curl -k --silent -L | grep username_hidden | awk -F'[.]' '{print $4}' | awk '!a[$0]++' | tr -dc "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")"
 		uci set kopijahe.@autologin["$multiautologinnum"].wmsid="$wms_id"
 	fi
 	
@@ -642,9 +642,9 @@ logout_wifi() {
 	# Simpan jam dan tanggal saat ini
 	date > "/tmp/last.login.$waninterface"
 	
-	# Cek versi OS, jika menggunakan LEDE 17.01
+	# Cek versi OS, jika menggunakan LEDE 17.01 atau OpenWrt 18.06
 	# Maka perlu menggunakan tambahan parameter -k
-	if [[ "$osversion" = "17" ]]; then
+	if [[ "$osversion" = "17" ]] || [[ "$osversion" = "18" ]]; then
 		curladditionalparameter='-k --silent'
 	else
 		curladditionalparameter='--silent'
@@ -687,9 +687,9 @@ login_wifi() {
 	# Simpan jam dan tanggal saat ini
 	date > "/tmp/last.login.$waninterface"
 	
-	# Cek versi OS, jika menggunakan LEDE 17.01
+	# Cek versi OS, jika menggunakan LEDE 17.01 atau OpenWrt 18.06
 	# Maka perlu menggunakan tambahan parameter -k
-	if [[ "$osversion" = "17" ]]; then
+	if [[ "$osversion" = "17" ]] || [[ "$osversion" = "18" ]]; then
 		curladditionalparameter='-k --silent'
 	else
 		curladditionalparameter='--silent'
@@ -767,9 +767,9 @@ login_file() {
 			# Gandakan berkas tangkapan login CURL ke tempat proses
 			cp "$loginfiletxt" "$loginwifi"
 			# Proses berkas autologin
-			# Cek versi OS, jika menggunakan LEDE 17.01.x
+			# Cek versi OS, jika menggunakan LEDE 17.01 atau OpenWrt 18.06
 			# Maka perlu menggunakan tambahan parameter -k
-			if [[ "$osversion" = "17" ]]; then
+			if [[ "$osversion" = "17" ]] || [[ "$osversion" = "18" ]]; then
 				sed -i "s/curl/curl -k --silent --interface $wandevice/g" "$loginwifi"
 			else
 				sed -i "s/curl/curl --silent --interface $wandevice/g" "$loginwifi"
