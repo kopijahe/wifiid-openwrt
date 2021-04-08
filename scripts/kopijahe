@@ -17,7 +17,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="1.8.6"
+	ver="1.8.7"
 }
 
 bantuan() {
@@ -270,12 +270,12 @@ detecturl() {
 	# Fungsi deteksi URL halaman login
 	
 	# Deteksi URL login dengan cara melihat jawaban redirect dari halaman periksa koneksi
-	deteksi="$(curl -I --silent --interface "$wandevice" --max-redirs 1 --connect-timeout 10  "http://periksakoneksi.kopijahe.my.id/cek" | grep "Location")"
+	deteksi="$(curl -k -I --silent --interface "$wandevice" --max-redirs 1 --connect-timeout 10  "http://periksakoneksi.kopijahe.my.id/cek" | grep "Location")"
 	
 	# Jika gagal mendeteksi menggunakan teknik di atas, maka:
 	if [[ "$deteksi" = "" ]]; then
 		# Deteksi URL login dengan cara melihat URL landing di halaman redirect
-		urllanding="$(curl -I --silent --interface "$wandevice" --max-redirs 1 --connect-timeout 10  "http://periksakoneksi.kopijahe.my.id/cek" | grep URL | awk -F'[;]' '{print $2}' | head -c -3)"
+		urllanding="$(curl -k -I --silent --interface "$wandevice" --max-redirs 1 --connect-timeout 10  "http://periksakoneksi.kopijahe.my.id/cek" | grep URL | awk -F'[;]' '{print $2}' | head -c -3)"
 		deteksi=" Location: $urllanding"
 	fi
 }
