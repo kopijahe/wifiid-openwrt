@@ -17,7 +17,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="1.8.7"
+	ver="1.8.8"
 }
 
 bantuan() {
@@ -306,7 +306,7 @@ setup() {
 	# Jika digunakan di jaringan WMS, maka tentukan variabel wms_id
 	if [[ "$tipelogin" = "wms" ]]; then
 		url_landing="$(echo "$deteksi" | awk -F'[ ]' '{print $2}')"
-		wms_id="$(echo "$url_landing" | xargs curl -k --silent -L | grep username_hidden | awk -F'[.]' '{print $4}' | awk '!a[$0]++' | tr -dc "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")"
+		wms_id="$(echo "$url_landing" | xargs curl -k --silent -L --interface "$wandevice" | grep username_hidden | awk -F'[.]' '{print $4}' | awk '!a[$0]++' | tr -dc "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")"
 		uci set kopijahe.@autologin["$multiautologinnum"].wmsid="$wms_id"
 	fi
 	
@@ -596,8 +596,13 @@ hasil_login() {
 	hasillogin="$(echo "$login" | jsonfilter -e '@["message"]' 2> /dev/null)"
 
 	# Jika variabel hasillogin kosong, maka login tidak berhasil
-	if [[ "$hasillogin" = "" ]]; then
+	# Cek apakah mode bypass (parameter -z) hidup, jika tidak, maka:
+	if [[ "$hasillogin" = "" ]] && [[ "$bypassmode" = "" ]]; then
+		# Laporkan hasil login tidak berhasil, berikut kode status CURL untuk halaman login/landing dan percobaan login
 		hasillogin="Login tidak berhasil, kode status CURL: $kodestatuslanding & $kodestatus"
+	elif [[ "$hasillogin" = "" ]] && [[ "$bypassmode" = "true" ]]; then
+		# Laporkan hasil login tidak berhasil, berikut kode status CURL untuk percobaan login
+		hasillogin="Login tidak berhasil, kode status CURL: $kodestatus"
 	fi
 	
 	# Jika digunakan di mode lanjutan, maka:
@@ -620,8 +625,13 @@ hasil_logout() {
 	hasillogout="$(echo "$logout" | awk -F'[<>]' '{print $5}' 2> /dev/null)"
 
 	# Jika variabel hasillogin kosong, maka login tidak berhasil
-	if [[ "$hasillogout" = "" ]]; then
-		hasillogout="Logout tidak berhasil, kode status CURL: $kodestatus"
+	# Cek apakah mode bypass (parameter -z) hidup, jika tidak, maka:
+	if [[ "$hasillogin" = "" ]] && [[ "$bypassmode" = "" ]]; then
+		# Laporkan hasil login tidak berhasil, berikut kode status CURL untuk halaman login/landing dan percobaan login
+		hasillogin="Login tidak berhasil, kode status CURL: $kodestatuslanding & $kodestatus"
+	elif [[ "$hasillogin" = "" ]] && [[ "$bypassmode" = "true" ]]; then
+		# Laporkan hasil login tidak berhasil, berikut kode status CURL untuk percobaan login
+		hasillogin="Login tidak berhasil, kode status CURL: $kodestatus"
 	fi
 	
 	# Jika digunakan di mode lanjutan, maka:
@@ -948,6 +958,7 @@ do
 			;;
 		z)
 			advancedmode="true"
+			bypassmode="true"
 			versi
 			multiautologin
 			detectwan
