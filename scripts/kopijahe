@@ -17,7 +17,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="1.8.8"
+	ver="1.8.9"
 }
 
 bantuan() {
@@ -1021,10 +1021,12 @@ while [[ "$advancedmode" = "" ]]; do
 			logout_wifi
 			# Minta penggantian alamat IP
 			releaseobtainnewip
-		# Jika interface tidak terdeteksi, maka:
-		elif [[ "$kodestatus" = "45" ]]; then
-			# Coba refresh interface sebelum mencoba kembali
+		# Jika interface tidak terdeteksi atau mendapat kode status cURL 7, maka:
+		elif [[ "$kodestatus" = "45" ]] || [[ "$kodestatus" = "7" ]]; then
+			# Coba refresh interface terlebih dahulu
 			refreshinterface
+			# Dan tunggu 3 detik sebelum mencoba kembali
+			sleep 3
 		# Jika login sebelumnya tidak diblokir, maka:
 		else
 			login_wifi
