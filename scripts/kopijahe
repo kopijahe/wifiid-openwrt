@@ -17,7 +17,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="1.8.9"
+	ver="1.9.0"
 }
 
 bantuan() {
@@ -391,12 +391,12 @@ sleeptimer() {
 	
 	# Jika konfigurasi tidak ditemukan, maka:
 	if [[ "$sleeptime" = "" ]]; then
-		# Masukkan konfigurasi bawaan pengulangan setiap 10 detik 
-		uci set "kopijahe.@autologin[$multiautologinnum].sleeptime=10"
+		# Masukkan konfigurasi bawaan pengulangan setiap 8 detik 
+		uci set "kopijahe.@autologin[$multiautologinnum].sleeptime=8"
 		# Simpan konfigurasi
 		uci commit kopijahe
-		# Tentukan variabel sleeptime ke 10 detik
-		sleeptime="10"
+		# Tentukan variabel sleeptime ke 8 detik
+		sleeptime="8"
 	fi	
 }
 
@@ -436,12 +436,12 @@ captiveportalcheck() {
 	
 	#	Jika konfigurasi tidak ditemukan, maka:
 	if [[ "$cpcretry" = "" ]]; then
-		# Masukkan konfigurasi bawaan percobaan ulang 5 kali
-		uci set "kopijahe.@autologin[$multiautologinnum].cpcretry=5"
+		# Masukkan konfigurasi bawaan percobaan ulang 2 kali
+		uci set "kopijahe.@autologin[$multiautologinnum].cpcretry=2"
 		# Simpan konfigurasi
 		uci commit kopijahe
-		# Tentukan variabel cpcretry ke 5
-		cpcretry="5"
+		# Tentukan variabel cpcretry ke 2
+		cpcretry="2"
 	fi
 	
 	# Lama timeout cek captive portal
@@ -449,12 +449,12 @@ captiveportalcheck() {
 	
 	# Jika konfigurasi tidak ditemukan, maka:
 	if [[ "$cpctimeout" = "" ]]; then
-		# Masukkan konfigurasi bawaan percobaan ulang 5 kali
-		uci set "kopijahe.@autologin[$multiautologinnum].cpctimeout=5"
+		# Masukkan konfigurasi bawaan timeout 3 detik
+		uci set "kopijahe.@autologin[$multiautologinnum].cpctimeout=3"
 		# Simpan konfigurasi
 		uci commit kopijahe
-		# Tentukan variabel cpcretry ke 5
-		cpctimeout="5"
+		# Tentukan variabel cpcretry ke 3
+		cpctimeout="3"
 	fi	
 	
 	# Daftar penyedia layanan cek captive portal beserta hasil cek yang diharapkan
@@ -545,7 +545,11 @@ wificommunity() {
 			# Akun UT punya format berbeda dibandingkan dengan kampus lainnya
 			kampus="$(echo "$cfgkampus" | awk -F'[.]' '{print $1}')"
 			username2="$username@$cfgkampus@com.$kampus"
-		# Jika bukan akun UT, maka:
+		elif [[ "$cfgkampus" = "adibuana" ]]; then
+			# Akun Adibuana punya format berbeda dibandingkan dengan kampus lainnya
+			kampus="$(echo "$cfgkampus" | awk -F'[.]' '{print $1}')"
+			username2="$username@$cfgkampus.vmgmt@wms.00000000.000"
+		# Jika bukan akun UT dan adibuana, maka:
 		else
 			# Jika bukan UT, maka gunakan format standard:
 			username2="$username@com.$cfgkampus"
@@ -936,7 +940,7 @@ do
 			advancedmode="true"
 			multiautologin
 			if [[ "$wifivariant" = "kampus" ]]; then
-				echo "Silahkan masukkan nama kampus anda (misal: \"ut.ac.id\", \"unsiq\", \"trisakti\", )"
+				echo "Silahkan masukkan nama kampus anda (misal: \"ut.ac.id\", \"unsiq\", \"trisakti\", \"adibuana\")"
 				read -r kampus
 				kampus="$(echo "$kampus" | tr -dc "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.")"
 				uci set kopijahe.@autologin["$multiautologinnum"].kampus="$kampus"
