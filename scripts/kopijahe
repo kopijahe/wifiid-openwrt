@@ -17,7 +17,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="1.9.0"
+	ver="1.9.1"
 }
 
 bantuan() {
@@ -547,7 +547,6 @@ wificommunity() {
 			username2="$username@$cfgkampus@com.$kampus"
 		elif [[ "$cfgkampus" = "adibuana" ]]; then
 			# Akun Adibuana punya format berbeda dibandingkan dengan kampus lainnya
-			kampus="$(echo "$cfgkampus" | awk -F'[.]' '{print $1}')"
 			username2="$username@$cfgkampus.vmgmt@wms.00000000.000"
 		# Jika bukan akun UT dan adibuana, maka:
 		else
@@ -939,14 +938,19 @@ do
 			wifivariant="$OPTARG"
 			advancedmode="true"
 			multiautologin
+			if [[ "$wifivariant" = "wifi.id" ]] || [[ "$wifivariant" = "@wifi.id" ]] || [[ "$wifivariant" = "wms" ]] || [[ "$wifivariant" = "wms-lite" ]] || [[ "$wifivariant" = "smartbisnis" ]] || [[ "$wifivariant" = "kampus" ]]; then
+				uci set kopijahe.@autologin["$multiautologinnum"].wifivariant="$wifivariant"
+			else
+				echo "Varian jaringan yang didukung:"
+				echo "\"wifi.id\", \"wms\", \"wms-lite\", \"kampus\", \"smartbisnis\""
+				exit 1
+			fi
 			if [[ "$wifivariant" = "kampus" ]]; then
 				echo "Silahkan masukkan nama kampus anda (misal: \"ut.ac.id\", \"unsiq\", \"trisakti\", \"adibuana\")"
 				read -r kampus
 				kampus="$(echo "$kampus" | tr -dc "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.")"
 				uci set kopijahe.@autologin["$multiautologinnum"].kampus="$kampus"
-				uci commit kopijahe
 			fi
-			uci set kopijahe.@autologin["$multiautologinnum"].wifivariant="$wifivariant"
 			uci commit kopijahe
 			;;
 		w)
