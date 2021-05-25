@@ -17,7 +17,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="1.9.1"
+	ver="1.9.2"
 }
 
 bantuan() {
@@ -479,6 +479,16 @@ captiveportalcheck() {
 		cekkoneksi="$(curl --interface "$wandevice" -L --silent --retry $cpcretry --max-redirs 1 --connect-timeout $cpctimeout "http://captive.apple.com/" | grep -o "Success" | head -c8)"
 		kodestatuslanding="$?"
 		hasil="Success"
+	# Apple2: Layanan cek captive portal alternatif perangkat Apple
+	elif [[ "$cpcprovider" = "apple2" ]]; then
+		cekkoneksi="$(curl --interface "$wandevice" -L --silent --retry $cpcretry --max-redirs 1 --connect-timeout $cpctimeout "https://www.apple.com/library/test/success.html" | grep -o "Success" | head -c8)"
+		kodestatuslanding="$?"
+		hasil="Success"
+	# Microsoft2: Layanan cek captive portal alternatif milik Microsoft
+	elif [[ "$cpcprovider" = "microsoft2" ]]; then
+		cekkoneksi="$(curl --interface "$wandevice" -L --silent --retry $cpcretry --max-redirs 1 --connect-timeout $cpctimeout "http://www.msftncsi.com/ncsi.txt")"
+		kodestatuslanding="$?"
+		hasil="Microsoft NCSI"
 	# Microsoft: Layanan cek captive portal bawaan sistem operasi Windows
 	elif [[ "$cpcprovider" = "microsoft" ]]; then
 		cekkoneksi="$(curl --interface "$wandevice" -L --silent --retry $cpcretry --max-redirs 1 --connect-timeout $cpctimeout "http://www.msftconnecttest.com/connecttest.txt")"
@@ -629,12 +639,12 @@ hasil_logout() {
 
 	# Jika variabel hasillogin kosong, maka login tidak berhasil
 	# Cek apakah mode bypass (parameter -z) hidup, jika tidak, maka:
-	if [[ "$hasillogin" = "" ]] && [[ "$bypassmode" = "" ]]; then
+	if [[ "$hasillogout" = "" ]] && [[ "$bypassmode" = "" ]]; then
 		# Laporkan hasil login tidak berhasil, berikut kode status CURL untuk halaman login/landing dan percobaan login
-		hasillogin="Login tidak berhasil, kode status CURL: $kodestatuslanding & $kodestatus"
-	elif [[ "$hasillogin" = "" ]] && [[ "$bypassmode" = "true" ]]; then
+		hasillogout="Login tidak berhasil, kode status CURL: $kodestatuslanding & $kodestatus"
+	elif [[ "$hasillogout" = "" ]] && [[ "$bypassmode" = "true" ]]; then
 		# Laporkan hasil login tidak berhasil, berikut kode status CURL untuk percobaan login
-		hasillogin="Login tidak berhasil, kode status CURL: $kodestatus"
+		hasillogout="Login tidak berhasil, kode status CURL: $kodestatus"
 	fi
 	
 	# Jika digunakan di mode lanjutan, maka:
@@ -853,7 +863,7 @@ do
 			icpcprovider="$OPTARG"
 			advancedmode="true"
 			multiautologin
-			if [[ "$icpcprovider" = "kopijahe" ]] || [[ "$icpcprovider" = "firefox" ]] || [[ "$icpcprovider" = "google" ]] || [[ "$icpcprovider" = "apple" ]] || [[ "$icpcprovider" = "microsoft" ]] || [[ "$icpcprovider" = "xiaomi" ]]; then
+			if [[ "$icpcprovider" = "kopijahe" ]] || [[ "$icpcprovider" = "firefox" ]] || [[ "$icpcprovider" = "google" ]] || [[ "$icpcprovider" = "apple" ]] || [[ "$icpcprovider" = "apple2" ]] || [[ "$icpcprovider" = "microsoft" ]] || [[ "$icpcprovider" = "microsoft2" ]] || [[ "$icpcprovider" = "xiaomi" ]]; then
 				uci set kopijahe.@autologin["$multiautologinnum"].cpcprovider="$icpcprovider"
 			else
 				echo "Penyedia layanan yang didukung:"
