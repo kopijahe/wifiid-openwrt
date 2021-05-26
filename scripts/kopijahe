@@ -17,7 +17,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="1.9.2"
+	ver="1.9.3"
 }
 
 bantuan() {
@@ -641,10 +641,10 @@ hasil_logout() {
 	# Cek apakah mode bypass (parameter -z) hidup, jika tidak, maka:
 	if [[ "$hasillogout" = "" ]] && [[ "$bypassmode" = "" ]]; then
 		# Laporkan hasil login tidak berhasil, berikut kode status CURL untuk halaman login/landing dan percobaan login
-		hasillogout="Login tidak berhasil, kode status CURL: $kodestatuslanding & $kodestatus"
+		hasillogout="Logout tidak berhasil, kode status CURL: $kodestatuslanding & $kodestatus"
 	elif [[ "$hasillogout" = "" ]] && [[ "$bypassmode" = "true" ]]; then
 		# Laporkan hasil login tidak berhasil, berikut kode status CURL untuk percobaan login
-		hasillogout="Login tidak berhasil, kode status CURL: $kodestatus"
+		hasillogout="Logout tidak berhasil, kode status CURL: $kodestatus"
 	fi
 	
 	# Jika digunakan di mode lanjutan, maka:
