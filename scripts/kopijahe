@@ -17,7 +17,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="1.9.3"
+	ver="1.9.4"
 }
 
 bantuan() {
@@ -1026,6 +1026,8 @@ while [[ "$advancedmode" = "" ]]; do
 			logout_wifi
 			# Minta penggantian alamat IP
 			releaseobtainnewip
+			# Istirahat sebelum coba mengecek koneksi kembali
+			sleep "$sleeptime"
 		# Cek apakah login diblokir dan tidak menggunakan akun smartbisnis,
 		# Jika benar, maka:
 		elif [[ "$loginblocked" = "yes" ]] && [[ "$wifivariant" != "smartbisnis" ]]; then
@@ -1039,12 +1041,14 @@ while [[ "$advancedmode" = "" ]]; do
 			logout_wifi
 			# Minta penggantian alamat IP
 			releaseobtainnewip
+			# Istirahat sebelum coba mengecek koneksi kembali
+			sleep "$sleeptime"
 		# Jika interface tidak terdeteksi atau mendapat kode status cURL 7, maka:
 		elif [[ "$kodestatus" = "45" ]] || [[ "$kodestatus" = "7" ]]; then
 			# Coba refresh interface terlebih dahulu
 			refreshinterface
-			# Dan tunggu 3 detik sebelum mencoba kembali
-			sleep 3
+			# Istirahat sebelum coba mengecek koneksi kembali
+			sleep "$sleeptime"
 		# Jika login sebelumnya tidak diblokir, maka:
 		else
 			login_wifi
