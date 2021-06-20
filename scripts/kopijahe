@@ -17,7 +17,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="1.9.4"
+	ver="1.9.5"
 }
 
 bantuan() {
@@ -276,6 +276,9 @@ detecturl() {
 	if [[ "$deteksi" = "" ]]; then
 		# Deteksi URL login dengan cara melihat URL landing di halaman redirect
 		urllanding="$(curl -k -I --silent --interface "$wandevice" --max-redirs 1 --connect-timeout 10  "http://periksakoneksi.kopijahe.my.id/cek" | grep URL | awk -F'[;]' '{print $2}' | head -c -3)"
+		deteksi=" Location: $urllanding"
+	elif [[ "$(echo "$deteksi" | grep -o "URL")" = "URL" ]]; then
+		urllanding="$(curl -k -I --silent --interface "$wandevice" --max-redirs 1 --connect-timeout 10  "http://periksakoneksi.kopijahe.my.id/cek" | grep URL | awk -F'[;]' '{print $2}' | head -c -3 | awk -F'[=]' '{print $2"="$3"="$4"="$5"="$6"="$7}')"
 		deteksi=" Location: $urllanding"
 	fi
 }
@@ -602,59 +605,37 @@ dataraw() {
 	fi 
 }
 
-hasil_login() {
-	# Fungsi output hasil login
+hasil_loginout() {
+	# Fungsi output hasil login dan logout
 
-	# Filter hasil login hanya di bagian yang relevan saja
-	hasillogin="$(echo "$login" | jsonfilter -e '@["message"]' 2> /dev/null)"
+	# Filter hasil hanya di bagian yang relevan saja sesuai dengan fungsi yang digunakan
+	if [[ "$function" = "login" ]]; then
+		hasil="$(echo "$attempt" | jsonfilter -e '@["message"]' 2> /dev/null)"
+	elif [[ "$function" = "logout" ]]; then
+		hasil="$(echo "$attempt" | awk -F'[<>]' '{print $5}' 2> /dev/null)"
+	fi
 
-	# Jika variabel hasillogin kosong, maka login tidak berhasil
+	# Jika variabel hasil kosong, maka login tidak berhasil
 	# Cek apakah mode bypass (parameter -z) hidup, jika tidak, maka:
-	if [[ "$hasillogin" = "" ]] && [[ "$bypassmode" = "" ]]; then
+	if [[ "$hasil" = "" ]] && [[ "$bypassmode" = "" ]]; then
 		# Laporkan hasil login tidak berhasil, berikut kode status CURL untuk halaman login/landing dan percobaan login
-		hasillogin="Login tidak berhasil, kode status CURL: $kodestatuslanding & $kodestatus"
-	elif [[ "$hasillogin" = "" ]] && [[ "$bypassmode" = "true" ]]; then
+		hasil="$function tidak berhasil, kode status CURL: $kodestatuslanding & $kodestatus"
+	elif [[ "$hasil" = "" ]] && [[ "$bypassmode" = "true" ]]; then
 		# Laporkan hasil login tidak berhasil, berikut kode status CURL untuk percobaan login
-		hasillogin="Login tidak berhasil, kode status CURL: $kodestatus"
+		hasil="$function tidak berhasil, kode status CURL: $kodestatus"
 	fi
 	
 	# Jika digunakan di mode lanjutan, maka:
 	if [[ "$advancedmode" = "true" ]]; then
 		# Beritahu pengguna melalui layar terminal/stdout
-		echo "Percobaan login. Interface: $waninterface. Hasil: $hasillogin"
+		echo "Percobaan $function. Interface: $waninterface. Hasil: $hasil"
 		# Simpan juga hasilnya di berkas "/tmp/last.login.$waninterface" dan beritahu pengguna melalui System Log
-		echo "Percobaan login. Interface: $waninterface. Hasil: $hasillogin" | tee -a "/tmp/last.login.$waninterface" | logger -t "kopijahe $ver"
+		echo "Percobaan $function. Interface: $waninterface. Hasil: $hasil" | tee -a "/tmp/last.login.$waninterface" | logger -t "kopijahe $ver"
 	# Jika tidak, maka:
 	else
 		# Simpan hasilnya di berkas "/tmp/last.login.$waninterface" dan beritahu pengguna melalui System Log
-		echo "Percobaan login. Interface: $waninterface. Hasil: $hasillogin" | tee -a "/tmp/last.login.$waninterface" | logger -t "kopijahe $ver"
+		echo "Percobaan $function. Interface: $waninterface. Hasil: $hasil" | tee -a "/tmp/last.login.$waninterface" | logger -t "kopijahe $ver"
 	fi
-}
-
-hasil_logout() {
-	# Fungsi output hasil login
-
-	# Filter hasil login hanya di bagian yang relevan saja
-	hasillogout="$(echo "$logout" | awk -F'[<>]' '{print $5}' 2> /dev/null)"
-
-	# Jika variabel hasillogin kosong, maka login tidak berhasil
-	# Cek apakah mode bypass (parameter -z) hidup, jika tidak, maka:
-	if [[ "$hasillogout" = "" ]] && [[ "$bypassmode" = "" ]]; then
-		# Laporkan hasil login tidak berhasil, berikut kode status CURL untuk halaman login/landing dan percobaan login
-		hasillogout="Logout tidak berhasil, kode status CURL: $kodestatuslanding & $kodestatus"
-	elif [[ "$hasillogout" = "" ]] && [[ "$bypassmode" = "true" ]]; then
-		# Laporkan hasil login tidak berhasil, berikut kode status CURL untuk percobaan login
-		hasillogout="Logout tidak berhasil, kode status CURL: $kodestatus"
-	fi
-	
-	# Jika digunakan di mode lanjutan, maka:
-	if [[ "$advancedmode" = "true" ]]; then
-		# Beritahu pengguna melalui layar terminal/stdout
-		echo "Percobaan logout. Interface: $waninterface. Hasil: $hasillogout"
-	fi
-	
-	# Dan beritahu pengguna melalui System Log
-	echo "Percobaan logout. Interface: $waninterface. Hasil: $hasillogout" | logger -t "kopijahe $ver"
 }
 
 logout_wifi() {
@@ -675,7 +656,7 @@ logout_wifi() {
 	fi
 	
 	# Lakukan login sesuai dengan parameter konfigurasi autologin
-	logout="$(curl --interface "$wandevice" $curladditionalparameter """https://$server_id/authnew/logout/logoutx.php""" \
+	attempt="$(curl --interface "$wandevice" $curladditionalparameter """https://$server_id/authnew/logout/logoutx.php""" \
 	-H "authority: ""$server_id""" \
 	-H "accept: application/json, text/javascript, */*; q=0.01" \
 	-H "x-requested-with: XMLHttpRequest" \
@@ -688,7 +669,8 @@ logout_wifi() {
 	-H "referer: https://logout.wifi.id/")"
 	
 	kodestatus="$?"
-	hasil_logout
+	function="logout"
+	hasil_loginout
 }
 
 login_wifi() {
@@ -720,7 +702,7 @@ login_wifi() {
 	fi
 	
 	# Lakukan login sesuai dengan parameter konfigurasi autologin
-	login="$(curl --interface "$wandevice" $curladditionalparameter """$loginurl""?ipc=""$iprouter""&gw_id=""$gwid""&client_mac=""$clientmac""&redirect=&wlan=""$wlanid""" \
+	attempt="$(curl --interface "$wandevice" $curladditionalparameter """$loginurl""?ipc=""$iprouter""&gw_id=""$gwid""&client_mac=""$clientmac""&redirect=&wlan=""$wlanid""" \
 	-H "authority: ""$server_id""" \
 	-H "accept: application/json, text/javascript, */*; q=0.01" \
 	-H "x-requested-with: XMLHttpRequest" \
@@ -734,7 +716,8 @@ login_wifi() {
 	--data-raw "$login_cred")"
 	
 	kodestatus="$?"
-	hasil_login
+	function="login"
+	hasil_loginout
 }
 
 login_file() {
@@ -917,6 +900,7 @@ do
 			;;
 		o)
 			advancedmode="true"
+			bypassmode="true"
 			multiautologin
 			detectwan
 			logout_wifi
@@ -1021,7 +1005,7 @@ while [[ "$advancedmode" = "" ]]; do
 			# Catat percobaan login terakhir di berkas "/tmp/last.login.$waninterface"
 			echo "Percobaan login terakhir:" >> "/tmp/last.login.$waninterface"
 			# Beritahu pengguna bahwa koneksi dengan internet terputus
-			echo "Login di interface $waninterface diblokir, alasan: $hasillogin" | tee -a "/tmp/last.login.$waninterface" | logger -t "kopijahe $ver"
+			echo "Login di interface $waninterface diblokir, alasan: $hasil" | tee -a "/tmp/last.login.$waninterface" | logger -t "kopijahe $ver"
 			# Logout terlebih dahulu supaya akun tidak tersangkut di server
 			logout_wifi
 			# Minta penggantian alamat IP
@@ -1036,7 +1020,7 @@ while [[ "$advancedmode" = "" ]]; do
 			# Catat percobaan login terakhir di berkas "/tmp/last.login.$waninterface"
 			echo "Percobaan login terakhir:" >> "/tmp/last.login.$waninterface"
 			# Beritahu pengguna bahwa koneksi dengan internet terputus
-			echo "Login di interface $waninterface diblokir, alasan: $hasillogin" | tee -a "/tmp/last.login.$waninterface" | logger -t "kopijahe $ver"
+			echo "Login di interface $waninterface diblokir, alasan: $hasil" | tee -a "/tmp/last.login.$waninterface" | logger -t "kopijahe $ver"
 			# Logout terlebih dahulu supaya akun tidak tersangkut di server
 			logout_wifi
 			# Minta penggantian alamat IP
