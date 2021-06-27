@@ -17,7 +17,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="1.9.5"
+	ver="1.9.6"
 }
 
 bantuan() {
@@ -419,10 +419,47 @@ testing() {
 	echo "PID autologin: $pidkopijahe"
 }
 
+cpctesting() {
+	# Mode testing penyedia jasa cek koneksi
+	
+	echo "Tes penyedia jasa layanan cek koneksi"
+	cpcprovider="kopijahe"
+	captiveportalcheck
+	echo "Kopijahe: $cpcstatus"
+	cpcprovider="firefox"
+	captiveportalcheck
+	echo "Firefox: $cpcstatus"
+	cpcprovider="google"
+	captiveportalcheck
+	echo "Google: $cpcstatus"
+	cpcprovider="google2"
+	captiveportalcheck
+	echo "Google2: $cpcstatus"
+	cpcprovider="apple"
+	captiveportalcheck
+	echo "Apple: $cpcstatus"
+	cpcprovider="apple2"
+	captiveportalcheck
+	echo "Apple2: $cpcstatus"
+	cpcprovider="microsoft"
+	captiveportalcheck
+	echo "Microsoft: $cpcstatus"
+	cpcprovider="microsoft2"
+	captiveportalcheck
+	echo "Microsoft2: $cpcstatus"
+	cpcprovider="xiaomi"
+	captiveportalcheck
+	echo "Xiaomi: $cpcstatus"
+}
+
 captiveportalcheck() {
 	# Fungsi cek captive portal (halaman login)
-	# Tentukan penyedia layanan cek captive portal berdasarkan konfigurasi sebelumnya
-	cpcprovider="$(uci -q get kopijahe.@autologin["$multiautologinnum"].cpcprovider)"
+	
+	# Cek apakah dalam mode testing atau tidak
+	if [[ "$advancedmode" != "true" ]]; then
+		# Tentukan penyedia layanan cek captive portal berdasarkan konfigurasi sebelumnya
+		cpcprovider="$(uci -q get kopijahe.@autologin["$multiautologinnum"].cpcprovider)"
+	fi
 	
 	# Jika konfigurasi tidak ditemukan, maka:
 	if [[ "$cpcprovider" = "" ]]; then
@@ -477,6 +514,11 @@ captiveportalcheck() {
 		cekkoneksi="$(curl --interface "$wandevice" -LI --silent --retry $cpcretry --max-redirs 1 --connect-timeout $cpctimeout "http://connectivitycheck.gstatic.com/generate_204" | grep -o "204")"
 		kodestatuslanding="$?"
 		hasil="204"
+	# Google2: Layanan cek captive portal bawaan chrome
+	elif [[ "$cpcprovider" = "google2" ]]; then
+		cekkoneksi="$(curl --interface "$wandevice" -LI --silent --retry $cpcretry --max-redirs 1 --connect-timeout $cpctimeout "http://clients3.google.com/generate_204" | grep -o "204")"
+		kodestatuslanding="$?"
+		hasil="204"
 	# Apple: Layanan cek captive portal bawaan perangkat Apple
 	elif [[ "$cpcprovider" = "apple" ]]; then
 		cekkoneksi="$(curl --interface "$wandevice" -L --silent --retry $cpcretry --max-redirs 1 --connect-timeout $cpctimeout "http://captive.apple.com/" | grep -o "Success" | head -c8)"
@@ -508,10 +550,12 @@ captiveportalcheck() {
 	if [[ "$cekkoneksi" = "$hasil" ]]; then
 		# Tentukan bahwa terkoneksi dengan internet
 		internetconnected="yes"
+		cpcstatus="Sukses"
 	# Jika hasilnya tidak sama, maka:
 	else
 		# Tentukan bahwa tidak terkoneksi dengan internet
 		internetconnected="no"
+		cpcstatus="Gagal"
 	fi	
 	
 	# Jika kode status hasil cek koneksi adalah 127, maka:
@@ -848,6 +892,10 @@ do
 			multiautologin
 			if [[ "$icpcprovider" = "kopijahe" ]] || [[ "$icpcprovider" = "firefox" ]] || [[ "$icpcprovider" = "google" ]] || [[ "$icpcprovider" = "apple" ]] || [[ "$icpcprovider" = "apple2" ]] || [[ "$icpcprovider" = "microsoft" ]] || [[ "$icpcprovider" = "microsoft2" ]] || [[ "$icpcprovider" = "xiaomi" ]]; then
 				uci set kopijahe.@autologin["$multiautologinnum"].cpcprovider="$icpcprovider"
+			elif [[ "$icpcprovider" = "test" ]]; then
+				detectwan
+				cpctesting
+				exit 0
 			else
 				echo "Penyedia layanan yang didukung:"
 				echo "\"kopijahe\" (default), \"firefox\", \"google\", \"apple\", \"microsoft\", \"xiaomi\""
