@@ -502,46 +502,55 @@ captiveportalcheck() {
 	# KopiJahe: Layanan cek captive portal bawaan script
 	if [[ "$cpcprovider" = "kopijahe" ]]; then
 		cekkoneksi="$(curl --interface "$wandevice" -L --silent --retry $cpcretry --max-redirs 1 --connect-timeout $cpctimeout "http://periksakoneksi.kopijahe.my.id/cek")"
+		dnsserver="208.67.222.222"
 		kodestatuslanding="$?"
 		hasil="OK"
 	# Firefox: Layanan cek captive portal bawaan browser Mozilla Firefox
 	elif [[ "$cpcprovider" = "firefox" ]]; then
 		cekkoneksi="$(curl --interface "$wandevice" -L --silent --retry $cpcretry --max-redirs 1 --connect-timeout $cpctimeout "http://detectportal.firefox.com/success.txt")"
+		dnsserver="208.67.220.220"
 		kodestatuslanding="$?"
 		hasil="success"
 	# Google: Layanan cek captive portal bawaan sistem operasi android
 	elif [[ "$cpcprovider" = "google" ]]; then
 		cekkoneksi="$(curl --interface "$wandevice" -LI --silent --retry $cpcretry --max-redirs 1 --connect-timeout $cpctimeout "http://connectivitycheck.gstatic.com/generate_204" | grep -o "204")"
+		dnsserver="8.8.4.4"
 		kodestatuslanding="$?"
 		hasil="204"
 	# Google2: Layanan cek captive portal bawaan chrome
 	elif [[ "$cpcprovider" = "google2" ]]; then
 		cekkoneksi="$(curl --interface "$wandevice" -LI --silent --retry $cpcretry --max-redirs 1 --connect-timeout $cpctimeout "http://clients3.google.com/generate_204" | grep -o "204")"
+		dnsserver="8.8.8.8"
 		kodestatuslanding="$?"
 		hasil="204"
 	# Apple: Layanan cek captive portal bawaan perangkat Apple
 	elif [[ "$cpcprovider" = "apple" ]]; then
 		cekkoneksi="$(curl --interface "$wandevice" -L --silent --retry $cpcretry --max-redirs 1 --connect-timeout $cpctimeout "http://captive.apple.com/" | grep -o "Success" | head -c8)"
+		dnsserver="1.0.0.1"
 		kodestatuslanding="$?"
 		hasil="Success"
 	# Apple2: Layanan cek captive portal alternatif perangkat Apple
 	elif [[ "$cpcprovider" = "apple2" ]]; then
 		cekkoneksi="$(curl --interface "$wandevice" -L --silent --retry $cpcretry --max-redirs 1 --connect-timeout $cpctimeout "https://www.apple.com/library/test/success.html" | grep -o "Success" | head -c8)"
+		dnsserver="9.9.9.9"
 		kodestatuslanding="$?"
 		hasil="Success"
 	# Microsoft2: Layanan cek captive portal alternatif milik Microsoft
 	elif [[ "$cpcprovider" = "microsoft2" ]]; then
 		cekkoneksi="$(curl --interface "$wandevice" -L --silent --retry $cpcretry --max-redirs 1 --connect-timeout $cpctimeout "http://www.msftncsi.com/ncsi.txt")"
+		dnsserver="208.67.222.123"
 		kodestatuslanding="$?"
 		hasil="Microsoft NCSI"
 	# Microsoft: Layanan cek captive portal bawaan sistem operasi Windows
 	elif [[ "$cpcprovider" = "microsoft" ]]; then
 		cekkoneksi="$(curl --interface "$wandevice" -L --silent --retry $cpcretry --max-redirs 1 --connect-timeout $cpctimeout "http://www.msftconnecttest.com/connecttest.txt")"
+		dnsserver="208.67.220.123"
 		kodestatuslanding="$?"
 		hasil="Microsoft Connect Test"
 	# Xiaomi: Layanan cek captive portal bawaan sistem operasi MIUI
 	elif [[ "$cpcprovider" = "xiaomi" ]]; then
 		cekkoneksi="$(curl --interface "$wandevice" -LI --silent --retry $cpcretry --max-redirs 1 --connect-timeout $cpctimeout "http://connect.rom.miui.com/generate_204" | grep -o "204")"
+		dnsserver="77.88.8.8"
 		kodestatuslanding="$?"
 		hasil="204"
 	fi
@@ -553,9 +562,18 @@ captiveportalcheck() {
 		cpcstatus="Sukses"
 	# Jika hasilnya tidak sama, maka:
 	else
+		# lakukan test ping ke dns server sesuai pilihan penyedia captive portal
+		testping="$(ping -I "$wandevice" -c 2 $dnsserver)"
+		testping=$?
+		if [[ "$testping" == 0 ]]; then
+		# Tentukan bahwa terkoneksi dengan internet
+		internetconnected="yes"
+		cpcstatus="Sukses"
+		else
 		# Tentukan bahwa tidak terkoneksi dengan internet
 		internetconnected="no"
 		cpcstatus="Gagal"
+		fi
 	fi	
 	
 	# Jika kode status hasil cek koneksi adalah 127, maka:
