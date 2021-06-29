@@ -17,7 +17,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="1.9.6"
+	ver="1.9.7"
 }
 
 bantuan() {
@@ -67,11 +67,11 @@ bantuan() {
 	echo "kopijahe -m 1 -l \"yes\" -u \"halo@kopijahe.my.id\" -p \"en4kbang3t\" -v \"smartbisnis\" -a" 
 	echo "kopijahe -m 2 -l \"yes\" -u \"hola@kopijahe.my.id\" -p \"n1kmats3kali\" -v \"smartbisnis\" -a"
 	echo ""
-	echo "Penggunaan untuk 1 auto-reconnect seamless:"
-	echo "kopijahe -l \"no\" -s"
+	echo "Penggunaan untuk 1 auto-reconnect seamless (diletakkan di berkas /etc/rc.local):"
+	echo "kopijahe -s"
 	echo ""
-	echo "Penggunaan dengan berkas tangkapan login CURL via Google Chrome (login_file.txt):"
-	echo "kopijahe -l \"no\" -f \"/etc/login_file.txt\""
+	echo "Penggunaan dengan berkas tangkapan login CURL (login_file.txt) via Google Chrome (diletakkan di berkas /etc/rc.local):"
+	echo "kopijahe -f \"/etc/login_file.txt\""
 	echo ""
 	echo "Login manual jika autologin gagal (untuk keperluan analisa jika gagal autologin):"
 	echo "kopijahe -x -z"
@@ -421,6 +421,8 @@ testing() {
 
 cpctesting() {
 	# Mode testing penyedia jasa cek koneksi
+	cpcretry="1"
+	cpctimeout="1"
 	
 	echo "Tes penyedia jasa layanan cek koneksi"
 	cpcprovider="kopijahe"
@@ -459,6 +461,10 @@ captiveportalcheck() {
 	if [[ "$advancedmode" != "true" ]]; then
 		# Tentukan penyedia layanan cek captive portal berdasarkan konfigurasi sebelumnya
 		cpcprovider="$(uci -q get kopijahe.@autologin["$multiautologinnum"].cpcprovider)"
+		# Jumlah percobaan ulang cek captive portal
+		cpcretry="$(uci -q get kopijahe.@autologin["$multiautologinnum"].cpcretry)"
+		# Lama timeout cek captive portal
+		cpctimeout="$(uci -q get kopijahe.@autologin["$multiautologinnum"].cpctimeout)"
 	fi
 	
 	# Jika konfigurasi tidak ditemukan, maka:
@@ -471,9 +477,6 @@ captiveportalcheck() {
 		cpcprovider="kopijahe"
 	fi
 	
-	# Jumlah percobaan ulang cek captive portal
-	cpcretry="$(uci -q get kopijahe.@autologin["$multiautologinnum"].cpcretry)"
-	
 	#	Jika konfigurasi tidak ditemukan, maka:
 	if [[ "$cpcretry" = "" ]]; then
 		# Masukkan konfigurasi bawaan percobaan ulang 2 kali
@@ -483,9 +486,6 @@ captiveportalcheck() {
 		# Tentukan variabel cpcretry ke 2
 		cpcretry="2"
 	fi
-	
-	# Lama timeout cek captive portal
-	cpctimeout="$(uci -q get kopijahe.@autologin["$multiautologinnum"].cpctimeout)"
 	
 	# Jika konfigurasi tidak ditemukan, maka:
 	if [[ "$cpctimeout" = "" ]]; then
@@ -898,7 +898,9 @@ do
 				exit 0
 			else
 				echo "Penyedia layanan yang didukung:"
-				echo "\"kopijahe\" (default), \"firefox\", \"google\", \"apple\", \"microsoft\", \"xiaomi\""
+				echo "\"kopijahe\" (default), \"firefox\", \"google\", \"google2\", \"apple\", \"apple2\", \"microsoft\", \"microsoft2\", \"xiaomi\""
+				echo ""
+				echo "Untuk menguji penyedia layanan yang bisa dipakai, bisa menggunakan -c test"
 				exit 1
 			fi
 			uci commit kopijahe
@@ -973,9 +975,6 @@ do
 			uci set kopijahe.@autologin["$multiautologinnum"].username="$username"
 			uci commit kopijahe
 			;;
-		\?)
-			bantuan
-			;;
 		v)
 			wifivariant="$OPTARG"
 			advancedmode="true"
@@ -1014,12 +1013,14 @@ do
 			detectwan
 			login_wifi
 			;; 
+		\?)
+			bantuan
+			;;
 		:)
-			echo "invalid"
+			echo "perintah tidak diketahui atau salah"
 			exit 1
 			;;
 		*)
-			autologin
 			;;
 	esac
 done
