@@ -560,6 +560,7 @@ captiveportalcheck() {
 		# Tentukan bahwa terkoneksi dengan internet
 		internetconnected="yes"
 		cpcstatus="Sukses"
+		
 	# Jika hasilnya tidak sama, maka:
 	else
 		# lakukan test ping ke dns server sesuai pilihan penyedia captive portal
@@ -1106,6 +1107,10 @@ while [[ "$advancedmode" = "" ]]; do
 			sleep "$sleeptime"
 		fi
 	else
+		# Catat jam dan tanggal saat ini di berkas "/tmp/last.login.$waninterface"
+		date > "/tmp/last.login.$waninterface"
+		# Catat percobaan login terakhir di berkas "/tmp/last.login.$waninterface"
+		echo "Tes Koneksi sukses" >> "/tmp/last.login.$waninterface"
 		# Istirahat sebelum coba mengecek koneksi kembali
 		sleep "$sleeptime"
 	fi
