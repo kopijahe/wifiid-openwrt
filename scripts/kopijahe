@@ -17,7 +17,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="1.9.8"
+	ver="1.9.9"
 }
 
 bantuan() {
@@ -51,7 +51,7 @@ bantuan() {
 	echo "\"wifi.id\", \"wms\", \"wms-lite\", \"kampus\", \"smartbisnis\""
 	echo ""
 	echo "Penyedia layanan cek captive portal yang didukung:"
-	echo "\"kopijahe\" (default), \"firefox\", \"google\", \"apple\", \"microsoft\", \"xiaomi\", "
+	echo "\"kopijahe\" (default), \"firefox\", \"google\", \"google2\", \"apple\", \"apple2\", \"microsoft\", \"microsoft2\", \"xiaomi\", \"httpforever\""
 	echo ""
 	echo "=========================================================================="
 	echo ""
@@ -427,7 +427,7 @@ cpctesting() {
 	echo "Tes penyedia jasa layanan cek koneksi"
 	cpcprovider="kopijahe"
 	captiveportalcheck
-	echo "Kopijahe: $cpcstatus"
+	echo "KopiJahe: $cpcstatus"
 	cpcprovider="firefox"
 	captiveportalcheck
 	echo "Firefox: $cpcstatus"
@@ -452,6 +452,9 @@ cpctesting() {
 	cpcprovider="xiaomi"
 	captiveportalcheck
 	echo "Xiaomi: $cpcstatus"
+	cpcprovider="httpforever"
+	captiveportalcheck
+	echo "HTTPForever: $cpcstatus"
 }
 
 captiveportalcheck() {
@@ -502,8 +505,6 @@ captiveportalcheck() {
 	dnsgoogle2="8.8.4.4"
 	dnsopendns="208.67.222.222"
 	dnsopendns2="208.67.220.220"
-	dnscloudflare="1.1.1.1"
-	dnscloudflare2="1.0.0.1"
 	dnsquad9="9.9.9.9"
 	
 	# Daftar penyedia layanan cek captive portal beserta hasil cek yang diharapkan
@@ -537,13 +538,13 @@ captiveportalcheck() {
 		cekkoneksi="$(curl --interface "$wandevice" -L --silent --retry $cpcretry --max-redirs 1 --connect-timeout $cpctimeout "http://captive.apple.com/" | grep -o "Success" | head -c8)"
 		kodestatuslanding="$?"
 		hasil="Success"
-		dnsserver="$dnscloudflare"
+		dnsserver="$dnsopendns"
 	# Apple2: Layanan cek captive portal alternatif perangkat Apple
 	elif [[ "$cpcprovider" = "apple2" ]]; then
-		cekkoneksi="$(curl --interface "$wandevice" -L --silent --retry $cpcretry --max-redirs 1 --connect-timeout $cpctimeout "https://www.apple.com/library/test/success.html" | grep -o "Success" | head -c8)"
+		cekkoneksi="$(curl --interface "$wandevice" -L --silent --retry $cpcretry --max-redirs 1 --connect-timeout $cpctimeout "http://www.apple.com/library/test/success.html" | grep -o "Success" | head -c8)"
 		kodestatuslanding="$?"
 		hasil="Success"
-		dnsserver="$dnscloudflare2"
+		dnsserver="$dnsopendns2"
 	# Microsoft2: Layanan cek captive portal alternatif milik Microsoft
 	elif [[ "$cpcprovider" = "microsoft2" ]]; then
 		cekkoneksi="$(curl --interface "$wandevice" -L --silent --retry $cpcretry --max-redirs 1 --connect-timeout $cpctimeout "http://www.msftncsi.com/ncsi.txt")"
@@ -562,6 +563,12 @@ captiveportalcheck() {
 		kodestatuslanding="$?"
 		hasil="204"
 		dnsserver="$dnsquad9"
+	# HTTP Forever: Layanan cek captive portal dari Scott Helme (https://github.com/ScottHelme)
+	elif [[ "$cpcprovider" = "httpforever" ]]; then
+		cekkoneksi="$(curl --interface "$wandevice" --silent --retry $cpcretry --max-redirs 1 --connect-timeout $cpctimeout "http://httpforever.com/" | grep -o "A reliably insecure connection")"
+		kodestatuslanding="$?"
+		hasil="A reliably insecure connection"
+		dnsserver="$dnsgoogle"
 	fi
 	
 	# Jika hasil cek koneksi sesuai dengan hasil yang diharapkan, maka:
@@ -918,7 +925,7 @@ do
 			icpcprovider="$OPTARG"
 			advancedmode="true"
 			multiautologin
-			if [[ "$icpcprovider" = "kopijahe" ]] || [[ "$icpcprovider" = "firefox" ]] || [[ "$icpcprovider" = "google" ]] || [[ "$icpcprovider" = "apple" ]] || [[ "$icpcprovider" = "apple2" ]] || [[ "$icpcprovider" = "microsoft" ]] || [[ "$icpcprovider" = "microsoft2" ]] || [[ "$icpcprovider" = "xiaomi" ]]; then
+			if [[ "$icpcprovider" = "kopijahe" ]] || [[ "$icpcprovider" = "firefox" ]] || [[ "$icpcprovider" = "google" ]] || [[ "$icpcprovider" = "apple" ]] || [[ "$icpcprovider" = "apple2" ]] || [[ "$icpcprovider" = "microsoft" ]] || [[ "$icpcprovider" = "microsoft2" ]] || [[ "$icpcprovider" = "xiaomi" ]] || [[ "$icpcprovider" = "httpforever" ]]; then
 				uci set kopijahe.@autologin["$multiautologinnum"].cpcprovider="$icpcprovider"
 			elif [[ "$icpcprovider" = "test" ]]; then
 				detectwan
@@ -926,7 +933,7 @@ do
 				exit 0
 			else
 				echo "Penyedia layanan yang didukung:"
-				echo "\"kopijahe\" (default), \"firefox\", \"google\", \"google2\", \"apple\", \"apple2\", \"microsoft\", \"microsoft2\", \"xiaomi\""
+				echo "\"kopijahe\" (default), \"firefox\", \"google\", \"google2\", \"apple\", \"apple2\", \"microsoft\", \"microsoft2\", \"xiaomi\", \"httpforever\""
 				echo ""
 				echo "Untuk menguji penyedia layanan yang bisa dipakai, bisa menggunakan -c test"
 				exit 1
