@@ -17,7 +17,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="1.9.9"
+	ver="2.0.0"
 }
 
 bantuan() {
@@ -689,31 +689,31 @@ hasil_loginout() {
 
 	# Filter hasil hanya di bagian yang relevan saja sesuai dengan fungsi yang digunakan
 	if [[ "$function" = "login" ]]; then
-		hasil="$(echo "$attempt" | jsonfilter -e '@["message"]' 2> /dev/null)"
+		loginout="$(echo "$attempt" | jsonfilter -e '@["message"]' 2> /dev/null)"
 	elif [[ "$function" = "logout" ]]; then
-		hasil="$(echo "$attempt" | awk -F'[<>]' '{print $5}' 2> /dev/null)"
+		loginout="$(echo "$attempt" | awk -F'[<>]' '{print $5}' 2> /dev/null)"
 	fi
 
 	# Jika variabel hasil kosong, maka login tidak berhasil
 	# Cek apakah mode bypass (parameter -z) hidup, jika tidak, maka:
-	if [[ "$hasil" = "" ]] && [[ "$bypassmode" = "" ]]; then
+	if [[ "$loginout" = "" ]] && [[ "$bypassmode" = "" ]]; then
 		# Laporkan hasil login tidak berhasil, berikut kode status CURL untuk halaman login/landing dan percobaan login
-		hasil="$function tidak berhasil, kode status CURL: $kodestatuslanding & $kodestatus"
-	elif [[ "$hasil" = "" ]] && [[ "$bypassmode" = "true" ]]; then
+		loginout="$function tidak berhasil, kode status CURL: $kodestatuslanding & $kodestatus"
+	elif [[ "$loginout" = "" ]] && [[ "$bypassmode" = "true" ]]; then
 		# Laporkan hasil login tidak berhasil, berikut kode status CURL untuk percobaan login
-		hasil="$function tidak berhasil, kode status CURL: $kodestatus"
+		loginout="$function tidak berhasil, kode status CURL: $kodestatus"
 	fi
 	
 	# Jika digunakan di mode lanjutan, maka:
 	if [[ "$advancedmode" = "true" ]]; then
 		# Beritahu pengguna melalui layar terminal/stdout
-		echo "Percobaan $function. Interface: $waninterface. Hasil: $hasil"
+		echo "Percobaan $function. Interface: $waninterface. Hasil: $loginout"
 		# Simpan juga hasilnya di berkas "/tmp/last.login.$waninterface" dan beritahu pengguna melalui System Log
-		echo "Percobaan $function. Interface: $waninterface. Hasil: $hasil" | tee -a "/tmp/last.login.$waninterface" | logger -t "kopijahe $ver"
+		echo "Percobaan $function. Interface: $waninterface. Hasil: $loginout" | tee -a "/tmp/last.login.$waninterface" | logger -t "kopijahe $ver"
 	# Jika tidak, maka:
 	else
 		# Simpan hasilnya di berkas "/tmp/last.login.$waninterface" dan beritahu pengguna melalui System Log
-		echo "Percobaan $function. Interface: $waninterface. Hasil: $hasil" | tee -a "/tmp/last.login.$waninterface" | logger -t "kopijahe $ver"
+		echo "Percobaan $function. Interface: $waninterface. Hasil: $loginout" | tee -a "/tmp/last.login.$waninterface" | logger -t "kopijahe $ver"
 	fi
 }
 
@@ -1089,7 +1089,7 @@ while [[ "$advancedmode" = "" ]]; do
 			# Catat percobaan login terakhir di berkas "/tmp/last.login.$waninterface"
 			echo "Percobaan login terakhir:" >> "/tmp/last.login.$waninterface"
 			# Beritahu pengguna bahwa koneksi dengan internet terputus
-			echo "Login di interface $waninterface diblokir, alasan: $hasil" | tee -a "/tmp/last.login.$waninterface" | logger -t "kopijahe $ver"
+			echo "Login di interface $waninterface diblokir, alasan: $loginout" | tee -a "/tmp/last.login.$waninterface" | logger -t "kopijahe $ver"
 			# Logout terlebih dahulu supaya akun tidak tersangkut di server
 			logout_wifi
 			# Minta penggantian alamat IP
@@ -1104,7 +1104,7 @@ while [[ "$advancedmode" = "" ]]; do
 			# Catat percobaan login terakhir di berkas "/tmp/last.login.$waninterface"
 			echo "Percobaan login terakhir:" >> "/tmp/last.login.$waninterface"
 			# Beritahu pengguna bahwa koneksi dengan internet terputus
-			echo "Login di interface $waninterface diblokir, alasan: $hasil" | tee -a "/tmp/last.login.$waninterface" | logger -t "kopijahe $ver"
+			echo "Login di interface $waninterface diblokir, alasan: $loginout" | tee -a "/tmp/last.login.$waninterface" | logger -t "kopijahe $ver"
 			# Logout terlebih dahulu supaya akun tidak tersangkut di server
 			logout_wifi
 			# Minta penggantian alamat IP
