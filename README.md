@@ -12,7 +12,7 @@ Di sini saya akan membeberkan cara menangkap dan memancarkan kembali sinyal @wif
 
 2. Punya router jaringan berbasiskan OpenWrt/LEDE atau TP-Link Pharos
 
-3. Punya akun @wifi.id (beli voucher fisik, atau lewat SMS ke 98108, lewat aplikasi wifi.id GO ([android](https://play.google.com/store/apps/details?id=com.telkom.wifiidgo), [iOS](https://apps.apple.com/id/app/wifi-id-go/id1198078195)) atau lewat online marketplace seperti [Tokopedia](https://www.tokopedia.com/streaming/), keterangan lebih lanjut bisa merujuk ke: https://wifi.id/belivoucher )
+3. Punya akun @wifi.id (beli voucher fisik, atau lewat SMS ke 98108/99099, lewat aplikasi wifi.id GO ([android](https://play.google.com/store/apps/details?id=com.telkom.wifiidgo), [iOS](https://apps.apple.com/id/app/wifi-id-go/id1198078195)) atau lewat online marketplace seperti [Tokopedia](https://www.tokopedia.com/streaming/), keterangan lebih lanjut bisa merujuk ke: https://wifi.id/voucher )
 
 
 ## Daftar Isi:
