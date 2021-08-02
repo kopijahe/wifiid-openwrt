@@ -5,26 +5,23 @@
 ### **Tutorial Untuk Menangkap dan Memancarkan Kembali Sinyal @wifi.id Menggunakan OpenWrt/LEDE**
 
 ### **Langkah-Langkah**
-#### **A. Mengatur DNS router**
+#### **A. Mengatur Hostnames router**
 1. Koneksikan perangkat (PC/laptop) ke router (biasanya [192.168.1.1](http://192.168.1.1))
 
    ![login](pics/01-login-router.png)
 
-2. Masuk ke tab **Network** -> **Interfaces**
+2. Masuk ke tab **Network** -> **Hostnames**
 
-3. Tekan tombol **Edit** di bagian **LAN**
+   ![hostnames](pics/openwrt-hostnames-1.png)
 
-   ![interfaces](pics/02-interfaces.png)
+3. Tekan tombol **Add**, lalu masukkan 2 nilai berikut, lalu tekan tombol **Save** 
+   > Hostname: welcome2.wifi.id & logout.wifi.id  
+   > IP address: 10.233.16.13
 
-4. Scroll ke bagian **DHCP Server** di bawah, lalu tekan tab **Advanced Settings**
+   ![hostnames](pics/openwrt-hostnames-2.png)  
+   ![hostnames](pics/openwrt-hostnames-3.png)
 
-5. Masukkan `6,118.98.44.10,118.98.44.100` di bagian **DHCP-Options**
-
-   ![dns](pics/03-dns-server.png)
-
-6. Tekan tombol **Save and Apply**
-
-7. Cabut-pasang kembali kabel LAN agar pengaturan ini langsung dipakai oleh perangkat
+4. Kalau sudah sesuai dengan gambar di atas, tekan tombol **Save and Apply**
 
 #### **B Koneksi dengan jaringan @wifi.id (selain seamless<span></span>@wifi.id)**
 
@@ -53,11 +50,3 @@
 7. Halaman login akan muncul, lakukan login sesuai dengan voucher yang sudah dibeli
 
    ![interfaces](pics/09-login-page.png)
-
-<br><br>
-<p align="center">
-	<b>Kirim dukungan donasi melalui:</b>
-</p>
-<p align="center">
-    <a href="https://trakteer.id/kopijahe"><img src="https://github.com/kopijahe/wifiid-openwrt/blob/master/pics/trakteer-button.svg" alt="Trakteer ✖ KopiJahe" width="225">
-</p>

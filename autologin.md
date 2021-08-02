@@ -138,14 +138,3 @@ Solusinya ada 2:
 > Untuk kedepannya, jika voucher yang digunakan untuk login sudah habis/tidak berlaku, atau proses autologin sudah tidak lagi berjalan, maka hanya perlu memperbarui berkas login_file.txt saja.
 
 > :warning: Jika script tidak berjalan setelah router sempat mati/reboot, bisa lihat [pemecahan masalahnya di sini](https://github.com/kopijahe/wifiid-openwrt/issues/4).
-
-<br><br>
-> :loudspeaker: **Masih ada pertanyaan lain?** Bisa merujuk ke dokumen [faq-technical-info.md](faq-technical-info.md)
-
-<br><br>
-<p align="center">
-	<b>Kirim dukungan donasi melalui:</b>
-</p>
-<p align="center">
-    <a href="https://trakteer.id/kopijahe"><img src="https://github.com/kopijahe/wifiid-openwrt/blob/master/pics/trakteer-button.svg" alt="Trakteer ✖ KopiJahe" width="225">
-</p>
