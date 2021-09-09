@@ -17,7 +17,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="2.0.8"
+	ver="2.0.9"
 }
 
 bantuan() {
@@ -51,7 +51,7 @@ bantuan() {
 	echo "\"wifi.id\", \"wms\", \"wms-lite\", \"kampus\", \"smartbisnis\""
 	echo ""
 	echo "Penyedia layanan cek captive portal yang didukung:"
-	echo "\"kopijahe\" (default), \"firefox\", \"google\", \"google2\", \"apple\", \"apple2\", \"microsoft\", \"microsoft2\", \"xiaomi\", \"httpforever\""
+	echo "\"kopijahe\" (default), \"firefox\", \"google\", \"google2\", \"apple\", \"apple2\", \"microsoft\", \"microsoft2\", \"xiaomi\", \"httpforever\", \"neverssl\", \"ubuntu\", \"archlinux\"""\"kopijahe\" (default), \"firefox\", \"google\", \"google2\", \"apple\", \"apple2\", \"microsoft\", \"microsoft2\", \"xiaomi\", \"httpforever\", \"neverssl\", \"ubuntu\", \"archlinux\", \"examplecom\""
 	echo ""
 	echo "=========================================================================="
 	echo ""
@@ -85,7 +85,7 @@ detectconfig() {
 	
 	# Cek apakah belum ada pengaturan autologin sebelumnya
 	# Jika benar, maka:
-	# shellcheck disable=SC2102
+	# shellcheck disable=SC2086
 	if [[ "$advancedmode" = "true" ]] && [[ "$(uci -q show kopijahe.@autologin[$multiautologincfg])" = "" ]]; then
 		# Tambahkan pengaturan baru
 		uci add kopijahe autologin
@@ -180,13 +180,13 @@ multiautologin() {
 	multiautologincfg="$((inputmultiautologin-1))"
 	detectconfig
 	
-	# shellcheck disable=SC2102
+	# shellcheck disable=SC2086
 	if [[ "$(uci -q get kopijahe.@autologin[$multiautologincfg].multi_autologin)" = "" ]]; then
 		uci set kopijahe.@autologin["$multiautologincfg"].multi_autologin="$multiautologincfg"
 		uci commit kopijahe
 	fi
 	
-	# shellcheck disable=SC2102
+	# shellcheck disable=SC2086
 	multiautologinnum="$(uci -q get kopijahe.@autologin[$multiautologincfg].multi_autologin)"
 }
 
@@ -462,6 +462,18 @@ cpctesting() {
 	cpcprovider="httpforever"
 	captiveportalcheck
 	echo "HTTPForever: $cpcstatus"
+	cpcprovider="neverssl"
+	captiveportalcheck
+	echo "NeverSSL: $cpcstatus"
+	cpcprovider="ubuntu"
+	captiveportalcheck
+	echo "Ubuntu: $cpcstatus"
+	cpcprovider="archlinux"
+	captiveportalcheck
+	echo "Arch Linux: $cpcstatus"
+	cpcprovider="examplecom"
+	captiveportalcheck
+	echo "example.com: $cpcstatus"
 }
 
 captiveportalcheck() {
@@ -576,6 +588,30 @@ captiveportalcheck() {
 		kodestatuslanding="$?"
 		hasil="A reliably insecure connection"
 		dnsserver="$dnsgoogle"
+	# NeverSSL: Layanan cek captive portal dari Colm MacCárthaigh (https://github.com/colmmacc/neverssl.com)
+	elif [[ "$cpcprovider" = "neverssl" ]]; then
+		cekkoneksi="$(curl --interface "$wandevice" --silent --retry $cpcretry --max-redirs 1 --connect-timeout $cpctimeout "http://neverssl.com/" | grep -o "helping you get online")"
+		kodestatuslanding="$?"
+		hasil="helping you get online"
+		dnsserver="$dnsopendns"
+	# Ubuntu: Layanan cek captive portal bawaan sistem operasi ubuntu
+	elif [[ "$cpcprovider" = "ubuntu" ]]; then
+		cekkoneksi="$(curl --interface "$wandevice" -LI --silent --retry $cpcretry --max-redirs 1 --connect-timeout $cpctimeout "http://connectivity-check.ubuntu.com" | grep -o "204")"
+		kodestatuslanding="$?"
+		hasil="204"
+		dnsserver="$dnsgoogle"
+	# Archlinux: Layanan cek captive portal bawaan sistem operasi archlinux
+	elif [[ "$cpcprovider" = "archlinux" ]]; then
+		cekkoneksi="$(curl --interface "$wandevice" -LI --silent --retry $cpcretry --max-redirs 1 --connect-timeout $cpctimeout "http://ping.archlinux.org" | grep -o "200")"
+		kodestatuslanding="$?"
+		hasil="200"
+		dnsserver="$dnsquad9"
+	# Example: Situs percobaan yang dikelola oleh IANA (https://www.iana.org/domains/reserved)
+	elif [[ "$cpcprovider" = "examplecom" ]]; then
+		cekkoneksi="$(curl --interface "$wandevice" -L --silent --retry $cpcretry --max-redirs 1 --connect-timeout $cpctimeout "http://example.com/" | grep -o "Example Domain" | awk '!a[$0]++')"
+		kodestatuslanding="$?"
+		hasil="Example Domain"
+		dnsserver="$dnsquad9"
 	fi
 	
 	# Jika hasil cek koneksi sesuai dengan hasil yang diharapkan, maka:
@@ -599,9 +635,9 @@ captiveportalcheck() {
 			cpcstatus="Gagal"
 		fi
 	else
-			# Tentukan bahwa tidak terkoneksi dengan internet
-			internetconnected="no"
-			cpcstatus="Gagal"
+		# Tentukan bahwa tidak terkoneksi dengan internet
+		internetconnected="no"
+		cpcstatus="Gagal"
 	fi	
 	
 	# Jika kode status hasil cek koneksi adalah 127, maka:
@@ -937,7 +973,7 @@ do
 			icpcprovider="$OPTARG"
 			advancedmode="true"
 			multiautologin
-			if [[ "$icpcprovider" = "kopijahe" ]] || [[ "$icpcprovider" = "firefox" ]] || [[ "$icpcprovider" = "google" ]] || [[ "$icpcprovider" = "apple" ]] || [[ "$icpcprovider" = "apple2" ]] || [[ "$icpcprovider" = "microsoft" ]] || [[ "$icpcprovider" = "microsoft2" ]] || [[ "$icpcprovider" = "xiaomi" ]] || [[ "$icpcprovider" = "httpforever" ]]; then
+			if [[ "$icpcprovider" = "kopijahe" ]] || [[ "$icpcprovider" = "firefox" ]] || [[ "$icpcprovider" = "google" ]] || [[ "$icpcprovider" = "apple" ]] || [[ "$icpcprovider" = "apple2" ]] || [[ "$icpcprovider" = "microsoft" ]] || [[ "$icpcprovider" = "microsoft2" ]] || [[ "$icpcprovider" = "xiaomi" ]] || [[ "$icpcprovider" = "httpforever" ]] || [[ "$icpcprovider" = "neverssl" ]] || [[ "$icpcprovider" = "ubuntu" ]] || [[ "$icpcprovider" = "archlinux" ]] || [[ "$icpcprovider" = "examplecom" ]]; then
 				uci set kopijahe.@autologin["$multiautologinnum"].cpcprovider="$icpcprovider"
 			elif [[ "$icpcprovider" = "test" ]]; then
 				detectwan
@@ -945,7 +981,7 @@ do
 				exit 0
 			else
 				echo "Penyedia layanan yang didukung:"
-				echo "\"kopijahe\" (default), \"firefox\", \"google\", \"google2\", \"apple\", \"apple2\", \"microsoft\", \"microsoft2\", \"xiaomi\", \"httpforever\""
+				echo "\"kopijahe\" (default), \"firefox\", \"google\", \"google2\", \"apple\", \"apple2\", \"microsoft\", \"microsoft2\", \"xiaomi\", \"httpforever\", \"neverssl\", \"ubuntu\", \"archlinux\"""\"kopijahe\" (default), \"firefox\", \"google\", \"google2\", \"apple\", \"apple2\", \"microsoft\", \"microsoft2\", \"xiaomi\", \"httpforever\", \"neverssl\", \"ubuntu\", \"archlinux\", \"examplecom\""
 				echo ""
 				echo "Untuk menguji penyedia layanan yang bisa dipakai, bisa menggunakan -c test"
 				exit 1
