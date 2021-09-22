@@ -17,7 +17,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="2.0.9"
+	ver="2.1.0"
 }
 
 bantuan() {
@@ -51,7 +51,7 @@ bantuan() {
 	echo "\"wifi.id\", \"wms\", \"wms-lite\", \"kampus\", \"smartbisnis\""
 	echo ""
 	echo "Penyedia layanan cek captive portal yang didukung:"
-	echo "\"kopijahe\" (default), \"firefox\", \"google\", \"google2\", \"apple\", \"apple2\", \"microsoft\", \"microsoft2\", \"xiaomi\", \"httpforever\", \"neverssl\", \"ubuntu\", \"archlinux\"""\"kopijahe\" (default), \"firefox\", \"google\", \"google2\", \"apple\", \"apple2\", \"microsoft\", \"microsoft2\", \"xiaomi\", \"httpforever\", \"neverssl\", \"ubuntu\", \"archlinux\", \"examplecom\""
+	echo "\"kopijahe\" (default), \"kopijahe2\", \"firefox\", \"google\", \"google2\", \"apple\", \"apple2\", \"microsoft\", \"microsoft2\", \"xiaomi\", \"httpforever\", \"neverssl\", \"ubuntu\", \"archlinux\"""\"kopijahe\" (default), \"firefox\", \"google\", \"google2\", \"apple\", \"apple2\", \"microsoft\", \"microsoft2\", \"xiaomi\", \"httpforever\", \"neverssl\", \"ubuntu\", \"archlinux\", \"examplecom\""
 	echo ""
 	echo "=========================================================================="
 	echo ""
@@ -435,6 +435,9 @@ cpctesting() {
 	cpcprovider="kopijahe"
 	captiveportalcheck
 	echo "KopiJahe: $cpcstatus"
+	cpcprovider="kopijahe2"
+	captiveportalcheck
+	echo "KopiJahe2: $cpcstatus"
 	cpcprovider="firefox"
 	captiveportalcheck
 	echo "Firefox: $cpcstatus"
@@ -534,6 +537,12 @@ captiveportalcheck() {
 		kodestatuslanding="$?"
 		hasil="OK"
 		dnsserver="$dnsopendns"
+	# KopiJahe2: Layanan cek captive portal alternatif bawaan script
+	elif [[ "$cpcprovider" = "kopijahe2" ]]; then
+		cekkoneksi="$(curl --interface "$wandevice" -L --silent --retry $cpcretry --max-redirs 1 --connect-timeout $cpctimeout "http://kopijahe.my.id/ok.txt")"
+		kodestatuslanding="$?"
+		hasil="OK"
+		dnsserver="$dnsopendns2"
 	# Firefox: Layanan cek captive portal bawaan browser Mozilla Firefox
 	elif [[ "$cpcprovider" = "firefox" ]]; then
 		cekkoneksi="$(curl --interface "$wandevice" -L --silent --retry $cpcretry --max-redirs 1 --connect-timeout $cpctimeout "http://detectportal.firefox.com/success.txt")"
@@ -762,6 +771,18 @@ hasil_loginout() {
 		# Simpan hasilnya di berkas "/tmp/last.login.$waninterface" dan beritahu pengguna melalui System Log
 		echo "Percobaan $function. Interface: $waninterface. Hasil: $loginout" | tee -a "/tmp/last.login.$waninterface" | logger -t "kopijahe $ver"
 	fi
+	
+	# Jika kode status hasil login adalah 3, maka:
+	if [[ "$function" = "login" ]] && [[ "$kodestatus" = "3" ]]; then
+		# Beritahu pengguna bahwa pengaturan belum lengkap lewat stdout dan System log jika melalui mode lanjutan
+		if [[ "$advancedmode" = "true" ]]; then
+			echo "Pengaturan belum lengkap, silahkan ulangi konfigurasi"
+			echo "Pengaturan belum lengkap, silahkan ulangi konfigurasi" | logger -t "kopijahe $ver"
+		# Jika tidak, maka beritahu pengguna lewat System Log saja
+		else 
+			echo "Pengaturan belum lengkap, silahkan ulangi konfigurasi" | logger -t "kopijahe $ver"
+		fi
+	fi
 }
 
 logout_wifi() {
@@ -973,7 +994,7 @@ do
 			icpcprovider="$OPTARG"
 			advancedmode="true"
 			multiautologin
-			if [[ "$icpcprovider" = "kopijahe" ]] || [[ "$icpcprovider" = "firefox" ]] || [[ "$icpcprovider" = "google" ]] || [[ "$icpcprovider" = "apple" ]] || [[ "$icpcprovider" = "apple2" ]] || [[ "$icpcprovider" = "microsoft" ]] || [[ "$icpcprovider" = "microsoft2" ]] || [[ "$icpcprovider" = "xiaomi" ]] || [[ "$icpcprovider" = "httpforever" ]] || [[ "$icpcprovider" = "neverssl" ]] || [[ "$icpcprovider" = "ubuntu" ]] || [[ "$icpcprovider" = "archlinux" ]] || [[ "$icpcprovider" = "examplecom" ]]; then
+			if [[ "$icpcprovider" = "kopijahe" ]] || [[ "$icpcprovider" = "kopijahe2" ]] || [[ "$icpcprovider" = "firefox" ]] || [[ "$icpcprovider" = "google" ]] || [[ "$icpcprovider" = "apple" ]] || [[ "$icpcprovider" = "apple2" ]] || [[ "$icpcprovider" = "microsoft" ]] || [[ "$icpcprovider" = "microsoft2" ]] || [[ "$icpcprovider" = "xiaomi" ]] || [[ "$icpcprovider" = "httpforever" ]] || [[ "$icpcprovider" = "neverssl" ]] || [[ "$icpcprovider" = "ubuntu" ]] || [[ "$icpcprovider" = "archlinux" ]] || [[ "$icpcprovider" = "examplecom" ]]; then
 				uci set kopijahe.@autologin["$multiautologinnum"].cpcprovider="$icpcprovider"
 			elif [[ "$icpcprovider" = "test" ]]; then
 				detectwan
@@ -981,7 +1002,7 @@ do
 				exit 0
 			else
 				echo "Penyedia layanan yang didukung:"
-				echo "\"kopijahe\" (default), \"firefox\", \"google\", \"google2\", \"apple\", \"apple2\", \"microsoft\", \"microsoft2\", \"xiaomi\", \"httpforever\", \"neverssl\", \"ubuntu\", \"archlinux\"""\"kopijahe\" (default), \"firefox\", \"google\", \"google2\", \"apple\", \"apple2\", \"microsoft\", \"microsoft2\", \"xiaomi\", \"httpforever\", \"neverssl\", \"ubuntu\", \"archlinux\", \"examplecom\""
+				echo "\"kopijahe\" (default), \"kopijahe2\", \"firefox\", \"google\", \"google2\", \"apple\", \"apple2\", \"microsoft\", \"microsoft2\", \"xiaomi\", \"httpforever\", \"neverssl\", \"ubuntu\", \"archlinux\"""\"kopijahe\" (default), \"firefox\", \"google\", \"google2\", \"apple\", \"apple2\", \"microsoft\", \"microsoft2\", \"xiaomi\", \"httpforever\", \"neverssl\", \"ubuntu\", \"archlinux\", \"examplecom\""
 				echo ""
 				echo "Untuk menguji penyedia layanan yang bisa dipakai, bisa menggunakan -c test"
 				exit 1
@@ -1169,7 +1190,7 @@ while [[ "$advancedmode" = "" ]]; do
 		elif [[ "$kodestatuslanding" = "0" ]] && [[ "$kodestatus" = "7" ]]; then
 			# Lakukan login, lalu langsung cek status kembali
 			login_wifi
-		# Jika terdeteksi cURL 0 & 7, maka:
+		# Jika terdeteksi cURL 6 & 7, maka:
 		elif [[ "$kodestatuslanding" = "6" ]] && [[ "$kodestatus" = "7" ]]; then
 			# Coba refresh interface terlebih dahulu
 			refreshinterface
