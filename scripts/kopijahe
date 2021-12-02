@@ -17,7 +17,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="2.1.4"
+	ver="2.1.5"
 }
 
 bantuan() {
@@ -805,12 +805,8 @@ hasil_loginout() {
 logout_wifi() {
 	# Fungsi login dari pengaturan yang disimpan
 	
-	login_folder
-	versi
-		
 	# Simpan jam dan tanggal saat ini
 	date > "/tmp/last.login.$waninterface"
-	
 	# Cek versi OS, jika menggunakan LEDE 17.01 atau OpenWrt 18.06
 	# Maka perlu menggunakan tambahan parameter -k
 	if [[ "$osversion" = "17" ]] || [[ "$osversion" = "18" ]]; then
@@ -818,6 +814,9 @@ logout_wifi() {
 	else
 		curladditionalparameter='--silent'
 	fi
+	
+	login_folder
+	versi
 	
 	# Lakukan login sesuai dengan parameter konfigurasi autologin
 	attempt="$(curl --interface "$wandevice" $curladditionalparameter """https://$server_id/authnew/logout/logoutx.php""" \
@@ -828,6 +827,7 @@ logout_wifi() {
 	-H "content-type: application/x-www-form-urlencoded; charset=UTF-8" \
 	-H "origin: https://logout.wifi.id" \
 	-H "sec-fetch-site: same-site" \
+	-H "sec-ch-ua-platform: Windows" \
 	-H "sec-fetch-mode: cors" \
 	-H "sec-fetch-dest: empty" \
 	-H "referer: https://logout.wifi.id/")"
@@ -853,6 +853,17 @@ welcomepageloadtime() {
 login_wifi() {
 	# Fungsi login dari pengaturan yang disimpan
 	
+	# Simpan jam dan tanggal saat ini
+	date > "/tmp/last.login.$waninterface"
+	
+	# Cek versi OS, jika menggunakan LEDE 17.01 atau OpenWrt 18.06
+	# Maka perlu menggunakan tambahan parameter -k
+	if [[ "$osversion" = "17" ]] || [[ "$osversion" = "18" ]]; then
+		curladditionalparameter='-k --silent'
+	else
+		curladditionalparameter='--silent'
+	fi
+	
 	login_folder
 	randommaccheck
 	versi
@@ -868,17 +879,6 @@ login_wifi() {
 	dataraw
 	welcomepageloadtime
 	
-	# Simpan jam dan tanggal saat ini
-	date > "/tmp/last.login.$waninterface"
-	
-	# Cek versi OS, jika menggunakan LEDE 17.01 atau OpenWrt 18.06
-	# Maka perlu menggunakan tambahan parameter -k
-	if [[ "$osversion" = "17" ]] || [[ "$osversion" = "18" ]]; then
-		curladditionalparameter='-k --silent'
-	else
-		curladditionalparameter='--silent'
-	fi
-	
 	# Lakukan login sesuai dengan parameter konfigurasi autologin
 	attempt="$(curl --interface "$wandevice" $curladditionalparameter """$loginurl""?ipc=""$iprouter""&gw_id=""$gwid""&client_mac=""$clientmac""&redirect=&wlan=""$wlanid""&load_wp=""$loadwp_value""" \
 	-H "authority: ""$server_id""" \
@@ -888,6 +888,7 @@ login_wifi() {
 	-H "content-type: application/x-www-form-urlencoded; charset=UTF-8" \
 	-H "origin: https://""$server_id""" \
 	-H "sec-fetch-site: same-origin" \
+	-H "sec-ch-ua-platform: Windows" \
 	-H "sec-fetch-mode: cors" \
 	-H "sec-fetch-dest: empty" \
 	-H "referer: https://""$server_id""/""$tipelogin""/?gw_id=""$gwid""&client_mac=""$clientmac""&wlan=""$wlanid""&sessionid=""$session_id""" \
