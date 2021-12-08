@@ -17,7 +17,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="2.1.6"
+	ver="2.1.7"
 }
 
 bantuan() {
@@ -48,7 +48,7 @@ bantuan() {
 	echo "-z: lakukan login secara manual (untuk keperluan analisa jika gagal autologin)"
 	echo ""
 	echo "Varian jaringan yang didukung:"
-	echo "\"wifi.id\", \"wms\", \"wms-lite\", \"kampus\", \"smartbisnis\", \"sso\", \"rumah-sakit\", \"wico\", \"grosirbersama\", \"internetku\", \"gift\""
+	echo "\"wifi.id\", \"wms\", \"wms-lite\", \"kampus\", \"smartbisnis\", \"sso\", \"rumah-sakit\", \"wico\", \"grosirbersama\", \"internetku\", \"gift\", \"starwifi\""
 	echo "Coba gunakan \"komunitas-generik\" jika komunitas atau kampus anda belum didukung secara langsung oleh script."
 	echo ""
 	echo "Penyedia layanan cek captive portal yang didukung:"
@@ -748,6 +748,10 @@ wificommunity() {
 	elif [[ "$wifivariant" = "gift" ]]; then
 		# Tidak perlu merubah akhiran username
 		username2="$username"
+	# Jika starwifi, maka:
+	elif [[ "$wifivariant" = "starwifi" ]]; then
+		# Tidak perlu merubah akhiran username
+		username2="$username.starwifi@event"
 	# Jika SSO atau Rumah Sakit atau komunitas generik lainnya, maka:
 	elif [[ "$wifivariant" = "sso" ]] || [[ "$wifivariant" = "rumah-sakit" ]] || [[ "$wifivariant" = "komunitas-generik" ]]; then
 		# Tentukan akhiran username ".vmgmt@wms.00000000.000"
@@ -1133,11 +1137,11 @@ do
 			wifivariant="$OPTARG"
 			advancedmode="true"
 			multiautologin
-			if [[ "$wifivariant" = "wifi.id" ]] || [[ "$wifivariant" = "@wifi.id" ]] || [[ "$wifivariant" = "wms" ]] || [[ "$wifivariant" = "wms-lite" ]] || [[ "$wifivariant" = "smartbisnis" ]] || [[ "$wifivariant" = "kampus" ]] || [[ "$wifivariant" = "sso" ]] || [[ "$wifivariant" = "rumah-sakit" ]] || [[ "$wifivariant" = "wico" ]] || [[ "$wifivariant" = "grosirbersama" ]] || [[ "$wifivariant" = "internetku" ]] || [[ "$wifivariant" = "gift" ]] || [[ "$wifivariant" = "komunitas-generik" ]]; then
+			if [[ "$wifivariant" = "wifi.id" ]] || [[ "$wifivariant" = "@wifi.id" ]] || [[ "$wifivariant" = "wms" ]] || [[ "$wifivariant" = "wms-lite" ]] || [[ "$wifivariant" = "smartbisnis" ]] || [[ "$wifivariant" = "kampus" ]] || [[ "$wifivariant" = "sso" ]] || [[ "$wifivariant" = "rumah-sakit" ]] || [[ "$wifivariant" = "wico" ]] || [[ "$wifivariant" = "grosirbersama" ]] || [[ "$wifivariant" = "internetku" ]] || [[ "$wifivariant" = "gift" ]] || [[ "$wifivariant" = "starwifi" ]] || [[ "$wifivariant" = "komunitas-generik" ]]; then
 				uci set kopijahe.@autologin["$multiautologinnum"].wifivariant="$wifivariant"
 			else
 				echo "Varian jaringan yang didukung:"
-				echo "\"wifi.id\", \"wms\", \"wms-lite\", \"kampus\", \"smartbisnis\", \"sso\", \"rumah-sakit\", \"wico\", \"grosirbersama\", \"internetku\", \"gift\", \"komunitas-generik\""
+				echo "\"wifi.id\", \"wms\", \"wms-lite\", \"kampus\", \"smartbisnis\", \"sso\", \"rumah-sakit\", \"wico\", \"grosirbersama\", \"internetku\", \"gift\", \"starwifi\", \"komunitas-generik\""
 				exit 1
 			fi
 			if [[ "$wifivariant" = "kampus" ]]; then
