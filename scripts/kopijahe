@@ -17,7 +17,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="2.1.8"
+	ver="2.1.9"
 }
 
 bantuan() {
@@ -65,7 +65,7 @@ bantuan() {
 	echo "kopijahe -l \"no\" -u \"halo@kopijahe.my.id\" -p \"en4kbang3t\" -v \"wifi.id\" -d"
 	echo ""
 	echo "Penggunaan untuk 2 autologin:"
-	echo "kopijahe -m 1 -l \"yes\" -u \"halo@kopijahe.my.id\" -p \"en4kbang3t\" -v \"smartbisnis\" -a" 
+	echo "kopijahe -m 1 -l \"yes\" -u \"halo@kopijahe.my.id\" -p \"en4kbang3t\" -v \"smartbisnis\" -a"
 	echo "kopijahe -m 2 -l \"yes\" -u \"hola@kopijahe.my.id\" -p \"n1kmats3kali\" -v \"smartbisnis\" -a"
 	echo ""
 	echo "Penggunaan untuk 1 auto-reconnect seamless (diletakkan di berkas /etc/rc.local):"
@@ -112,7 +112,7 @@ osversioncheck() {
 	# Jika tidak menggunakan parameter OPENWRT_BOARD, coba parameter LEDE_BOARD
 	if [[ "$openwrt_board" = "" ]]; then
 		openwrt_board="$(grep LEDE_BOARD /etc/os-release | awk -F'["=/]' '{print $3}')"
-	fi 
+	fi
 	
 	# Jika digunakan untuk STB (board sunxi), maka anggap versi os sama dengan LEDE 17.01
 	if [[ "$openwrt_board" = "sunxi" ]]; then
@@ -160,7 +160,7 @@ mwan3check() {
 		checkmwan3use="ok"
 	else
 		# Tentukan bahwa mwan3 tidak memiliki fungsi "use"
-		checkmwan3use="no"	
+		checkmwan3use="no"
 	fi
 }
 
@@ -398,13 +398,13 @@ sleeptimer() {
 	
 	# Jika konfigurasi tidak ditemukan, maka:
 	if [[ "$sleeptime" = "" ]]; then
-		# Masukkan konfigurasi bawaan pengulangan setiap 8 detik 
+		# Masukkan konfigurasi bawaan pengulangan setiap 8 detik
 		uci set "kopijahe.@autologin[$multiautologinnum].sleeptime=8"
 		# Simpan konfigurasi
 		uci commit kopijahe
 		# Tentukan variabel sleeptime ke 8 detik
 		sleeptime="8"
-	fi	
+	fi
 }
 
 testing() {
@@ -521,7 +521,7 @@ captiveportalcheck() {
 		uci commit kopijahe
 		# Tentukan variabel cpcretry ke 3
 		cpctimeout="3"
-	fi	
+	fi
 	
 	# Daftar IP server DNS publik (untuk pengecekan cadangan menggunakan ping jika gagal mengecek menggunakan curl)
 	dnsgoogle="8.8.8.8"
@@ -648,8 +648,8 @@ captiveportalcheck() {
 		# Tentukan bahwa tidak terkoneksi dengan internet
 		internetconnected="no"
 		cpcstatus="Gagal"
-	fi	
-	
+	fi
+
 	# Jika kode status hasil cek koneksi adalah 127, maka:
 	if [[ "$kodestatuslanding" = "127" ]]; then
 		# Beritahu pengguna bahwa CURL belum terpasang
@@ -692,7 +692,7 @@ wificommunity() {
 		# Tentukan akhiran username sesuai dengan konfigurasi kampus yang tersimpan
 		cfgkampus="$(uci -q get kopijahe.@autologin["$multiautologinnum"].kampus)"
 		
-		# Hindari error karena penulisan akun kampus tidak ditulis NIM saja 
+		# Hindari error karena penulisan akun kampus tidak ditulis NIM saja
 		username="$(echo "$username" | awk -F'[@]' '{print $1}')"
 		
 		# Jika digunakan untuk akun UT, maka:
@@ -719,7 +719,7 @@ wificommunity() {
 	elif [[ "$wifivariant" = "wms" ]]; then
 		generaterandomid
 		# Tentukan akhiran username login untuk jaringan WMS
-		wmsid="$(uci -q get kopijahe.@autologin["$multiautologinnum"].wmsid)"	
+		wmsid="$(uci -q get kopijahe.@autologin["$multiautologinnum"].wmsid)"
 		username3="@wms.$wmsid.000"
 	# Jika WICO, maka:
 	elif [[ "$wifivariant" = "wico" ]]; then
@@ -760,19 +760,16 @@ wificommunity() {
 }
 
 dataraw() {
-	# Jika digunakan untuk jaringan @wifi.id umum, maka:
-	if [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "@wifi.id" ]] || [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "wifi.id" ]]; then
-		login_cred="username=""$username2""&password=""$password"""
-	# Jika digunakan untuk jaringan komunitas, maka:
-	elif [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "smartbisnis" ]] || [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "kampus" ]]; then
-		login_cred="username=""$username2""&password=""$password"""
 	# Jika digunakan untuk jaringan WMS atau WMS Lite, maka:
-	elif [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "wms" ]] || [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "wms-lite" ]]; then
+	if [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "wms" ]] || [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "wms-lite" ]]; then
 		login_cred="username_=""$username2""&autologin_time=86000&username=""$username"".""$randomid""$username3""&password=""$password"""
 	# Jika digunakan untuk jaringan WICO, maka:
 	elif [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "wico" ]]; then
 		login_cred="username_=""$username""&username=""$username2""&password=""$password"""
-	fi 
+	# Jika digunakan untuk jaringan lain, maka:
+	else
+		login_cred="username=""$username2""&password=""$password"""
+	fi
 }
 
 hasil_loginout() {
@@ -814,7 +811,7 @@ hasil_loginout() {
 			echo "Pengaturan belum lengkap, silahkan ulangi konfigurasi"
 			echo "Pengaturan belum lengkap, silahkan ulangi konfigurasi" | logger -t "kopijahe $ver"
 		# Jika tidak, maka beritahu pengguna lewat System Log saja
-		else 
+		else
 			echo "Pengaturan belum lengkap, silahkan ulangi konfigurasi" | logger -t "kopijahe $ver"
 		fi
 	fi
@@ -987,7 +984,7 @@ login_file() {
 }
 
 seamless_reconnect() {
-	# Fungsi mode reconnect seamless	
+	# Fungsi mode reconnect seamless
 	advancedmode="true"
 	seamlessreconnectmode="true"
 	
@@ -1039,7 +1036,7 @@ do
 			icpcprovider="$OPTARG"
 			advancedmode="true"
 			multiautologin
-			if [[ "$icpcprovider" = "kopijahe" ]] || [[ "$icpcprovider" = "kopijahe2" ]] || [[ "$icpcprovider" = "firefox" ]] || [[ "$icpcprovider" = "google" ]] || [[ "$icpcprovider" = "apple" ]] || [[ "$icpcprovider" = "apple2" ]] || [[ "$icpcprovider" = "microsoft" ]] || [[ "$icpcprovider" = "microsoft2" ]] || [[ "$icpcprovider" = "xiaomi" ]] || [[ "$icpcprovider" = "httpforever" ]] || [[ "$icpcprovider" = "neverssl" ]] || [[ "$icpcprovider" = "ubuntu" ]] || [[ "$icpcprovider" = "archlinux" ]] || [[ "$icpcprovider" = "examplecom" ]]; then
+			if [[ "$icpcprovider" = "kopijahe" ]] || [[ "$icpcprovider" = "kopijahe2" ]] || [[ "$icpcprovider" = "firefox" ]] || [[ "$icpcprovider" = "google" ]] || [[ "$icpcprovider" = "google2" ]] || [[ "$icpcprovider" = "apple" ]] || [[ "$icpcprovider" = "apple2" ]] || [[ "$icpcprovider" = "microsoft" ]] || [[ "$icpcprovider" = "microsoft2" ]] || [[ "$icpcprovider" = "xiaomi" ]] || [[ "$icpcprovider" = "httpforever" ]] || [[ "$icpcprovider" = "neverssl" ]] || [[ "$icpcprovider" = "ubuntu" ]] || [[ "$icpcprovider" = "archlinux" ]] || [[ "$icpcprovider" = "examplecom" ]]; then
 				uci set kopijahe.@autologin["$multiautologinnum"].cpcprovider="$icpcprovider"
 			elif [[ "$icpcprovider" = "test" ]]; then
 				detectwan
@@ -1047,7 +1044,7 @@ do
 				exit 0
 			else
 				echo "Penyedia layanan yang didukung:"
-				echo "\"kopijahe\" (default), \"kopijahe2\", \"firefox\", \"google\", \"google2\", \"apple\", \"apple2\", \"microsoft\", \"microsoft2\", \"xiaomi\", \"httpforever\", \"neverssl\", \"ubuntu\", \"archlinux\"""\"kopijahe\" (default), \"firefox\", \"google\", \"google2\", \"apple\", \"apple2\", \"microsoft\", \"microsoft2\", \"xiaomi\", \"httpforever\", \"neverssl\", \"ubuntu\", \"archlinux\", \"examplecom\""
+				echo "\"kopijahe\" (default), \"kopijahe2\", \"firefox\", \"google\", \"google2\", \"apple\", \"apple2\", \"microsoft\", \"microsoft2\", \"xiaomi\", \"httpforever\", \"neverssl\", \"ubuntu\", \"archlinux\", \"examplecom\""
 				echo ""
 				echo "Untuk menguji penyedia layanan yang bisa dipakai, bisa menggunakan -c test"
 				exit 1
@@ -1082,7 +1079,7 @@ do
 			if [[ "$loadbalance" = "yes" ]] || [[ "$loadbalance" = "no" ]]; then
 				uci set kopijahe.@autologin["$multiautologinnum"].loadbalance="$loadbalance"
 				uci commit kopijahe
-			else 
+			else
 				echo "hanya menerima jawaban 'yes' atau 'no'"
 				exit 1
 			fi
@@ -1165,7 +1162,7 @@ do
 			multiautologin
 			detectwan
 			login_wifi
-			;; 
+			;;
 		\?)
 			bantuan
 			;;
@@ -1198,7 +1195,7 @@ while [[ "$advancedmode" = "" ]]; do
 	if [[ "$internetconnected" = "no" ]]; then
 		# Cek dulu varian jaringan yang digunakan:
 		wifivariant="$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)"
-				
+		
 		# Cek apakah IP diblokir,
 		# Jika benar, maka:
 		if [[ "$ipblocked" = "yes" ]]; then
