@@ -17,7 +17,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="2.2.0"
+	ver="2.2.1"
 }
 
 bantuan() {
@@ -293,18 +293,37 @@ detecturl() {
 setup() {
 	# Fungsi penyiapan berkas konfigurasi autologin
 	advancedmode="true"
-	# Deteksi tipe login (hasil "login" = wifi.id, hasil "wms" = wms)
-	tipelogin="$(echo "$deteksi" | awk -F'[=&]' '{print $1}' | awk -F'[=/]' '{print $4}')"
-	# Deteksi variabel gw_id
-	gwid="$(echo "$deteksi" | awk -F'[=&]' '{print $2}')"
-	# Deteksi MAC address yang digunakan
-	clientmac="$(echo "$deteksi" | awk -F'[=&]' '{print $4}')"
-	# Deteksi variabel wlan_id
-	wlanid="$(echo "$deteksi" | awk -F'[=&]' '{print $6}')"
-	# Deteksi variabel session_id, filter hasilnya agar tidak ada error
-	session_id="$(echo "$deteksi" | awk -F'[=&]' '{print $8}' | tr -dc "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-")"
-	# Deteksi variabel server_id
-	server_id="$(echo "$deteksi" | awk -F'[/]' '{print $3}')"
+	
+	# Jika digunakan untuk login di jaringan "wifi.id-lanjutkan", maka:
+	if [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "wifi.id-lanjutkan" ]]; then
+		# Deteksi tipe login (hasil "login" = wifi.id, hasil "wms" = wms)
+		tipelogin="$(echo "$deteksi" | awk -F'[=&]' '{print $1}' | awk -F'[=/]' '{print $4"/"$5}')"
+		# Deteksi variabel gw_id
+		gwid="$(echo "$deteksi" | awk -F'[=&]' '{print $2}')"
+		# Deteksi MAC address yang digunakan
+		clientmac="$(echo "$deteksi" | awk -F'[=&]' '{print $8}')"
+		# Deteksi variabel wlan_id
+		wlanid="$(echo "$deteksi" | awk -F'[=&]' '{print $6}')"
+		# Deteksi variabel session_id, filter hasilnya agar tidak ada error
+		session_id="$(echo "$deteksi" | awk -F'[=&]' '{print $10}' | tr -dc "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-")"
+		# Deteksi variabel server_id
+		server_id="$(echo "$deteksi" | awk -F'[/]' '{print $3}')"
+	# Jika tidak, maka:
+	else
+		# Deteksi tipe login (hasil "login" = wifi.id, hasil "wms" = wms)
+		tipelogin="$(echo "$deteksi" | awk -F'[=&]' '{print $1}' | awk -F'[=/]' '{print $4}')"
+		# Deteksi variabel gw_id
+		gwid="$(echo "$deteksi" | awk -F'[=&]' '{print $2}')"
+		# Deteksi MAC address yang digunakan
+		clientmac="$(echo "$deteksi" | awk -F'[=&]' '{print $4}')"
+		# Deteksi variabel wlan_id
+		wlanid="$(echo "$deteksi" | awk -F'[=&]' '{print $6}')"
+		# Deteksi variabel session_id, filter hasilnya agar tidak ada error
+		session_id="$(echo "$deteksi" | awk -F'[=&]' '{print $8}' | tr -dc "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-")"
+		# Deteksi variabel server_id
+		server_id="$(echo "$deteksi" | awk -F'[/]' '{print $3}')"
+	fi
+	
 	# Masukkan konfigurasi sesuai dengan hasil di atas dan sesuai dengan nomor konfigurasi multi-autologin
 	uci set kopijahe.@autologin["$multiautologinnum"].tipelogin="$tipelogin"
 	uci set kopijahe.@autologin["$multiautologinnum"].gwid="$gwid"
@@ -680,10 +699,36 @@ login_folder() {
 	# Jika tipe login adalah wms dan varian jaringan WICO, maka tentukan URL login yang sesuai:
 	elif [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].tipelogin)" = "wms" ]] && [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "wico" ]]; then
 		loginurl="https://$server_id/wms/auth/authnew/autologin/quarantine.php"
+	# Jika tipe login adalah wms dan varian jaringan WMS-lanjutkan, maka tentukan URL login yang sesuai:
+	elif [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].tipelogin)" = "wms" ]] && [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "wms-lanjutkan" ]]; then
+		loginurl="https://$server_id/wms/auth/authnew/autologin-free/quarantine.php"
+	# Jika tipe login adalah wms dan varian jaringan wifi.id-lanjutkan, maka tentukan URL login yang sesuai:
+	elif [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].tipelogin)" = "wifi.id-new/wp_free" ]] && [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "wifi.id-lanjutkan" ]]; then
+		loginurl="https://$server_id/authnew/login-free/check_login.php"
 	else
 	# Jika tipe login tidak diketahui, maka konfigurasi masih belum lengkap, silahkan ulangi deteksi otomatis jaringan
 		echo "Ada kesalahan konfigurasi jaringan"
 	fi
+}
+
+wplanjutkan() {
+	# Fungsi mencari username dan password untuk sistem "lanjutkan"
+	
+	# Tentukan url landing
+	urllanding="https://""$server_id""/""$tipelogin""/?gw_id=""$gwid""&client_mac=""$clientmac""&wlan=""$wlanid""&sessionid=""$session_id"""
+	
+	# Unduh halaman landing
+	wp="$(curl --interface "$wandevice" "$curladditionalparameter" "$urllanding")"
+	
+	# Cari username
+	if [[ "$wifivariant" = "wms-lanjutkan" ]]; then
+		username2="$(echo "$wp" | grep username | grep username | awk -F'[=]' '{print $2}' | awk -F '[&]' '{print $1}')"		
+	else
+		username2="pass-$clientmac@wms.00000000.000"
+	fi
+	
+	# Cari password
+	password_lanjutkan="$(echo "$wp" | grep username | grep username | awk -F'[=]' '{print $3}' | awk -F '[&]' '{print $1}' | sed s/\'//g | sed s/\,//g)"
 }
 
 wificommunity() {
@@ -762,6 +807,10 @@ wificommunity() {
 	elif [[ "$wifivariant" = "sso" ]] || [[ "$wifivariant" = "rumah-sakit" ]] || [[ "$wifivariant" = "komunitas-generik" ]]; then
 		# Tentukan akhiran username ".vmgmt@wms.00000000.000"
 		username2="$username.vmgmt@wms.00000000.000"
+	# Jika "lanjutkan", maka:
+	elif [[ "$wifivariant" = "wms-lanjutkan" ]] || [[ "$wifivariant" = "wifi.id-lanjutkan" ]]; then
+		# Jalankan fungsi wplanjutkan untuk mencari nilai username dan password
+		wplanjutkan
 	fi
 }
 
@@ -772,10 +821,26 @@ dataraw() {
 	# Jika digunakan untuk jaringan WICO, maka:
 	elif [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "wico" ]]; then
 		login_cred="username_=""$username""&username=""$username2""&password=""$password"""
+	# Jika digunakan untuk jaringan "lanjutkan", maka:
+	elif [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "wms-lanjutkan" ]] || [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "wifi.id-lanjutkan" ]]; then
+		login_cred="username=""$username2""&password=""$password_lanjutkan""&autologin_time="
 	# Jika digunakan untuk jaringan lain, maka:
 	else
 		login_cred="username=""$username2""&password=""$password"""
 	fi
+}
+
+welcomepageloadtime() {
+	# Fungsi mencari nilai dari "load_wp"
+	
+	# Tentukan url landing
+	urllanding="https://""$server_id""/""$tipelogin""/?gw_id=""$gwid""&client_mac=""$clientmac""&wlan=""$wlanid""&sessionid=""$session_id"""
+	
+	# Unduh halaman landing
+	wp="$(curl --interface "$wandevice" "$curladditionalparameter" "$urllanding")"
+	
+	# Cari dan kalkulasi nilai parameter "load_wp"
+	loadwp_value="$(echo "$wp" | grep load_time | awk -F'[=]' '{print $2}' | sed s/\'//g | sed s/\"//g | head -n 1 | awk -F '[*]' '{print $1*10000}')"
 }
 
 hasil_loginout() {
@@ -856,19 +921,6 @@ logout_wifi() {
 	kodestatus="$?"
 	function="logout"
 	hasil_loginout
-}
-
-welcomepageloadtime() {
-	# Fungsi mencari nilai dari "load_wp"
-	
-	# Tentukan url landing
-	urllanding="https://""$server_id""/""$tipelogin""/?gw_id=""$gwid""&client_mac=""$clientmac""&wlan=""$wlanid""&sessionid=""$session_id"""
-	
-	# Unduh halaman landing
-	wp="$(curl --interface "$wandevice" $curladditionalparameter "$urllanding")"
-	
-	# Cari dan kalkulasi nilai parameter "load_wp"
-	loadwp_value="$(echo "$wp" | grep load_time | awk -F'[=]' '{print $2}' | sed s/\'//g | sed s/\"//g | head -n 1 | awk -F '[*]' '{print $1*10000}')"
 }
 
 login_wifi() {
@@ -1130,11 +1182,11 @@ do
 			wifivariant="$OPTARG"
 			advancedmode="true"
 			multiautologin
-			if [[ "$wifivariant" = "wifi.id" ]] || [[ "$wifivariant" = "@wifi.id" ]] || [[ "$wifivariant" = "wms" ]] || [[ "$wifivariant" = "wms-lite" ]] || [[ "$wifivariant" = "smartbisnis" ]] || [[ "$wifivariant" = "kampus" ]] || [[ "$wifivariant" = "sso" ]] || [[ "$wifivariant" = "rumah-sakit" ]] || [[ "$wifivariant" = "wico" ]] || [[ "$wifivariant" = "grosirbersama" ]] || [[ "$wifivariant" = "internetku" ]] || [[ "$wifivariant" = "gift" ]] || [[ "$wifivariant" = "starwifi" ]] || [[ "$wifivariant" = "komunitas-generik" ]]; then
+			if [[ "$wifivariant" = "wifi.id" ]] || [[ "$wifivariant" = "wifi.id-lanjutkan" ]] || [[ "$wifivariant" = "@wifi.id" ]] || [[ "$wifivariant" = "wms" ]] || [[ "$wifivariant" = "wms-lanjutkan" ]] || [[ "$wifivariant" = "wms-lite" ]] || [[ "$wifivariant" = "smartbisnis" ]] || [[ "$wifivariant" = "kampus" ]] || [[ "$wifivariant" = "sso" ]] || [[ "$wifivariant" = "rumah-sakit" ]] || [[ "$wifivariant" = "wico" ]] || [[ "$wifivariant" = "grosirbersama" ]] || [[ "$wifivariant" = "internetku" ]] || [[ "$wifivariant" = "gift" ]] || [[ "$wifivariant" = "starwifi" ]] || [[ "$wifivariant" = "komunitas-generik" ]]; then
 				uci set kopijahe.@autologin["$multiautologinnum"].wifivariant="$wifivariant"
 			else
 				echo "Varian jaringan yang didukung:"
-				echo "\"wifi.id\", \"wms\", \"wms-lite\", \"kampus\", \"smartbisnis\", \"sso\", \"rumah-sakit\", \"wico\", \"grosirbersama\", \"internetku\", \"gift\", \"starwifi\", \"komunitas-generik\""
+				echo "\"wifi.id\", \"wifi.id-lanjutkan\", \"wms\", \"wms-lanjutkan\", \"wms-lite\", \"kampus\", \"smartbisnis\", \"sso\", \"rumah-sakit\", \"wico\", \"grosirbersama\", \"internetku\", \"gift\", \"starwifi\", \"komunitas-generik\""
 				exit 1
 			fi
 			if [[ "$wifivariant" = "kampus" ]]; then
