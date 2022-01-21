@@ -17,7 +17,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="2.2.2"
+	ver="2.2.3"
 }
 
 bantuan() {
@@ -513,9 +513,11 @@ captiveportalcheck() {
 		cpcretry="$(uci -q get kopijahe.@autologin["$multiautologinnum"].cpcretry)"
 		# Lama timeout cek captive portal
 		cpctimeout="$(uci -q get kopijahe.@autologin["$multiautologinnum"].cpctimeout)"
+		# Penggunaan ping dalam cek koneksi
+		cpcuseping="$(uci -q get kopijahe.@autologin["$multiautologinnum"].cpcuseping)"
 	fi
 	
-	# Jika konfigurasi tidak ditemukan, maka:
+	# Jika konfigurasi penyedia jasa cek koneksi tidak ditemukan, maka:
 	if [[ "$cpcprovider" = "" ]]; then
 		# Masukkan konfigurasi penyedia layanan KopiJahe sebagai penyedia layanan bawaan
 		uci set "kopijahe.@autologin[$multiautologinnum].cpcprovider=kopijahe"
@@ -525,32 +527,42 @@ captiveportalcheck() {
 		cpcprovider="kopijahe"
 	fi
 	
-	#	Jika konfigurasi tidak ditemukan, maka:
+	#	Jika konfigurasi jumlah pengulangan tidak ditemukan, maka:
 	if [[ "$cpcretry" = "" ]]; then
-		# Masukkan konfigurasi bawaan percobaan ulang 2 kali
+		# Masukkan konfigurasi bawaan percobaan ulang ke 2 kali
 		uci set "kopijahe.@autologin[$multiautologinnum].cpcretry=2"
 		# Simpan konfigurasi
 		uci commit kopijahe
-		# Tentukan variabel cpcretry ke 2
+		# Tentukan variabel cpcretry ke 2 kali
 		cpcretry="2"
 	fi
 	
-	# Jika konfigurasi tidak ditemukan, maka:
+	# Jika konfigurasi timeout percobaan tidak ditemukan, maka:
 	if [[ "$cpctimeout" = "" ]]; then
-		# Masukkan konfigurasi bawaan timeout 3 detik
+		# Masukkan konfigurasi bawaan timeout ke 3 detik
 		uci set "kopijahe.@autologin[$multiautologinnum].cpctimeout=3"
 		# Simpan konfigurasi
 		uci commit kopijahe
-		# Tentukan variabel cpcretry ke 3
+		# Tentukan variabel cpcretry ke 3 detik
 		cpctimeout="3"
 	fi
 	
+	# Jika konfigurasi penggunaan ping dalam cek koneksi tidak ditemukan, maka:
+	if [[ "$cpcuseping" = "" ]]; then
+		# Masukkan konfigurasi bawaan penggunaan ping ke "true"
+		uci set "kopijahe.@autologin[$multiautologinnum].cpcuseping=true"
+		# Simpan konfigurasi
+		uci commit kopijahe
+		# Tentukan variabel cpcuseping ke "true"
+		cpcuseping="true"
+	fi
+	
 	# Daftar IP server DNS publik (untuk pengecekan cadangan menggunakan ping jika gagal mengecek menggunakan curl)
-	dnsgoogle="8.8.8.8"
-	dnsgoogle2="8.8.4.4"
-	dnsopendns="208.67.222.222"
-	dnsopendns2="208.67.220.220"
-	dnsquad9="9.9.9.9"
+	dnsgoogle='8.8.8.8'
+	dnsgoogle2='8.8.4.4'
+	dnsopendns='208.67.222.222'
+	dnsopendns2='208.67.220.220'
+	dnsquad9='9.9.9.9'
 	
 	# Daftar penyedia layanan cek captive portal beserta hasil cek yang diharapkan
 	# 
@@ -652,7 +664,7 @@ captiveportalcheck() {
 		internetconnected="yes"
 		cpcstatus="Sukses"
 	# Jika hasilnya tidak sama dan bukan mode tes penyedia jasa koneksi, maka:
-	elif [[ "$cekkoneksi" != "$hasil" ]] && [[ "$advancedmode" != "true" ]]; then
+	elif [[ "$cekkoneksi" != "$hasil" ]] && [[ "$advancedmode" != "true" ]] && [[ "$cpcuseping" = "true" ]]; then
 		# Lakukan cek menggunakan ping terlebih dahulu ke dns server sesuai pilihan penyedia captive portal
 		cekkoneksiping="$(ping -I "$wandevice" -c $cpcretry $dnsserver)"
 		cekkoneksiping="$?"
