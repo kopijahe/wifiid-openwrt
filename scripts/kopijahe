@@ -17,7 +17,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="2.2.3"
+	ver="2.2.4"
 }
 
 bantuan() {
@@ -845,11 +845,16 @@ dataraw() {
 welcomepageloadtime() {
 	# Fungsi mencari nilai dari "load_wp"
 	
+	# Jumlah percobaan ulang cek captive portal
+	cpcretry="$(uci -q get kopijahe.@autologin["$multiautologinnum"].cpcretry)"
+	# Lama timeout cek captive portal
+	cpctimeout="$(uci -q get kopijahe.@autologin["$multiautologinnum"].cpctimeout)"
+	
 	# Tentukan url landing
 	urllanding="https://""$server_id""/""$tipelogin""/?gw_id=""$gwid""&client_mac=""$clientmac""&wlan=""$wlanid""&sessionid=""$session_id"""
 	
-	# Unduh halaman landing
-	wp="$(curl --interface "$wandevice" "$curladditionalparameter" "$urllanding")"
+	# Unduh halaman landing, gunakan nilai dari fungsi cek captive portal agar tidak macet
+	wp="$(curl --interface "$wandevice" --retry "$cpcretry" --connect-timeout "$cpctimeout" "$curladditionalparameter" "$urllanding")"
 	
 	# Cari dan kalkulasi nilai parameter "load_wp"
 	loadwp_value="$(echo "$wp" | grep load_time | awk -F'[=]' '{print $2}' | sed s/\'//g | sed s/\"//g | head -n 1 | awk -F '[*]' '{print $1*10000}')"
