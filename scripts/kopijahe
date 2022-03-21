@@ -17,7 +17,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="2.2.6"
+	ver="2.2.7"
 }
 
 bantuan() {
@@ -436,7 +436,8 @@ testing() {
 	
 	openwrtversion="$(grep VERSION_ID /etc/os-release | awk -F'[=]' '{print $2}' | awk -F'["]' '{print $2}')"
 	systemmodel="$(grep "machine" /proc/cpuinfo | awk -F'[:]' '{print $2}' | cut -c2-)"
-	pidkopijahe="$(pgrep -f "kopijahe" | grep -v "^$$" | sed 1d | tr '\n' ' ')"
+	pskopijahe="$(ps | grep -c "kopijahe")"
+	numkopijahe="$((pskopijahe-3))"
 	
 	echo "Pengaturan autologin:"
 	echo ""
@@ -446,7 +447,7 @@ testing() {
 	echo "OpenWrt version: $openwrtversion"
 	echo "Device model: $systemmodel"
 	echo "Random ID: $randomid"
-	echo "PID autologin: $pidkopijahe"
+	echo "Jumlah autologin berjalan: $numkopijahe"
 }
 
 cpctesting() {
@@ -1103,6 +1104,7 @@ do
 			multiautologin
 			if [[ "$icpcprovider" = "kopijahe" ]] || [[ "$icpcprovider" = "kopijahe2" ]] || [[ "$icpcprovider" = "firefox" ]] || [[ "$icpcprovider" = "google" ]] || [[ "$icpcprovider" = "google2" ]] || [[ "$icpcprovider" = "apple" ]] || [[ "$icpcprovider" = "apple2" ]] || [[ "$icpcprovider" = "microsoft" ]] || [[ "$icpcprovider" = "microsoft2" ]] || [[ "$icpcprovider" = "xiaomi" ]] || [[ "$icpcprovider" = "httpforever" ]] || [[ "$icpcprovider" = "neverssl" ]] || [[ "$icpcprovider" = "ubuntu" ]] || [[ "$icpcprovider" = "archlinux" ]] || [[ "$icpcprovider" = "examplecom" ]]; then
 				uci set kopijahe.@autologin["$multiautologinnum"].cpcprovider="$icpcprovider"
+				uci commit kopijahe
 			elif [[ "$icpcprovider" = "test" ]]; then
 				detectwan
 				cpctesting
@@ -1114,7 +1116,6 @@ do
 				echo "Untuk menguji penyedia layanan yang bisa dipakai, bisa menggunakan -c test"
 				exit 1
 			fi
-			uci commit kopijahe
 			;;
 		d)
 			multiautologin
