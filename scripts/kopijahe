@@ -17,7 +17,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="2.2.9"
+	ver="2.3.0"
 }
 
 bantuan() {
@@ -741,9 +741,16 @@ login_folder() {
 	# Jika tipe login adalah wms dan varian jaringan wifi.id-lanjutkan, maka tentukan URL login yang sesuai:
 	elif [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "wifi.id-lanjutkan" ]] || [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "pegadaian" ]]; then
 		loginurl="https://$server_id/authnew/login-free/check_login.php"
-	# Jika tipe login adalah wms, maka tentukan URL login yang sesuai:
+	# Jika tipe login adalah wms, maka:
 	elif [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].tipelogin)" = "wms" ]]; then
-		loginurl="https://$server_id/wms/auth/authnew/login/check_login.php"
+		# Tentukan url landing
+		urllanding="https://""$server_id""/""$tipelogin""/?gw_id=""$gwid""&client_mac=""$clientmac""&wlan=""$wlanid""&sessionid=""$session_id"""
+		# Unduh halaman landing
+		wp="$(curl --interface "$wandevice" --retry 1 --connect-timeout 10 "$curladditionalparameter" "$urllanding")"
+		# Tentukan wms_url
+		wms_url="$(echo "$wp" | grep url | awk -F'[:]' '{print $2}' | awk -F'[?]' '{print $1}' | sed s/\'//g | sed s/\ //g)"
+		# Tentukan URL login yang sesuai
+		loginurl="https://$server_id/wms/$wms_url"
 	else
 	# Jika tipe login tidak diketahui, maka konfigurasi masih belum lengkap, silahkan ulangi deteksi otomatis jaringan
 		echo "Ada kesalahan konfigurasi jaringan"
@@ -990,7 +997,6 @@ login_wifi() {
 		curladditionalparameter='--silent'
 	fi
 	
-	login_folder
 	randommaccheck
 	versi
 	username="$(uci -q get kopijahe.@autologin["$multiautologinnum"].username)"
@@ -1002,6 +1008,7 @@ login_wifi() {
 	session_id="$(uci -q get kopijahe.@autologin["$multiautologinnum"].sessionid)"
 	wifivariant="$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)"
 	wificommunity
+	login_folder
 	dataraw
 	welcomepageloadtime
 	
