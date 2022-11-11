@@ -17,7 +17,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="2.3.3"
+	ver="2.3.4"
 }
 
 bantuan() {
@@ -335,7 +335,8 @@ setup() {
 	# Jika digunakan di jaringan WMS, maka tentukan variabel wms_id
 	if [[ "$tipelogin" = "wms" ]]; then
 		url_landing="$(echo "$deteksi" | awk -F'[ ]' '{print $2}')"
-		wms_id="$(echo "$url_landing" | xargs curl -k --silent -L --interface "$wandevice" | grep username_hidden | awk -F'[.]' '{print $4}' | awk '!a[$0]++' | tr -dc "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")"
+		# shellcheck disable=2020
+		wms_id="$(echo "$url_landing" | xargs curl -k --silent -L --interface "$wandevice" | grep makeId | awk -F'[.]' '{print $4}' | tr -dc "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\n" | awk '!a[$0]++')"
 		uci set kopijahe.@autologin["$multiautologinnum"].wmsid="$wms_id"
 	fi
 	
@@ -978,16 +979,19 @@ logout_wifi() {
 	
 	# Lakukan login sesuai dengan parameter konfigurasi autologin
 	attempt="$(curl --interface "$wandevice" "$curladditionalparameter" """https://$server_id/authnew/logout/logoutx.php""" \
-	-H "authority: ""$server_id""" \
 	-H "accept: application/json, text/javascript, */*; q=0.01" \
-	-H "x-requested-with: XMLHttpRequest" \
-	-H "user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4315.5 Safari/537.36" \
+	-H "accept-language: en-US,en;q=0.9,id;q=0.8" \
+	-H "connection: keep-alive" \
 	-H "content-type: application/x-www-form-urlencoded; charset=UTF-8" \
 	-H "origin: https://logout.wifi.id" \
-	-H "sec-fetch-site: same-site" \
-	-H "sec-ch-ua-platform: Windows" \
-	-H "sec-fetch-mode: cors" \
 	-H "sec-fetch-dest: empty" \
+	-H "sec-fetch-mode: cors" \
+	-H "sec-fetch-site: same-origin" \
+	-H "user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36" \
+	-H "x-requested-with: XMLHttpRequest" \
+	-H 'sec-ch-ua: "Not_A Brand";v="99", "Google Chrome";v="109", "Chromium";v="109"' \
+	-H "sec-ch-ua-mobile: ?0" \
+	-H "sec-ch-ua-platform: Windows" \
 	-H "referer: https://logout.wifi.id/")"
 	
 	kodestatus="$?"
@@ -1026,16 +1030,21 @@ login_wifi() {
 	
 	# Lakukan login sesuai dengan parameter konfigurasi autologin
 	attempt="$(curl --interface "$wandevice" "$curladditionalparameter" """$loginurl""?ipc=""$iprouter""&gw_id=""$gwid""&client_mac=""$clientmac""&redirect=&wlan=""$wlanid""&load_wp=""$loadwp_value""" \
-	-H "authority: ""$server_id""" \
 	-H "accept: application/json, text/javascript, */*; q=0.01" \
-	-H "x-requested-with: XMLHttpRequest" \
-	-H "user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4315.5 Safari/537.36" \
+	-H "accept-language: en-US,en;q=0.9,id;q=0.8" \
+	-H "connection: keep-alive" \
 	-H "content-type: application/x-www-form-urlencoded; charset=UTF-8" \
-	-H "origin: https://""$server_id""" \
-	-H "sec-fetch-site: same-origin" \
-	-H "sec-ch-ua-platform: Windows" \
-	-H "sec-fetch-mode: cors" \
+	-H "origin: ""$server_id""" \
+	-H "referer: $loginurl?ipc=$iprouter&gw_id=$gwid&client_mac=$clientmac&redirect=&wlan=$wlanid&load_wp=$loadwp_value" \
 	-H "sec-fetch-dest: empty" \
+	-H "sec-fetch-mode: cors" \
+	-H "sec-fetch-site: same-origin" \
+	-H "user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36" \
+	-H "x-requested-with: XMLHttpRequest" \
+	-H 'sec-ch-ua: "Not_A Brand";v="99", "Google Chrome";v="109", "Chromium";v="109"' \
+	-H "origin: https://""$server_id""" \
+	-H "sec-ch-ua-mobile: ?0" \
+	-H "sec-ch-ua-platform: Windows" \
 	-H "referer: https://""$server_id""/""$tipelogin""/?gw_id=""$gwid""&client_mac=""$clientmac""&wlan=""$wlanid""&sessionid=""$session_id""" \
 	--data-raw "$login_cred")"
 	
