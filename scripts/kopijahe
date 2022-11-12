@@ -17,7 +17,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="2.3.4"
+	ver="2.3.5"
 }
 
 bantuan() {
@@ -739,7 +739,7 @@ login_folder() {
 		# Tentukan URL login yang sesuai
 		loginurl="$(echo "$wp" | grep urlx | awk -F'[=]' '{print $2}' | awk -F'[?]' '{print $1}' | sed s/\'//g | sed s/\ //g | head -n 1)"
 		# Jika gagal dalam mendapatkan URL login yang sesuai, maka:
-		if [[ "$loginurl" = "" ]]; then
+		if [[ "$loginurl" = "https://$server_id/" ]]; then
 			# Gunakan URL login  di bawah:
 			loginurl="https://$server_id/authnew/login/check_login.php"
 		fi
@@ -760,7 +760,7 @@ login_folder() {
 		# Tentukan URL login yang sesuai
 		loginurl="https://$server_id/wms/$wms_url"
 		# Jika gagal dalam mendapatkan URL login yang sesuai, maka:
-		if [[ "$loginurl" = "" ]]; then
+		if [[ "$loginurl" = "https://$server_id/wms/" ]]; then
 			# Gunakan URL login  di bawah:
 			loginurl="https://$server_id/wms/auth/authnew/autologin/quarantine.php"
 		fi
