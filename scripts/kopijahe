@@ -17,7 +17,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="2.3.6"
+	ver="2.3.7"
 }
 
 bantuan() {
@@ -728,14 +728,9 @@ curl_statuscodes() {
 
 login_folder() {
 	# Fungsi penentuan folder dan url login
-	# Tentukan variabel server_id untuk dipakai nanti
-	server_id="$(uci -q get kopijahe.@autologin["$multiautologinnum"].serverid)"
+	
 	# Jika tipe login adalah wifi.id, maka:
 	if [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].tipelogin)" = "login" ]]; then
-		# Tentukan url landing
-		urllanding="https://""$server_id""/""$tipelogin""/?gw_id=""$gwid""&client_mac=""$clientmac""&wlan=""$wlanid""&sessionid=""$session_id"""
-		# Unduh halaman landing
-		wp="$(curl --interface "$wandevice" --retry 1 --connect-timeout 10 "$curladditionalparameter" "$urllanding")"
 		# Tentukan URL login yang sesuai
 		loginurl="$(echo "$wp" | grep urlx | awk -F'[=]' '{print $2}' | awk -F'[?]' '{print $1}' | sed s/\'//g | sed s/\ //g | head -n 1)"
 		# Jika gagal dalam mendapatkan URL login yang sesuai, maka:
@@ -751,10 +746,6 @@ login_folder() {
 		loginurl="https://$server_id/authnew/login-free/check_login.php"
 	# Jika tipe login adalah wms, maka:
 	elif [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].tipelogin)" = "wms" ]]; then
-		# Tentukan url landing
-		urllanding="https://""$server_id""/""$tipelogin""/?gw_id=""$gwid""&client_mac=""$clientmac""&wlan=""$wlanid""&sessionid=""$session_id"""
-		# Unduh halaman landing
-		wp="$(curl --interface "$wandevice" --retry 1 --connect-timeout 10 "$curladditionalparameter" "$urllanding")"
 		# Tentukan wms_url
 		wms_url="$(echo "$wp" | grep url | awk -F'[:]' '{print $2}' | awk -F'[?]' '{print $1}' | sed s/\'//g | sed s/\ //g | head -n 1)"
 		# Tentukan URL login yang sesuai
@@ -773,15 +764,9 @@ login_folder() {
 wplanjutkan() {
 	# Fungsi mencari username dan password untuk sistem "lanjutkan"
 	
-	# Tentukan url landing
-	urllanding="https://""$server_id""/""$tipelogin""/?gw_id=""$gwid""&client_mac=""$clientmac""&wlan=""$wlanid""&sessionid=""$session_id"""
-	
-	# Unduh halaman landing
-	wp="$(curl --interface "$wandevice" "$curladditionalparameter" "$urllanding")"
-	
 	# Cari username
-	if [[ "$wifivariant" = "wms-lanjutkan" ]] || [[ "$wifivariant" = "pegadaian" ]]; then
-		username2="$(echo "$wp" | grep username | grep username | awk -F'[=]' '{print $2}' | awk -F '[&]' '{print $1}')"		
+	if [[ "$wifivariant" = "wms-lanjutkan" ]] || [[ "$wifivariant" = "pegadaian" ]] || [[ "$wifivariant" = "wifi.id-lanjutkan" ]]; then
+		username2="$(echo "$wp" | grep username | grep username | awk -F'[=]' '{print $2}' | awk -F '[&]' '{print $1}')"
 	else
 		username2="pass-$clientmac@wms.00000000.000"
 	fi
@@ -901,15 +886,18 @@ dataraw() {
 	fi
 }
 
-welcomepageloadtime() {
-	# Fungsi mencari nilai dari "load_wp"
+loadwelcomepage() {
+	# Fungsi memuat welcome page
 	
-	# Tentukan url landing
+	# Tentukan url welcome page
 	urllanding="https://""$server_id""/""$tipelogin""/?gw_id=""$gwid""&client_mac=""$clientmac""&wlan=""$wlanid""&sessionid=""$session_id"""
 	
-	# Unduh halaman landing
+	# Unduh halaman welcome page
 	wp="$(curl --interface "$wandevice" --retry 1 --connect-timeout 10 "$curladditionalparameter" "$urllanding")"
-	
+}
+
+welcomepageloadtime() {
+	# Fungsi mencari nilai dari "load_wp"
 	# Cari dan kalkulasi nilai parameter "load_wp"
 	loadwp_value="$(echo "$wp" | grep load_time | awk -F'[=]' '{print $2}' | sed s/\'//g | sed s/\"//g | head -n 1 | awk -F '[*]' '{print $1*10000}')"
 }
@@ -974,7 +962,7 @@ logout_wifi() {
 		curladditionalparameter='--silent'
 	fi
 	
-	login_folder
+	server_id="$(uci -q get kopijahe.@autologin["$multiautologinnum"].serverid)"
 	versi
 	
 	# Lakukan login sesuai dengan parameter konfigurasi autologin
@@ -1023,6 +1011,8 @@ login_wifi() {
 	wlanid="$(uci -q get kopijahe.@autologin["$multiautologinnum"].wlanid)"
 	session_id="$(uci -q get kopijahe.@autologin["$multiautologinnum"].sessionid)"
 	wifivariant="$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)"
+	server_id="$(uci -q get kopijahe.@autologin["$multiautologinnum"].serverid)"
+	loadwelcomepage
 	login_folder
 	wificommunity
 	dataraw
