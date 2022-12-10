@@ -17,7 +17,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="2.3.7"
+	ver="2.3.8"
 }
 
 bantuan() {
@@ -460,53 +460,60 @@ cpctesting() {
 	echo "Tes penyedia jasa layanan cek koneksi"
 	cpcprovider="kopijahe"
 	captiveportalcheck
-	echo "KopiJahe: $cpcstatus"
+	echo "$cpcprovider: $cpcstatus"
 	cpcprovider="kopijahe2"
 	captiveportalcheck
-	echo "KopiJahe2: $cpcstatus"
+	echo "$cpcprovider: $cpcstatus"
 	cpcprovider="firefox"
 	captiveportalcheck
-	echo "Firefox: $cpcstatus"
+	echo "$cpcprovider: $cpcstatus"
 	cpcprovider="google"
 	captiveportalcheck
-	echo "Google: $cpcstatus"
+	echo "$cpcprovider: $cpcstatus"
 	cpcprovider="google2"
 	captiveportalcheck
-	echo "Google2: $cpcstatus"
+	echo "$cpcprovider: $cpcstatus"
 	cpcprovider="apple"
 	captiveportalcheck
-	echo "Apple: $cpcstatus"
+	echo "$cpcprovider: $cpcstatus"
 	cpcprovider="apple2"
 	captiveportalcheck
-	echo "Apple2: $cpcstatus"
+	echo "$cpcprovider: $cpcstatus"
 	cpcprovider="microsoft"
 	captiveportalcheck
-	echo "Microsoft: $cpcstatus"
+	echo "$cpcprovider: $cpcstatus"
 	cpcprovider="microsoft2"
 	captiveportalcheck
-	echo "Microsoft2: $cpcstatus"
+	echo "$cpcprovider: $cpcstatus"
 	cpcprovider="xiaomi"
 	captiveportalcheck
-	echo "Xiaomi: $cpcstatus"
+	echo "$cpcprovider: $cpcstatus"
 	cpcprovider="httpforever"
 	captiveportalcheck
-	echo "HTTPForever: $cpcstatus"
+	echo "$cpcprovider: $cpcstatus"
 	cpcprovider="neverssl"
 	captiveportalcheck
-	echo "NeverSSL: $cpcstatus"
+	echo "$cpcprovider: $cpcstatus"
 	cpcprovider="ubuntu"
 	captiveportalcheck
-	echo "Ubuntu: $cpcstatus"
+	echo "$cpcprovider: $cpcstatus"
 	cpcprovider="archlinux"
 	captiveportalcheck
-	echo "Arch Linux: $cpcstatus"
+	echo "$cpcprovider: $cpcstatus"
 	cpcprovider="examplecom"
 	captiveportalcheck
-	echo "example.com: $cpcstatus"
+	echo "$cpcprovider: $cpcstatus"
 }
 
 captiveportalcheck() {
 	# Fungsi cek captive portal (halaman login)
+	
+	# Daftar IP server DNS publik (untuk pengecekan cadangan menggunakan ping jika gagal mengecek menggunakan curl)
+	dnsgoogle='8.8.8.8'
+	dnsgoogle2='8.8.4.4'
+	dnsopendns='208.67.222.222'
+	dnsopendns2='208.67.220.220'
+	dnsquad9='9.9.9.9'
 	
 	# Cek apakah dalam mode testing atau tidak
 	if [[ "$advancedmode" != "true" ]]; then
@@ -518,6 +525,10 @@ captiveportalcheck() {
 		cpctimeout="$(uci -q get kopijahe.@autologin["$multiautologinnum"].cpctimeout)"
 		# Penggunaan ping dalam cek koneksi
 		cpcuseping="$(uci -q get kopijahe.@autologin["$multiautologinnum"].cpcuseping)"
+		# Tentukan perintah yang digunakan
+	else
+		# Catat waktu sebelum melakukan pengetesan
+		cpctestbefore="$(awk '{print $1}' < /proc/uptime)"
 	fi
 	
 	# Jika konfigurasi penyedia jasa cek koneksi tidak ditemukan, maka:
@@ -559,13 +570,6 @@ captiveportalcheck() {
 		# Tentukan variabel cpcuseping ke "true"
 		cpcuseping="true"
 	fi
-	
-	# Daftar IP server DNS publik (untuk pengecekan cadangan menggunakan ping jika gagal mengecek menggunakan curl)
-	dnsgoogle='8.8.8.8'
-	dnsgoogle2='8.8.4.4'
-	dnsopendns='208.67.222.222'
-	dnsopendns2='208.67.220.220'
-	dnsquad9='9.9.9.9'
 	
 	# Daftar penyedia layanan cek captive portal beserta hasil cek yang diharapkan
 	# 
@@ -661,11 +665,22 @@ captiveportalcheck() {
 		dnsserver="$dnsquad9"
 	fi
 	
+	# Cek apakah dalam mode testing atau tidak
+	if [[ "$advancedmode" = "true" ]]; then
+		# Hitung berapa lama waktu yang dibutuhkan untuk pengecekan
+		cpctestafter="$(awk '{print $1}' < /proc/uptime)"
+		cpctestelapsed="$(awk 'BEGIN {print "'"$cpctestafter"'"-"'"$cpctestbefore"'"}')"
+	fi
+	
 	# Jika hasil cek koneksi sesuai dengan hasil yang diharapkan, maka:
-	if [[ "$cekkoneksi" = "$hasil" ]]; then
+	if [[ "$cekkoneksi" = "$hasil" ]] && [[ "$advancedmode" != "true" ]]; then
 		# Tentukan bahwa terkoneksi dengan internet
 		internetconnected="yes"
 		cpcstatus="Sukses"
+	elif [[ "$cekkoneksi" = "$hasil" ]] && [[ "$advancedmode" = "true" ]]; then
+		# Tentukan bahwa terkoneksi dengan internet dan tulis waktu yang diperlukan untuk mengecek koneksi
+		internetconnected="yes"
+		cpcstatus="Sukses ($cpctestelapsed detik)"
 	# Jika hasilnya tidak sama dan bukan mode tes penyedia jasa koneksi, maka:
 	elif [[ "$cekkoneksi" != "$hasil" ]] && [[ "$advancedmode" != "true" ]] && [[ "$cpcuseping" = "true" ]]; then
 		# Lakukan cek menggunakan ping terlebih dahulu ke dns server sesuai pilihan penyedia captive portal
@@ -681,6 +696,11 @@ captiveportalcheck() {
 			internetconnected="no"
 			cpcstatus="Gagal"
 		fi
+	# Jika hasilnya tidak sama dan dalam mode tes penyedia jasa koneksi, maka:
+	elif [[ "$cekkoneksi" != "$hasil" ]] && [[ "$advancedmode" = "true" ]]; then
+		# Tentukan bahwa tidak terkoneksi dengan internet dan tulis waktu yang diperlukan untuk mengecek koneksi
+		internetconnected="no"
+		cpcstatus="Gagal ($cpctestelapsed detik)"
 	else
 		# Tentukan bahwa tidak terkoneksi dengan internet
 		internetconnected="no"
