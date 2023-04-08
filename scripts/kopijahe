@@ -17,7 +17,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="2.4.1"
+	ver="2.4.2"
 }
 
 bantuan() {
@@ -869,8 +869,8 @@ wificommunity() {
 		username2="$username@com.internetku"
 	# Jika gift, maka:
 	elif [[ "$wifivariant" = "gift" ]]; then
-		# Tidak perlu merubah akhiran username
-		username2="$username"
+		# Tentukan akhiran username "@gift"
+		username2="$username@gift"
 	# Jika homewifi, maka:
 	elif [[ "$wifivariant" = "homewifi" ]]; then
 		# Tidak perlu merubah akhiran username
