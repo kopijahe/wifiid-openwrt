@@ -17,7 +17,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="2.4.2"
+	ver="2.4.3"
 }
 
 bantuan() {
@@ -747,9 +747,9 @@ curl_statuscodes() {
 }
 
 curl_additionalparameter() {
-	# Cek versi OS, jika menggunakan LEDE 17.01 atau OpenWrt 18.06
+	# Cek versi OS, jika tidak menggunakan OpenWrt 22.03
 	# Maka perlu menggunakan tambahan parameter -k
-	if [[ "$osversion" = "17" ]] || [[ "$osversion" = "18" ]]; then
+	if [[ "$osversion" != "22" ]]; then
 		curladditionalparameter="-k"
 	fi
 }
@@ -1295,6 +1295,7 @@ do
 			advancedmode="true"
 			bypassmode="true"
 			versi
+			osversioncheck
 			multiautologin
 			detectwan
 			login_wifi
