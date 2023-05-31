@@ -17,7 +17,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="2.4.6"
+	ver="2.4.7"
 }
 
 bantuan() {
@@ -922,6 +922,7 @@ loadwelcomepage() {
 		# Jika tidak, maka:
 		# Cari dan kalkulasi nilai parameter "load_wp"
 		loadwp_value="$(echo "$wp" | grep load_time | awk -F'[=]' '{print $2}' | sed s/\'//g | sed s/\"//g | head -n 1 | awk -F '[*]' '{print $1*10000}')"
+		loadwp_token="$(echo "$wp" | grep token_wp_login | awk -F'[=]' '{print $4}' | sed s/\"//g | sed s/\>//g | head -n 1)"
 	fi
 }
 
@@ -1049,6 +1050,7 @@ login_wifi() {
 	-H "origin: https://""$server_id""" \
 	-H "sec-ch-ua-mobile: ?0" \
 	-H "sec-ch-ua-platform: Windows" \
+	-H "Cookie: csrf_token_wp=""$loadwp_token""" \
 	-H "referer: https://""$server_id""/""$tipelogin""/?gw_id=""$gwid""&client_mac=""$clientmac""&wlan=""$wlanid""&sessionid=""$session_id""" \
 	--data-raw "$login_cred")"
 	
