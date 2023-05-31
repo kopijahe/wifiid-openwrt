@@ -17,7 +17,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="2.4.5"
+	ver="2.4.6"
 }
 
 bantuan() {
@@ -909,16 +909,17 @@ dataraw() {
 loadwelcomepage() {
 	# Fungsi memuat welcome page
 	
+	# Tentukan url welcome page
+	urllanding="https://""$server_id""/""$tipelogin""/?gw_id=""$gwid""&client_mac=""$clientmac""&wlan=""$wlanid""&sessionid=""$session_id"""
+	# Unduh halaman welcome page
+	wp="$(curl --silent --interface "$wandevice" --retry 1 --connect-timeout 10 "$curladditionalparameter" "$urllanding")"
+	
 	# Jika digunakan di jaringan WMS
 	if [[ "$wifivariant" = "wms" ]] || [[ "$wifivariant" = "wms-lite" ]] || [[ "$wifivariant" = "wms-lanjutkan" ]]; then
 		# Maka  kosongi nilai "loadwp"
 		loadwp_value=""
 	else
 		# Jika tidak, maka:
-		# Tentukan url welcome page
-		urllanding="https://""$server_id""/""$tipelogin""/?gw_id=""$gwid""&client_mac=""$clientmac""&wlan=""$wlanid""&sessionid=""$session_id"""
-		# Unduh halaman welcome page
-		wp="$(curl --silent --interface "$wandevice" --retry 1 --connect-timeout 10 "$curladditionalparameter" "$urllanding")"
 		# Cari dan kalkulasi nilai parameter "load_wp"
 		loadwp_value="$(echo "$wp" | grep load_time | awk -F'[=]' '{print $2}' | sed s/\'//g | sed s/\"//g | head -n 1 | awk -F '[*]' '{print $1*10000}')"
 	fi
