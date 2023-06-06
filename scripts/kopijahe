@@ -17,7 +17,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="2.4.7"
+	ver="2.4.8"
 }
 
 bantuan() {
@@ -450,6 +450,21 @@ testing() {
 	echo "Device model: $systemmodel"
 	echo "Random ID: $randomid"
 	echo "Jumlah autologin berjalan: $numkopijahe"
+	
+	if [[ "$reportmode" = "true" ]]; then
+		echo ""
+		echo "=========="
+		echo "/etc/rc.local:"
+		cat /etc/rc.local
+		echo ""
+		echo "=========="
+		echo "Hostnames:"
+		uci show dhcp | grep "@domain"
+		echo ""
+		echo "=========="
+		echo "System log:"
+		logread | grep kopijahe
+	fi
 }
 
 cpctesting() {
@@ -516,7 +531,7 @@ captiveportalcheck() {
 	dnsquad9='9.9.9.9'
 	
 	# Cek apakah dalam mode testing atau tidak
-	if [[ "$advancedmode" != "true" ]]; then
+	if ! [[ "$advancedmode" = "true" ]]; then
 		# Tentukan penyedia layanan cek captive portal berdasarkan konfigurasi sebelumnya
 		cpcprovider="$(uci -q get kopijahe.@autologin["$multiautologinnum"].cpcprovider)"
 		# Jumlah percobaan ulang cek captive portal
@@ -673,7 +688,7 @@ captiveportalcheck() {
 	fi
 	
 	# Jika hasil cek koneksi sesuai dengan hasil yang diharapkan, maka:
-	if [[ "$cekkoneksi" = "$hasil" ]] && [[ "$advancedmode" != "true" ]]; then
+	if [[ "$cekkoneksi" = "$hasil" ]] && ! [[ "$advancedmode" = "true" ]]; then
 		# Tentukan bahwa terkoneksi dengan internet
 		internetconnected="yes"
 		cpcstatus="Sukses"
@@ -682,7 +697,7 @@ captiveportalcheck() {
 		internetconnected="yes"
 		cpcstatus="Sukses ($cpctestelapsed detik)"
 	# Jika hasilnya tidak sama dan bukan mode tes penyedia jasa koneksi, maka:
-	elif [[ "$cekkoneksi" != "$hasil" ]] && [[ "$advancedmode" != "true" ]] && [[ "$cpcuseping" = "true" ]]; then
+	elif ! [[ "$cekkoneksi" = "$hasil" ]] && ! [[ "$advancedmode" = "true" ]] && ! [[ "$cpcuseping" = "true" ]]; then
 		# Lakukan cek menggunakan ping terlebih dahulu ke dns server sesuai pilihan penyedia captive portal
 		cekkoneksiping="$(ping -I "$wandevice" -c "$cpcretry" "$dnsserver")"
 		cekkoneksiping="$?"
@@ -697,7 +712,7 @@ captiveportalcheck() {
 			cpcstatus="Gagal"
 		fi
 	# Jika hasilnya tidak sama dan dalam mode tes penyedia jasa koneksi, maka:
-	elif [[ "$cekkoneksi" != "$hasil" ]] && [[ "$advancedmode" = "true" ]]; then
+	elif ! [[ "$cekkoneksi" = "$hasil" ]] && [[ "$advancedmode" = "true" ]]; then
 		# Tentukan bahwa tidak terkoneksi dengan internet dan tulis waktu yang diperlukan untuk mengecek koneksi
 		internetconnected="no"
 		cpcstatus="Gagal ($cpctestelapsed detik)"
@@ -749,8 +764,13 @@ curl_statuscodes() {
 curl_additionalparameter() {
 	# Cek versi OS, jika tidak menggunakan OpenWrt 22.03
 	# Maka perlu menggunakan tambahan parameter -k
-	if [[ "$osversion" != "22" ]]; then
+	if ! [[ "$osversion" = "22" ]]; then
 		curladditionalparameter="-k"
+	fi
+	
+	# Jika perlu, tentukan alamat server secara manual
+	if [[ "$manualresolve" = "yes" ]]; then
+		curladditionalparameter2="--resolve welcome2.wifi.id:443:10.233.16.13"
 	fi
 }
 
@@ -964,7 +984,7 @@ hasil_loginout() {
 	fi
 	
 	# Jika kode status hasil login tidak berhasil (bukan 0), maka:
-	if [[ "$function" = "login" ]] && [[ "$kodestatus" != "0" ]]; then
+	if [[ "$function" = "login" ]] && ! [[ "$kodestatus" = "0" ]]; then
 		# Muat penjelasan kode cURL
 		curl_statuscodes
 		# Beritahu pengguna bahwa lewat stdout dan System log jika melalui mode lanjutan
@@ -1034,7 +1054,7 @@ login_wifi() {
 	curl_additionalparameter
 	
 	# Lakukan login sesuai dengan parameter konfigurasi autologin
-	attempt="$(curl --silent --interface "$wandevice" "$curladditionalparameter" """$loginurl""?ipc=""$iprouter""&gw_id=""$gwid""&client_mac=""$clientmac""&redirect=&wlan=""$wlanid""&load_wp=""$loadwp_value""" \
+	attempt="$(curl --silent --interface "$wandevice" "$curladditionalparameter" "$curladditionalparameter2" """$loginurl""?ipc=""$iprouter""&gw_id=""$gwid""&client_mac=""$clientmac""&redirect=&wlan=""$wlanid""&load_wp=""$loadwp_value""" \
 	-H "accept: application/json, text/javascript, */*; q=0.01" \
 	-H "accept-language: en-US,en;q=0.9,id;q=0.8" \
 	-H "connection: keep-alive" \
@@ -1160,7 +1180,7 @@ seamless_reconnect() {
 }
 
 # Fungsi mendapatkan parameter aplikasi
-while getopts :abc:df:hkil:m:op:stu:v:w:xz flags
+while getopts :abc:df:hkil:m:op:rstu:v:w:xz flags
 do
 	case "${flags}" in
 		a)
@@ -1249,6 +1269,10 @@ do
 			password="$(echo "$password" | sed 's/<//g' | sed 's/>//g')"
 			uci set kopijahe.@autologin["$multiautologinnum"].password="$password"
 			uci commit kopijahe
+			;;
+		r)
+			reportmode="true"
+			testing
 			;;
 		s)
 			seamless_reconnect
@@ -1359,7 +1383,7 @@ while [[ "$advancedmode" = "" ]]; do
 			sleep "$sleeptime"
 		# Cek apakah login diblokir dan tidak menggunakan akun smartbisnis ataupun kampus,
 		# Jika benar, maka:
-		elif [[ "$loginblocked" = "yes" ]] && [[ "$wifivariant" != "smartbisnis" ]] && [[ "$wifivariant" != "kampus" ]]; then
+		elif [[ "$loginblocked" = "yes" ]] && ! [[ "$wifivariant" = "smartbisnis" ]] && ! [[ "$wifivariant" = "kampus" ]]; then
 			# Catat jam dan tanggal saat ini di berkas "/tmp/last.login.$waninterface"
 			date > "/tmp/last.login.$waninterface"
 			# Catat percobaan login terakhir di berkas "/tmp/last.login.$waninterface"
@@ -1390,6 +1414,10 @@ while [[ "$advancedmode" = "" ]]; do
 		elif [[ "$kodestatuslanding" = "6" ]] && [[ "$kodestatus" = "7" ]]; then
 			# Coba refresh interface terlebih dahulu
 			refreshinterface
+		# Jika terdeteksi cURL 6 & 6, maka:
+		elif [[ "$kodestatuslanding" = "6" ]] && [[ "$kodestatus" = "6" ]]; then
+			# Tentukan alamat server secara manual, dan ulangi proses login
+			manualresolve="yes"
 		# Jika interface terdeteksi tidak memiliki IP (mendapat 2 kode status cURL 28), maka:
 		elif [[ "$kodestatus" = "28" ]] && [[ "$kodestatuslanding" = "28" ]]; then
 			# Coba refresh interface terlebih dahulu
@@ -1419,7 +1447,7 @@ while [[ "$advancedmode" = "" ]]; do
 			# Lalu coba login kembali
 			login_wifi
 			# Jika masih dan router tidak memiliki MAC tetap, maka:
-			if [[ "$loginout" = "Login Gagal (SSID Tidak Sesuai)" ]] && [[ "$detectrandommac" != "" ]]; then
+			if [[ "$loginout" = "Login Gagal (SSID Tidak Sesuai)" ]] && ! [[ "$detectrandommac" = "" ]]; then
 				# Reboot router supaya menggunakan MAC lain
 				reboot
 			fi
