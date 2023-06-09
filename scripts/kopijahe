@@ -17,7 +17,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="2.4.8"
+	ver="2.4.9"
 }
 
 bantuan() {
@@ -767,11 +767,6 @@ curl_additionalparameter() {
 	if ! [[ "$osversion" = "22" ]]; then
 		curladditionalparameter="-k"
 	fi
-	
-	# Jika perlu, tentukan alamat server secara manual
-	if [[ "$manualresolve" = "yes" ]]; then
-		curladditionalparameter2="--resolve welcome2.wifi.id:443:10.233.16.13"
-	fi
 }
 
 login_folder() {
@@ -1054,7 +1049,7 @@ login_wifi() {
 	curl_additionalparameter
 	
 	# Lakukan login sesuai dengan parameter konfigurasi autologin
-	attempt="$(curl --silent --interface "$wandevice" "$curladditionalparameter" "$curladditionalparameter2" """$loginurl""?ipc=""$iprouter""&gw_id=""$gwid""&client_mac=""$clientmac""&redirect=&wlan=""$wlanid""&load_wp=""$loadwp_value""" \
+	attempt="$(curl --silent --interface "$wandevice" "$curladditionalparameter" """$loginurl""?ipc=""$iprouter""&gw_id=""$gwid""&client_mac=""$clientmac""&redirect=&wlan=""$wlanid""&load_wp=""$loadwp_value""" \
 	-H "accept: application/json, text/javascript, */*; q=0.01" \
 	-H "accept-language: en-US,en;q=0.9,id;q=0.8" \
 	-H "connection: keep-alive" \
@@ -1414,10 +1409,6 @@ while [[ "$advancedmode" = "" ]]; do
 		elif [[ "$kodestatuslanding" = "6" ]] && [[ "$kodestatus" = "7" ]]; then
 			# Coba refresh interface terlebih dahulu
 			refreshinterface
-		# Jika terdeteksi cURL 6 & 6, maka:
-		elif [[ "$kodestatuslanding" = "6" ]] && [[ "$kodestatus" = "6" ]]; then
-			# Tentukan alamat server secara manual, dan ulangi proses login
-			manualresolve="yes"
 		# Jika interface terdeteksi tidak memiliki IP (mendapat 2 kode status cURL 28), maka:
 		elif [[ "$kodestatus" = "28" ]] && [[ "$kodestatuslanding" = "28" ]]; then
 			# Coba refresh interface terlebih dahulu
