@@ -17,7 +17,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="2.5.2"
+	ver="2.5.3"
 }
 
 bantuan() {
@@ -794,7 +794,7 @@ login_folder() {
 		# Tentukan URL login yang sesuai
 		loginurl="https://$server_id/wms/$wms_url"
 		# Jika gagal dalam mendapatkan URL login yang sesuai, maka:
-		if [[ "$loginurl" = "https://$server_id/wms/" ]] || [[ "$loginurl" = "" ]] || [[ "$wms_url" = "" ]]; then
+		if [[ "$loginurl" = "https://$server_id/wms/" ]] || [[ "$loginurl" = "" ]] || [[ "$wms_url" = "" ]] || [[ "$wms_url" = "//welcome2.wifi.id/wms/" ]]; then
 			# Gunakan URL login  di bawah:
 			loginurl="https://$server_id/wms/auth/authnew/autologin/quarantine.php"
 		fi
