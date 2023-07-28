@@ -17,7 +17,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="2.5.3"
+	ver="2.5.4"
 }
 
 bantuan() {
@@ -531,7 +531,7 @@ captiveportalcheck() {
 	dnsquad9='9.9.9.9'
 	
 	# Cek apakah dalam mode testing atau tidak
-	if ! [[ "$advancedmode" = "true" ]]; then
+	if [[ "$advancedmode" != "true" ]]; then
 		# Tentukan penyedia layanan cek captive portal berdasarkan konfigurasi sebelumnya
 		cpcprovider="$(uci -q get kopijahe.@autologin["$multiautologinnum"].cpcprovider)"
 		# Jumlah percobaan ulang cek captive portal
@@ -688,7 +688,7 @@ captiveportalcheck() {
 	fi
 	
 	# Jika hasil cek koneksi sesuai dengan hasil yang diharapkan, maka:
-	if [[ "$cekkoneksi" = "$hasil" ]] && ! [[ "$advancedmode" = "true" ]]; then
+	if [[ "$cekkoneksi" = "$hasil" ]] && [[ "$advancedmode" != "true" ]]; then
 		# Tentukan bahwa terkoneksi dengan internet
 		internetconnected="yes"
 		cpcstatus="Sukses"
@@ -697,7 +697,7 @@ captiveportalcheck() {
 		internetconnected="yes"
 		cpcstatus="Sukses ($cpctestelapsed detik)"
 	# Jika hasilnya tidak sama dan bukan mode tes penyedia jasa koneksi, maka:
-	elif ! [[ "$cekkoneksi" = "$hasil" ]] && ! [[ "$advancedmode" = "true" ]] && [[ "$cpcuseping" = "true" ]]; then
+	elif [[ "$cekkoneksi" != "$hasil" ]] && [[ "$advancedmode" != "true" ]] && [[ "$cpcuseping" = "true" ]]; then
 		# Lakukan cek menggunakan ping terlebih dahulu ke dns server sesuai pilihan penyedia captive portal
 		cekkoneksiping="$(ping -I "$wandevice" -c "$cpcretry" "$dnsserver")"
 		cekkoneksiping="$?"
@@ -712,7 +712,7 @@ captiveportalcheck() {
 			cpcstatus="Gagal"
 		fi
 	# Jika hasilnya tidak sama dan dalam mode tes penyedia jasa koneksi, maka:
-	elif ! [[ "$cekkoneksi" = "$hasil" ]] && [[ "$advancedmode" = "true" ]]; then
+	elif [[ "$cekkoneksi" != "$hasil" ]] && [[ "$advancedmode" = "true" ]]; then
 		# Tentukan bahwa tidak terkoneksi dengan internet dan tulis waktu yang diperlukan untuk mengecek koneksi
 		internetconnected="no"
 		cpcstatus="Gagal ($cpctestelapsed detik)"
@@ -764,7 +764,7 @@ curl_statuscodes() {
 curl_additionalparameter() {
 	# Cek versi OS, jika tidak menggunakan OpenWrt 22.03
 	# Maka perlu menggunakan tambahan parameter -k
-	if ! [[ "$osversion" = "22" ]]; then
+	if [[ "$osversion" != "22" ]]; then
 		curladditionalparameter="-k"
 	fi
 }
@@ -979,7 +979,7 @@ hasil_loginout() {
 	fi
 	
 	# Jika kode status hasil login tidak berhasil (bukan 0), maka:
-	if [[ "$function" = "login" ]] && ! [[ "$kodestatus" = "0" ]]; then
+	if [[ "$function" = "login" ]] && [[ "$kodestatus" != "0" ]]; then
 		# Muat penjelasan kode cURL
 		curl_statuscodes
 		# Beritahu pengguna bahwa lewat stdout dan System log jika melalui mode lanjutan
@@ -1378,7 +1378,7 @@ while [[ "$advancedmode" = "" ]]; do
 			sleep "$sleeptime"
 		# Cek apakah login diblokir dan tidak menggunakan akun smartbisnis ataupun kampus,
 		# Jika benar, maka:
-		elif [[ "$loginblocked" = "yes" ]] && ! [[ "$wifivariant" = "smartbisnis" ]] && ! [[ "$wifivariant" = "kampus" ]]; then
+		elif [[ "$loginblocked" = "yes" ]] && [[ "$wifivariant" != "smartbisnis" ]] && [[ "$wifivariant" != "kampus" ]]; then
 			# Catat jam dan tanggal saat ini di berkas "/tmp/last.login.$waninterface"
 			date > "/tmp/last.login.$waninterface"
 			# Catat percobaan login terakhir di berkas "/tmp/last.login.$waninterface"
@@ -1438,7 +1438,7 @@ while [[ "$advancedmode" = "" ]]; do
 			# Lalu coba login kembali
 			login_wifi
 			# Jika masih dan router tidak memiliki MAC tetap, maka:
-			if [[ "$loginout" = "Login Gagal (SSID Tidak Sesuai)" ]] && ! [[ "$detectrandommac" = "" ]]; then
+			if [[ "$loginout" = "Login Gagal (SSID Tidak Sesuai)" ]] && [[ "$detectrandommac" != "" ]]; then
 				# Reboot router supaya menggunakan MAC lain
 				reboot
 			fi
