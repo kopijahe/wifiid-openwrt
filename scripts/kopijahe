@@ -17,7 +17,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="2.5.4"
+	ver="2.5.5"
 }
 
 bantuan() {
@@ -787,16 +787,16 @@ login_folder() {
 	# Jika tipe login adalah wms dan varian jaringan wifi.id-lanjutkan atau pegadaian, maka tentukan URL login yang sesuai:
 	elif [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "wifi.id-lanjutkan" ]] || [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "pegadaian" ]]; then
 		loginurl="https://$server_id/authnew/login-free/check_login.php"
-	# Jika tipe login adalah wms, maka:
-	elif [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].tipelogin)" = "wms" ]]; then
+	# Jika tipe login adalah wms atau wmslite, maka:
+	elif [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].tipelogin)" = "wms" ]] || [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].tipelogin)" = "wmslite" ]]; then
 		# Tentukan wms_url
 		wms_url="$(echo "$wp" | grep url | awk -F'[:]' '{print $2}' | awk -F'[?]' '{print $1}' | sed s/\'//g | sed s/\ //g | head -n 1)"
 		# Tentukan URL login yang sesuai
-		loginurl="https://$server_id/wms/$wms_url"
+		loginurl="https://$server_id/$tipelogin/$wms_url"
 		# Jika gagal dalam mendapatkan URL login yang sesuai, maka:
-		if [[ "$loginurl" = "https://$server_id/wms/" ]] || [[ "$loginurl" = "" ]] || [[ "$wms_url" = "" ]] || [[ "$wms_url" = "//welcome2.wifi.id/wms/" ]]; then
+		if [[ "$loginurl" = "https://$server_id/$tipelogin/" ]] || [[ "$loginurl" = "" ]] || [[ "$wms_url" = "" ]] || [[ "$wms_url" = "//welcome2.wifi.id/wms/" ]]; then
 			# Gunakan URL login  di bawah:
-			loginurl="https://$server_id/wms/auth/authnew/autologin/quarantine.php"
+			loginurl="https://$server_id/$tipelogin/auth/authnew/autologin/quarantine.php"
 		fi
 	else
 	# Jika tipe login tidak diketahui, maka konfigurasi masih belum lengkap, silahkan ulangi deteksi otomatis jaringan
@@ -850,9 +850,18 @@ wificommunity() {
 	# Jika WMS Lite, maka:
 	elif [[ "$wifivariant" = "wms-lite" ]] || [[ "$wifivariant" = "wmslite" ]]; then
 		generaterandomid
-		# Tentukan akhiran username login untuk jaringan WMS Lite
-		wmsid="$(uci -q get kopijahe.@autologin["$multiautologinnum"].wmsid)"
-		username3="@wmslite.$wmsid"
+		# Cek apakah tipe login wmslite baru
+		if [[ "$tipelogin" = "wmslite" ]]; then
+			# Jika iya, maka:
+			# Tentukan akhiran username login untuk jaringan WMS Lite
+			wmsid="$(uci -q get kopijahe.@autologin["$multiautologinnum"].wmsid)"
+			username3="@wmslite.$wmsid.000"
+		else
+			# Jika tipe lama, maka:
+			# Tentukan akhiran username login untuk jaringan WMS Lite
+			wmsid="$(uci -q get kopijahe.@autologin["$multiautologinnum"].wmsid)"
+			username3="@wmslite.$wmsid"
+		fi
 	# Jika WMS, maka:
 	elif [[ "$wifivariant" = "wms" ]]; then
 		generaterandomid
