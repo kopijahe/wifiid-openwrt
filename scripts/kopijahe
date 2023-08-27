@@ -17,7 +17,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="2.5.8"
+	ver="2.5.9"
 }
 
 bantuan() {
@@ -602,98 +602,114 @@ captiveportalcheck() {
 	
 	# Daftar penyedia layanan cek captive portal beserta hasil cek yang diharapkan
 	# 
-	# KopiJahe: Layanan cek captive portal bawaan script
-	if [[ "$cpcprovider" = "kopijahe" ]]; then
-		cekkoneksi="$(curl --interface "$wandevice" -L --silent --retry "$cpcretry" --max-redirs 1 --connect-timeout "$cpctimeout" "http://periksakoneksi.kopijahe.my.id/cek")"
-		kodestatuslanding="$?"
-		hasil="OK"
-		dnsserver="$dnsopendns"
-	# KopiJahe2: Layanan cek captive portal alternatif bawaan script
-	elif [[ "$cpcprovider" = "kopijahe2" ]]; then
-		cekkoneksi="$(curl --interface "$wandevice" -L --silent --retry "$cpcretry" --max-redirs 1 --connect-timeout "$cpctimeout" "http://kopijahe.my.id/ok.txt")"
-		kodestatuslanding="$?"
-		hasil="OK"
-		dnsserver="$dnsopendns2"
-	# Firefox: Layanan cek captive portal bawaan browser Mozilla Firefox
-	elif [[ "$cpcprovider" = "firefox" ]]; then
-		cekkoneksi="$(curl --interface "$wandevice" -L --silent --retry "$cpcretry" --max-redirs 1 --connect-timeout "$cpctimeout" "http://detectportal.firefox.com/success.txt")"
-		kodestatuslanding="$?"
-		hasil="success"
-		dnsserver="$dnsopendns2"
-	# Google: Layanan cek captive portal bawaan sistem operasi android
-	elif [[ "$cpcprovider" = "google" ]]; then
-		cekkoneksi="$(curl --interface "$wandevice" -LI --silent --retry "$cpcretry" --max-redirs 1 --connect-timeout "$cpctimeout" "http://connectivitycheck.gstatic.com/generate_204" | grep -o "204")"
-		kodestatuslanding="$?"
-		hasil="204"
-		dnsserver="$dnsgoogle"
-	# Google2: Layanan cek captive portal bawaan chrome
-	elif [[ "$cpcprovider" = "google2" ]]; then
-		cekkoneksi="$(curl --interface "$wandevice" -LI --silent --retry "$cpcretry" --max-redirs 1 --connect-timeout "$cpctimeout" "http://clients3.google.com/generate_204" | grep -o "204")"
-		kodestatuslanding="$?"
-		hasil="204"
-		dnsserver="$dnsgoogle2"
-	# Apple: Layanan cek captive portal bawaan perangkat Apple
-	elif [[ "$cpcprovider" = "apple" ]]; then
-		cekkoneksi="$(curl --interface "$wandevice" -L --silent --retry "$cpcretry" --max-redirs 1 --connect-timeout "$cpctimeout" "http://captive.apple.com/" | grep -o "Success" | head -c8)"
-		kodestatuslanding="$?"
-		hasil="Success"
-		dnsserver="$dnsopendns"
-	# Apple2: Layanan cek captive portal alternatif perangkat Apple
-	elif [[ "$cpcprovider" = "apple2" ]]; then
-		cekkoneksi="$(curl --interface "$wandevice" -L --silent --retry "$cpcretry" --max-redirs 1 --connect-timeout "$cpctimeout" "http://www.apple.com/library/test/success.html" | grep -o "Success" | head -c8)"
-		kodestatuslanding="$?"
-		hasil="Success"
-		dnsserver="$dnsopendns2"
-	# Microsoft2: Layanan cek captive portal alternatif milik Microsoft
-	elif [[ "$cpcprovider" = "microsoft2" ]]; then
-		cekkoneksi="$(curl --interface "$wandevice" -L --silent --retry "$cpcretry" --max-redirs 1 --connect-timeout "$cpctimeout" "http://www.msftncsi.com/ncsi.txt")"
-		kodestatuslanding="$?"
-		hasil="Microsoft NCSI"
-		dnsserver="$dnsopendns"
-	# Microsoft: Layanan cek captive portal bawaan sistem operasi Windows
-	elif [[ "$cpcprovider" = "microsoft" ]]; then
-		cekkoneksi="$(curl --interface "$wandevice" -L --silent --retry "$cpcretry" --max-redirs 1 --connect-timeout "$cpctimeout" "http://www.msftconnecttest.com/connecttest.txt")"
-		kodestatuslanding="$?"
-		hasil="Microsoft Connect Test"
-		dnsserver="$dnsquad9"
-	# Xiaomi: Layanan cek captive portal bawaan sistem operasi MIUI
-	elif [[ "$cpcprovider" = "xiaomi" ]]; then
-		cekkoneksi="$(curl --interface "$wandevice" -LI --silent --retry "$cpcretry" --max-redirs 1 --connect-timeout "$cpctimeout" "http://connect.rom.miui.com/generate_204" | grep -o "204")"
-		kodestatuslanding="$?"
-		hasil="204"
-		dnsserver="$dnsquad9"
-	# HTTP Forever: Layanan cek captive portal dari Scott Helme (https://github.com/ScottHelme)
-	elif [[ "$cpcprovider" = "httpforever" ]]; then
-		cekkoneksi="$(curl --interface "$wandevice" --silent --retry "$cpcretry" --max-redirs 1 --connect-timeout "$cpctimeout" "http://httpforever.com/" | grep -o "A reliably insecure connection")"
-		kodestatuslanding="$?"
-		hasil="A reliably insecure connection"
-		dnsserver="$dnsgoogle"
-	# NeverSSL: Layanan cek captive portal dari Colm MacCárthaigh (https://github.com/colmmacc/neverssl.com)
-	elif [[ "$cpcprovider" = "neverssl" ]]; then
-		cekkoneksi="$(curl --interface "$wandevice" --silent --retry "$cpcretry" --max-redirs 1 --connect-timeout "$cpctimeout" "http://neverssl.com/" | grep -o "helping you get online")"
-		kodestatuslanding="$?"
-		hasil="helping you get online"
-		dnsserver="$dnsopendns"
-	# Ubuntu: Layanan cek captive portal bawaan sistem operasi ubuntu
-	elif [[ "$cpcprovider" = "ubuntu" ]]; then
-		cekkoneksi="$(curl --interface "$wandevice" -LI --silent --retry "$cpcretry" --max-redirs 1 --connect-timeout "$cpctimeout" "http://connectivity-check.ubuntu.com" | grep -o "204")"
-		kodestatuslanding="$?"
-		hasil="204"
-		dnsserver="$dnsgoogle"
-	# Archlinux: Layanan cek captive portal bawaan sistem operasi archlinux
-	elif [[ "$cpcprovider" = "archlinux" ]]; then
-		cekkoneksi="$(curl --interface "$wandevice" -LI --silent --retry "$cpcretry" --max-redirs 1 --connect-timeout "$cpctimeout" "http://ping.archlinux.org" | grep -o "200")"
-		kodestatuslanding="$?"
-		hasil="200"
-		dnsserver="$dnsquad9"
-	# Example: Situs percobaan yang dikelola oleh IANA (https://www.iana.org/domains/reserved)
-	elif [[ "$cpcprovider" = "examplecom" ]]; then
-		cekkoneksi="$(curl --interface "$wandevice" -L --silent --retry "$cpcretry" --max-redirs 1 --connect-timeout "$cpctimeout" "http://example.com/" | grep -o "Example Domain" | awk '!a[$0]++')"
-		kodestatuslanding="$?"
-		hasil="Example Domain"
-		dnsserver="$dnsquad9"
-	fi
-	
+	case "$cpcprovider" in
+		"kopijahe")
+			# Layanan cek captive portal bawaan script
+			cekkoneksi="$(curl --interface "$wandevice" -L --silent --retry "$cpcretry" --max-redirs 1 --connect-timeout "$cpctimeout" "http://periksakoneksi.kopijahe.my.id/cek")"
+			kodestatuslanding="$?"
+			hasil="OK"
+			dnsserver="$dnsopendns"
+			;;
+		"kopijahe2")
+			# Layanan cek captive portal alternatif bawaan script
+			cekkoneksi="$(curl --interface "$wandevice" -L --silent --retry "$cpcretry" --max-redirs 1 --connect-timeout "$cpctimeout" "http://kopijahe.my.id/ok.txt")"
+			kodestatuslanding="$?"
+			hasil="OK"
+			dnsserver="$dnsopendns2"
+			;;
+		"firefox")
+			# Layanan cek captive portal bawaan browser Mozilla Firefox
+			cekkoneksi="$(curl --interface "$wandevice" -L --silent --retry "$cpcretry" --max-redirs 1 --connect-timeout "$cpctimeout" "http://detectportal.firefox.com/success.txt")"
+			kodestatuslanding="$?"
+			hasil="success"
+			dnsserver="$dnsopendns2"
+			;;
+		"google")
+			# Layanan cek captive portal bawaan sistem operasi android
+			cekkoneksi="$(curl --interface "$wandevice" -LI --silent --retry "$cpcretry" --max-redirs 1 --connect-timeout "$cpctimeout" "http://connectivitycheck.gstatic.com/generate_204" | grep -o "204")"
+			kodestatuslanding="$?"
+			hasil="204"
+			dnsserver="$dnsgoogle"
+			;;
+		"google2")
+			# Layanan cek captive portal bawaan Chrome
+			cekkoneksi="$(curl --interface "$wandevice" -LI --silent --retry "$cpcretry" --max-redirs 1 --connect-timeout "$cpctimeout" "http://clients3.google.com/generate_204" | grep -o "204")"
+			kodestatuslanding="$?"
+			hasil="204"
+			dnsserver="$dnsgoogle2"
+			;;
+		"apple")
+			# Layanan cek captive portal bawaan perangkat Apple
+			cekkoneksi="$(curl --interface "$wandevice" -L --silent --retry "$cpcretry" --max-redirs 1 --connect-timeout "$cpctimeout" "http://captive.apple.com/" | grep -o "Success" | head -c8)"
+			kodestatuslanding="$?"
+			hasil="Success"
+			dnsserver="$dnsopendns"
+			;;
+		"apple2")
+			# Layanan cek captive portal alternatif bawaan perangkat Apple
+			cekkoneksi="$(curl --interface "$wandevice" -L --silent --retry "$cpcretry" --max-redirs 1 --connect-timeout "$cpctimeout" "http://www.apple.com/library/test/success.html" | grep -o "Success" | head -c8)"
+			kodestatuslanding="$?"
+			hasil="Success"
+			dnsserver="$dnsopendns2"
+			;;
+		"microsoft")
+			# Layanan cek captive portal bawaan sistem operasi Windows
+			cekkoneksi="$(curl --interface "$wandevice" -L --silent --retry "$cpcretry" --max-redirs 1 --connect-timeout "$cpctimeout" "http://www.msftconnecttest.com/connecttest.txt")"
+			kodestatuslanding="$?"
+			hasil="Microsoft Connect Test"
+			dnsserver="$dnsquad9"
+			;;
+		"microsoft2")
+			# Layanan cek captive portal alternatif bawaan sistem operasi Windows
+			cekkoneksi="$(curl --interface "$wandevice" -L --silent --retry "$cpcretry" --max-redirs 1 --connect-timeout "$cpctimeout" "http://www.msftncsi.com/ncsi.txt")"
+			kodestatuslanding="$?"
+			hasil="Microsoft NCSI"
+			dnsserver="$dnsopendns"
+			;;
+		"xiaomi")
+			# Layanan cek captive portal bawaan sistem operasi MIUI
+			cekkoneksi="$(curl --interface "$wandevice" -LI --silent --retry "$cpcretry" --max-redirs 1 --connect-timeout "$cpctimeout" "http://connect.rom.miui.com/generate_204" | grep -o "204")"
+			kodestatuslanding="$?"
+			hasil="204"
+			dnsserver="$dnsquad9"
+			;;
+		"httpforever")
+			# Layanan cek captive portal dari Scott Helme (https://github.com/ScottHelme)
+			cekkoneksi="$(curl --interface "$wandevice" --silent --retry "$cpcretry" --max-redirs 1 --connect-timeout "$cpctimeout" "http://httpforever.com/" | grep -o "A reliably insecure connection")"
+			kodestatuslanding="$?"
+			hasil="A reliably insecure connection"
+			dnsserver="$dnsgoogle"
+			;;
+		"neverssl")
+			# Layanan cek captive portal dari Colm MacCárthaigh (https://github.com/colmmacc/neverssl.com)
+			cekkoneksi="$(curl --interface "$wandevice" --silent --retry "$cpcretry" --max-redirs 1 --connect-timeout "$cpctimeout" "http://neverssl.com/" | grep -o "helping you get online")"
+			kodestatuslanding="$?"
+			hasil="helping you get online"
+			dnsserver="$dnsopendns"
+			;;
+		"ubuntu")
+			# Layanan cek captive portal bawaan sistem operasi ubuntu
+			cekkoneksi="$(curl --interface "$wandevice" -LI --silent --retry "$cpcretry" --max-redirs 1 --connect-timeout "$cpctimeout" "http://connectivity-check.ubuntu.com" | grep -o "204")"
+			kodestatuslanding="$?"
+			hasil="204"
+			dnsserver="$dnsgoogle"
+			;;
+		"archlinux")
+			# Layanan cek captive portal bawaan sistem operasi archlinux
+			cekkoneksi="$(curl --interface "$wandevice" -LI --silent --retry "$cpcretry" --max-redirs 1 --connect-timeout "$cpctimeout" "http://ping.archlinux.org" | grep -o "200")"
+			kodestatuslanding="$?"
+			hasil="200"
+			dnsserver="$dnsquad9"
+			;;
+		"examplecom")
+			# Situs percobaan yang dikelola oleh IANA (https://www.iana.org/domains/reserved)
+			cekkoneksi="$(curl --interface "$wandevice" -L --silent --retry "$cpcretry" --max-redirs 1 --connect-timeout "$cpctimeout" "http://example.com/" | grep -o "Example Domain" | awk '!a[$0]++')"
+			kodestatuslanding="$?"
+			hasil="Example Domain"
+			dnsserver="$dnsquad9"
+			;;
+	esac
+
 	# Cek apakah dalam mode testing atau tidak
 	if [[ "$advancedmode" = "true" ]]; then
 		# Hitung berapa lama waktu yang dibutuhkan untuk pengecekan
@@ -754,25 +770,35 @@ curl_statuscodes() {
 	# Penjelasan beberapa kode status cURL
 	# Dan penyebab biasanya
 	
-	if [[ "$kodestatus" = "1" ]]; then
-		# Biasanya karena protokol https tidak diaktifkan oleh libcurl yang terpasang
-		curl_status="Protokol koneksi tidak didukung oleh cURL yang terpasang"
-	elif [[ "$kodestatus" = "3" ]]; then
-		# Biasanya karena deteksi URL otomatis tidak berhasil
-		curl_status="Pengaturan belum lengkap, silahkan ulangi konfigurasi"
-	elif [[ "$kodestatus" = "6" ]]; then
-		# Biasanya karena hostname belum diisi
-		curl_status="Alamat server tidak diketahui"
-	elif [[ "$kodestatus" = "7" ]]; then
-		# Biasanya karena hostname keliru, atau pengaturan mwan3 kurang tepat
-		curl_status="Server tidak dapat dihubungi"
-	elif [[ "$kodestatus" = "28" ]]; then
-		# Biasanya karena koneksi bengong, atau belum mendapatkan IP
-		curl_status="Koneksi ke server mengalami timeout"
-	elif [[ "$kodestatus" = "35" ]]; then
-		# Biasanya karena tanggal dan jam tidak sesuai
-		curl_status="Koneksi SSL/HTTPS ke server mengalami error"
-	fi
+	case "$kodestatus" in
+		1)
+			# Biasanya karena protokol https tidak diaktifkan oleh libcurl yang terpasang
+			curl_status="Protokol koneksi tidak didukung oleh cURL yang terpasang"
+			;;
+		3)
+			# Biasanya karena deteksi URL otomatis tidak berhasil
+			curl_status="Pengaturan belum lengkap, silahkan ulangi konfigurasi"
+			;;
+		6)
+			# Biasanya karena hostname belum diisi
+			curl_status="Alamat server tidak diketahui"
+			;;
+		7)
+			# Biasanya karena hostname keliru, atau pengaturan mwan3 kurang tepat
+			curl_status="Server tidak dapat dihubungi"
+			;;
+		28)
+			# Biasanya karena koneksi bengong, atau belum mendapatkan IP
+			curl_status="Koneksi ke server mengalami timeout"
+			;;
+		35)
+			# Biasanya karena tanggal dan jam tidak sesuai
+			curl_status="Koneksi SSL/HTTPS ke server mengalami error"
+			;;
+		*)
+			curl_status="Kode status tidak dikenali"
+			;;
+	esac
 }
 
 curl_additionalparameter() {
@@ -786,36 +812,42 @@ curl_additionalparameter() {
 login_folder() {
 	# Fungsi penentuan folder dan url login
 	
-	# Jika tipe login adalah wifi.id, maka:
-	if [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].tipelogin)" = "login" ]]; then
-		# Tentukan URL login yang sesuai
-		loginurl="$(echo "$wp" | grep urlx | awk -F'[=]' '{print $2}' | awk -F'[?]' '{print $1}' | sed s/\'//g | sed s/\ //g | head -n 1)"
-		# Jika gagal dalam mendapatkan URL login yang sesuai, maka:
-		if [[ "$loginurl" = "https://$server_id/" ]] || [[ "$loginurl" = "" ]]; then
-			# Gunakan URL login  di bawah:
-			loginurl="https://$server_id/authnew/login/check_login.php"
-		fi
-	# Jika tipe login adalah wms dan varian jaringan WMS-lanjutkan, maka tentukan URL login yang sesuai:
-	elif [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].tipelogin)" = "wms" ]] && [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "wms-lanjutkan" ]]; then
-		loginurl="https://$server_id/wms/auth/authnew/autologin-free/quarantine.php"
-	# Jika tipe login adalah wms dan varian jaringan wifi.id-lanjutkan atau pegadaian, maka tentukan URL login yang sesuai:
-	elif [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "wifi.id-lanjutkan" ]] || [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "pegadaian" ]]; then
-		loginurl="https://$server_id/authnew/login-free/check_login.php"
-	# Jika tipe login adalah wms atau wmslite, maka:
-	elif [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].tipelogin)" = "wms" ]] || [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].tipelogin)" = "wmslite" ]]; then
-		# Tentukan wms_url
-		wms_url="$(echo "$wp" | grep url | awk -F'[:]' '{print $2}' | awk -F'[?]' '{print $1}' | sed s/\'//g | sed s/\ //g | head -n 1)"
-		# Tentukan URL login yang sesuai
-		loginurl="https://$server_id/$tipelogin/$wms_url"
-		# Jika gagal dalam mendapatkan URL login yang sesuai, maka:
-		if [[ "$loginurl" = "https://$server_id/$tipelogin/" ]] || [[ "$loginurl" = "" ]] || [[ "$wms_url" = "" ]] || [[ "$wms_url" = "//welcome2.wifi.id/wms/" ]]; then
-			# Gunakan URL login  di bawah:
-			loginurl="https://$server_id/$tipelogin/auth/authnew/autologin/quarantine.php"
-		fi
-	else
-	# Jika tipe login tidak diketahui, maka konfigurasi masih belum lengkap, silahkan ulangi deteksi otomatis jaringan
-		echo "Ada kesalahan konfigurasi jaringan"
-	fi
+	case "$(uci -q get kopijahe.@autologin["$multiautologinnum"].tipelogin)" in
+		"login")
+			# Jika tipelogin wifi.id, maka:
+			loginurl="$(echo "$wp" | grep urlx | awk -F'[=]' '{print $2}' | awk -F'[?]' '{print $1}' | sed s/\'//g | sed s/\ //g | head -n 1)"
+			if [[ "$loginurl" = "https://$server_id/" ]] || [[ "$loginurl" = "" ]]; then
+				loginurl="https://$server_id/authnew/login/check_login.php"
+			fi
+			;;
+		"wms")
+			# Jika tipelogin wms, maka:
+			if [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "wms-lanjutkan" ]]; then
+				# Cek apakah di varian wms-lanjutkan, jika iya, maka:
+				# Tentukan URL login yang sesuai
+				loginurl="https://$server_id/wms/auth/authnew/autologin-free/quarantine.php"
+			elif [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "wifi.id-lanjutkan" ]] || [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "pegadaian" ]]; then
+				# Jika digunakan di varian wifi.id-lanjutkan atau pegadaian, maka:
+				# Tentukan URL login yang sesuai
+				loginurl="https://$server_id/authnew/login-free/check_login.php"
+			else
+				# Jika digunakan di varian jaringan wms dan wms lite, maka:
+				# Tentukan wms_url
+				wms_url="$(echo "$wp" | grep url | awk -F'[:]' '{print $2}' | awk -F'[?]' '{print $1}' | sed s/\'//g | sed s/\ //g | head -n 1)"
+				# Tentukan URL login yang sesuai dengan hasil dari wms_url
+				loginurl="https://$server_id/$tipelogin/$wms_url"
+				if [[ "$loginurl" = "https://$server_id/$tipelogin/" ]] || [[ "$loginurl" = "" ]] || [[ "$wms_url" = "" ]] || [[ "$wms_url" = "//welcome2.wifi.id/wms/" ]]; then
+					# Jika gagal dalam mendapatkan URL login yang sesuai, maka:
+					# Gunakan URL login  di bawah:
+					loginurl="https://$server_id/$tipelogin/auth/authnew/autologin/quarantine.php"
+				fi
+			fi
+			;;
+		*)
+			# Jika tipe login tidak diketahui, maka kemungkinan konfigurasi masih belum lengkap, silahkan ulangi deteksi otomatis jaringan
+			echo "Ada kesalahan konfigurasi jaringan"
+			;;
+	esac
 }
 
 wplanjutkan() {
@@ -835,113 +867,125 @@ wplanjutkan() {
 wificommunity() {
 	# Tentukan akhiran username sesuai dengan varian jaringan yang dipilih:
 	#
-	# Jika smartbisnis, maka:
-	if [[ "$wifivariant" = "smartbisnis" ]]; then
-		# Tentukan akhiran username "@com.smartbisnis"
-		username2="$username@com.smartbisnis"
-	# Jika kampus:
-	elif [[ "$wifivariant" = "kampus" ]]; then
-		# Tentukan akhiran username sesuai dengan konfigurasi kampus yang tersimpan
-		cfgkampus="$(uci -q get kopijahe.@autologin["$multiautologinnum"].kampus)"
-		
-		# Hindari error karena penulisan akun kampus tidak ditulis NIM saja
-		username="$(echo "$username" | awk -F'[@]' '{print $1}')"
-		
-		# Jika digunakan untuk akun UT, maka:
-		if [[ "$cfgkampus" = "ut.ac.id" ]]; then
-			# Akun UT punya format berbeda dibandingkan dengan kampus lainnya
-			kampus="$(echo "$cfgkampus" | awk -F'[.]' '{print $1}')"
-			username2="$username@$cfgkampus@com.$kampus"
-		elif [[ "$cfgkampus" = "adibuana" ]]; then
-			# Akun Adibuana mengikuti format komunitas generik
-			username2="$username@$cfgkampus.vmgmt@wms.00000000.000"
-		# Jika bukan akun UT dan adibuana, maka:
-		else
-			# Gunakan format standard
-			# Termasuk akun kampus dengan akhiran: "@itdel", "@polije", "@umaha", "@unej", "@unsiq"
-			username2="$username@com.$cfgkampus"
-		fi
-	# Jika WMS Lite, maka:
-	elif [[ "$wifivariant" = "wms-lite" ]] || [[ "$wifivariant" = "wmslite" ]]; then
-		generaterandomid
-		# Cek apakah tipe login wmslite baru
-		if [[ "$tipelogin" = "wmslite" ]]; then
-			# Jika iya, maka:
-			# Tentukan akhiran username login untuk jaringan WMS Lite
+	case "$wifivariant" in
+		"smartbisnis")
+			# Jika smartbisnis, maka:
+			username2="$username@com.smartbisnis"
+			;;
+		"kampus")
+			# Jika kampus, maka:
+			# Hindari error jika penulisan akun kampus tidak ditulis NIM saja
+			username="$(echo "$username" | awk -F'[@]' '{print $1}')"
+			# Tentukan akhiran username sesuai dengan konfigurasi kampus yang tersimpan
+			cfgkampus="$(uci -q get kopijahe.@autologin["$multiautologinnum"].kampus)"
+			case "$cfgkampus" in
+				"ut.ac.id")
+					# Akun UT punya format berbeda dibandingkan dengan kampus lainnya
+					kampus="$(echo "$cfgkampus" | awk -F'[.]' '{print $1}')"
+					username2="$username@$cfgkampus@com.$kampus"
+					;;
+				"adibuana")
+					# Akun Adibuana mengikuti format komunitas generik
+					username2="$username@$cfgkampus.vmgmt@wms.00000000.000"
+					;;
+				*)
+					# Selain itu, gunakan format standard
+					# Termasuk akun kampus dengan akhiran: "@itdel", "@polije", "@umaha", "@unej", "@unsiq"
+					username2="$username@com.$cfgkampus"
+					;;
+			esac
+			;;
+		"wms-lite" | "wmslite")
+			# Jika WMS Lite, maka:
+			generaterandomid
+			# Cek apakah tipe login wmslite baru
 			wmsid="$(uci -q get kopijahe.@autologin["$multiautologinnum"].wmsid)"
-			username3="@wmslite.$wmsid.000"
-		else
-			# Jika tipe lama, maka:
-			# Tentukan akhiran username login untuk jaringan WMS Lite
+			if [[ "$tipelogin" = "wmslite" ]]; then
+				# Jika iya, maka:
+				# Tentukan akhiran username login untuk jaringan WMS Lite baru
+				username3="@wmslite.$wmsid.000"
+			else
+				# Jika tipe lama, maka:
+				# Tentukan akhiran username login untuk jaringan WMS Lite lama
+				username3="@wmslite.$wmsid"
+			fi
+			;;
+		"wms")
+			# Jika WMS, maka:
+			generaterandomid
+			# Tentukan akhiran username login untuk jaringan WMS
 			wmsid="$(uci -q get kopijahe.@autologin["$multiautologinnum"].wmsid)"
-			username3="@wmslite.$wmsid"
-		fi
-	# Jika WMS, maka:
-	elif [[ "$wifivariant" = "wms" ]]; then
-		generaterandomid
-		# Tentukan akhiran username login untuk jaringan WMS
-		wmsid="$(uci -q get kopijahe.@autologin["$multiautologinnum"].wmsid)"
-		username3="@wms.$wmsid.000"
-	# Jika WICO, maka:
-	elif [[ "$wifivariant" = "wico" ]]; then
-		# Tentukan akhiran username "@violet"
-		username2="$username@violet"
-	# Jika wifi.id, maka:
-	elif [[ "$wifivariant" = "wifi.id" ]] || [[ "$wifivariant" = "@wifi.id" ]]; then
-		# Periksa apakah akun yang digunakan adalah akun violet*/giga.wigo/boingo/sooltan.id, jika iya, maka:
-		if [[ "$(echo "$username" | awk -F'[@]' '{print $2}')" = "violet" ]] ||  [[ "$(echo "$username" | awk -F'[@]' '{print $2}')" = "violet.unp" ]] ||  [[ "$(echo "$username" | awk -F'[@]' '{print $2}')" = "violet.unm" ]] ||  [[ "$(echo "$username" | awk -F'[@]' '{print $2}')" = "violet.ugm" ]] ||  [[ "$(echo "$username" | awk -F'[@]' '{print $2}')" = "violet.unpatti" ]] ||  [[ "$(echo "$username" | awk -F'[@]' '{print $2}')" = "violet.uho" ]] ||  [[ "$(echo "$username" | awk -F'[@]' '{print $2}')" = "violet.gamer" ]] ||  [[ "$(echo "$username" | awk -F'[@]' '{print $2}')" = "giga.wigo" ]] ||  [[ "$(echo "$username" | awk -F'[@]' '{print $2}')" = "mb.boingo.com" ]] ||  [[ "$(echo "$username" | awk -F'[@]' '{print $2}')" = "boingo.com" ]] ||  [[ "$(echo "$username" | awk -F'[@]' '{print $2}')" = "sooltan.id" ]]; then
-			# Tidak perlu diberi tambahan akhiran
+			username3="@wms.$wmsid.000"
+			;;
+		"wico")
+			# Jika WICO 2.0, maka:
+			username2="$username@violet"
+			;;
+		"wifi.id" | "@wifi.id" | "wifiid")
+			# Jika wifi.id, maka:
+			# Periksa apakah akun yang digunakan adalah akun violet*/giga.wigo/boingo/sooltan.id, jika iya, maka:
+			if [[ "$(echo "$username" | awk -F'[@]' '{print $2}')" = "violet" ]] ||  [[ "$(echo "$username" | awk -F'[@]' '{print $2}')" = "violet.unp" ]] ||  [[ "$(echo "$username" | awk -F'[@]' '{print $2}')" = "violet.unm" ]] ||  [[ "$(echo "$username" | awk -F'[@]' '{print $2}')" = "violet.ugm" ]] ||  [[ "$(echo "$username" | awk -F'[@]' '{print $2}')" = "violet.unpatti" ]] ||  [[ "$(echo "$username" | awk -F'[@]' '{print $2}')" = "violet.uho" ]] ||  [[ "$(echo "$username" | awk -F'[@]' '{print $2}')" = "violet.gamer" ]] ||  [[ "$(echo "$username" | awk -F'[@]' '{print $2}')" = "giga.wigo" ]] ||  [[ "$(echo "$username" | awk -F'[@]' '{print $2}')" = "mb.boingo.com" ]] ||  [[ "$(echo "$username" | awk -F'[@]' '{print $2}')" = "boingo.com" ]] ||  [[ "$(echo "$username" | awk -F'[@]' '{print $2}')" = "sooltan.id" ]]; then
+				# Tidak perlu diberi tambahan akhiran
+				username2="$username"
+			else
+				# Jika tidak, maka:
+				# Beri tambahan akhiran "@spin2"
+				username2="$username@spin2"
+			fi
+			;;
+		"grosirbersama")
+			# Jika grosirbersama, maka:
+			username2="$username@com.grosirbersama"
+			;;
+		"internetku")
+			# Jika internetku, maka:
+			username2="$username@com.internetku"
+			;;
+		"gift")
+			# Jika gift, maka:
+			username2="$username@gift"
+			;;
+		"homewifi")
+			# Jika homewifi, maka:
 			username2="$username"
-		# Jika tidak, maka:
-		else
-			# Beri tambahan akhiran "@spin2"
-			username2="$username@spin2"
-		fi
-	# Jika grosirbersama, maka:
-	elif [[ "$wifivariant" = "grosirbersama" ]]; then
-		# Tentukan akhiran username "@com.grosirbersama"
-		username2="$username@com.grosirbersama"
-	# Jika internetku, maka:
-	elif [[ "$wifivariant" = "internetku" ]]; then
-		# Tentukan akhiran username "@com.internetku"
-		username2="$username@com.internetku"
-	# Jika gift, maka:
-	elif [[ "$wifivariant" = "gift" ]]; then
-		# Tentukan akhiran username "@gift"
-		username2="$username@gift"
-	# Jika homewifi, maka:
-	elif [[ "$wifivariant" = "homewifi" ]]; then
-		# Tidak perlu merubah akhiran username
-		username2="$username"
-	# Jika starwifi, maka:
-	elif [[ "$wifivariant" = "starwifi" ]]; then
-		# Tidak perlu merubah akhiran username
-		username2="$username.starwifi@event"
-	# Jika SSO atau Rumah Sakit atau komunitas generik lainnya, maka:
-	elif [[ "$wifivariant" = "sso" ]] || [[ "$wifivariant" = "rumah-sakit" ]] || [[ "$wifivariant" = "komunitas-generik" ]]; then
-		# Tentukan akhiran username ".vmgmt@wms.00000000.000"
-		username2="$username.vmgmt@wms.00000000.000"
-	# Jika "lanjutkan", maka:
-	elif [[ "$wifivariant" = "wms-lanjutkan" ]] || [[ "$wifivariant" = "wifi.id-lanjutkan" ]] || [[ "$wifivariant" = "pegadaian" ]]; then
-		# Jalankan fungsi wplanjutkan untuk mencari nilai username dan password
-		wplanjutkan
-	fi
+			;;
+		"starwifi")
+			# Jika starwifi, maka:
+			username2="$username.starwifi@event"
+			;;
+		"sso" | "rumah-sakit" | "komunitas-generik")
+			# Jika SSO atau Rumah Sakit atau komunitas generik lainnya, maka:
+			username2="$username.vmgmt@wms.00000000.000"
+			;;
+		"wms-lanjutkan" | "wifi.id-lanjutkan" | "pegadaian")
+			# Jika "lanjutkan", maka:
+			# Jalankan fungsi wplanjutkan untuk mencari nilai username dan password
+			wplanjutkan
+			;;
+	esac
 }
 
 dataraw() {
-	# Jika digunakan untuk jaringan WMS atau WMS Lite, maka:
-	if [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "wms" ]] || [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "wms-lite" ]]; then
+	# Fungsi untuk menyesuaikan format identitas login berdasarkan hasil dari fungsi wificommunity di atas
+	
+	case "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" in
+	"wms" | "wms-lite")
+		# Jika digunakan untuk jaringan WMS atau WMS Lite, maka:
 		login_cred="username_=""$username2""&autologin_time=86000&username=""$username"".""$randomid""$username3""&password=""$password"""
-	# Jika digunakan untuk jaringan WICO, maka:
-	elif [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "wico" ]]; then
+		;;
+	"wico")
+		# Jika digunakan untuk jaringan WICO, maka:
 		login_cred="username_=""$username""&username=""$username2""&password=""$password"""
-	# Jika digunakan untuk jaringan "lanjutkan", maka:
-	elif [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "wms-lanjutkan" ]] || [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "wifi.id-lanjutkan" ]] || [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "pegadaian" ]]; then
+		;;
+	"wms-lanjutkan" | "wifi.id-lanjutkan" | "pegadaian")
+		# Jika digunakan untuk jaringan "lanjutkan", maka:
 		login_cred="username=""$username2""&password=""$password_lanjutkan""&autologin_time="
-	# Jika digunakan untuk jaringan lain, maka:
-	else
+		;;
+	*)
+		# Jika digunakan untuk jaringan lain, maka:
 		login_cred="username=""$username2""&password=""$password"""
-	fi
+		;;
+	esac
 }
 
 loadwelcomepage() {
