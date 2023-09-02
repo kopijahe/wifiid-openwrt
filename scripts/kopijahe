@@ -17,7 +17,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="2.5.9"
+	ver="2.6.0"
 }
 
 bantuan() {
@@ -286,22 +286,47 @@ detectwan() {
 
 detecturl() {
 	# Fungsi deteksi URL halaman login
+	detecturlcount=0
 	
-	# Deteksi URL login dengan cara melihat jawaban redirect dari halaman periksa koneksi
-	deteksi="$(curl -k -I --silent --interface "$wandevice" --max-redirs 1 --connect-timeout 10 "http://periksakoneksi.kopijahe.my.id/cek" | grep "Location")"
-	
-	# Jika gagal mendeteksi menggunakan teknik di atas, maka:
-	if [[ "$deteksi" = "" ]]; then
-		# Deteksi URL login dengan cara melihat URL landing di halaman redirect
-		urllanding="$(curl -k -I --silent --interface "$wandevice" --max-redirs 1 --connect-timeout 10 "http://periksakoneksi.kopijahe.my.id/cek" | grep URL | awk -F'[;]' '{print $2}' | head -c -3)"
-		deteksi=" Location: $urllanding"
-	fi
-	
-	# Jika masih saja gagal, maka:
-	if [[ "$deteksi" = "" ]]; then
-		urllanding="$(curl -k -I --silent --interface "$wandevice" --max-redirs 1 --connect-timeout 10 "http://periksakoneksi.kopijahe.my.id/cek" | grep URL | awk -F'[;]' '{print $2}' | head -c -3 | awk -F'[=]' '{print $2"="$3"="$4"="$5"="$6"="$7}')"
-		deteksi=" Location: $urllanding"
-	fi
+	# Lakukan pengulangan fungsi jika gagal
+	while [[ "$detecturlcount" -lt 2 ]]; do
+		
+		# Cek apakah sebelumnya gagal
+		if [[ "$deteksi" = "gagal" ]]; then
+			# Jika iya, maka:
+			# Tentukan URL deteksi
+			urldetect="http://8.8.8.8/"
+		else
+			# Jika tidak, maka:
+			# Tentukan URL deteksi
+			urldetect="http://periksakoneksi.kopijahe.my.id/cek"
+		fi
+		
+		# Deteksi URL login dengan cara melihat jawaban redirect dari halaman periksa koneksi
+		deteksi="$(curl -k -I --silent --interface "$wandevice" --max-redirs 1 --connect-timeout 10 "$urldetect" | grep "Location")"
+		
+		# Jika gagal mendeteksi menggunakan teknik di atas, maka:
+		if [[ "$deteksi" = "" ]]; then
+			# Deteksi URL login dengan cara melihat URL landing di halaman redirect
+			urllanding="$(curl -k -I --silent --interface "$wandevice" --max-redirs 1 --connect-timeout 10 "$urldetect" | grep URL | awk -F'[;]' '{print $2}' | head -c -3)"
+			deteksi=" Location: $urllanding"
+		fi
+		
+		# Jika masih saja gagal, maka:
+		if [[ "$deteksi" = "" ]]; then
+			urllanding="$(curl -k -I --silent --interface "$wandevice" --max-redirs 1 --connect-timeout 10 "$urldetect" | grep URL | awk -F'[;]' '{print $2}' | head -c -3 | awk -F'[=]' '{print $2"="$3"="$4"="$5"="$6"="$7}')"
+			deteksi=" Location: $urllanding"
+		fi
+		
+		# Jika ternyata masih saja gagal, maka:
+		if [[ "$deteksi" = "" ]]; then
+			# Nyatakan deteksi gagal
+			deteksi="gagal"
+			detecturlcount="$((detecturlcount+1))"
+		else
+			detecturlcount=2
+		fi
+	done
 }
 
 setup() {
@@ -350,7 +375,7 @@ setup() {
 	if [[ "$tipelogin" = "wms" ]]; then
 		url_landing="$(echo "$deteksi" | awk -F'[ ]' '{print $2}')"
 		# shellcheck disable=2020
-		wms_id="$(curl --resolve "welcome2.wifi.id:443:10.233.16.32,10.233.16.13" --resolve "welcome3.wifi.id:443:118.98.34.148" -k --silent -L --interface "$wandevice" "$url_landing" | grep makeId | awk -F'[.]' '{print $4}' | tr -dc "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\n" | awk '!a[$0]++')"
+		wms_id="$(curl --resolve "welcome2.wifi.id:443:10.233.16.32,10.233.16.13" --resolve "welcome3.wifi.id:443:118.98.34.148" -k --silent -L --interface "$wandevice" "$url_landing" | grep makeId | awk -F'[.]' '{print $4}' | tr -dc "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\n" | awk '!a[$0]++' | tr -d "\n")"
 		uci set kopijahe.@autologin["$multiautologinnum"].wmsid="$wms_id"
 	fi
 	
