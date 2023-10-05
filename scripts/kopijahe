@@ -17,7 +17,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="2.6.3"
+	ver="2.6.4"
 }
 
 bantuan() {
@@ -382,7 +382,7 @@ setup() {
 	# Jika digunakan di jaringan WMS, maka tentukan variabel wms_id
 	if [[ "$tipelogin" = "wms" ]]; then
 		# shellcheck disable=2020
-		wms_id="$(curl --resolve "welcome2.wifi.id:443:10.233.16.32,10.233.16.13" --resolve "welcome3.wifi.id:443:118.98.34.148" -k --silent -L --interface "$wandevice" "$urllanding" | grep makeId | awk -F'[.]' '{print $4}' | tr -dc "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\n" | awk '!a[$0]++' | tr -d "\n")"
+		wms_id="$(curl --resolve "welcome2.wifi.id:443:10.233.16.13" --resolve "welcome3.wifi.id:443:118.98.34.148" -k --silent -L --interface "$wandevice" "$urllanding" | grep makeId | awk -F'[.]' '{print $4}' | tr -dc "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\n" | awk '!a[$0]++' | tr -d "\n")"
 		uci set kopijahe.@autologin["$multiautologinnum"].wmsid="$wms_id"
 	fi
 	
@@ -827,6 +827,10 @@ curl_statuscodes() {
 			# Biasanya karena tanggal dan jam tidak sesuai
 			curl_status="Koneksi SSL/HTTPS ke server mengalami error"
 			;;
+		127)
+			# cURL belum terpasang
+			curl_status="cURL belum terpasang"
+			;;
 		*)
 			curl_status="Kode status tidak dikenali"
 			;;
@@ -1026,7 +1030,7 @@ loadwelcomepage() {
 	# Tentukan url welcome page
 	urllanding="https://""$server_id""/""$tipelogin""/?gw_id=""$gwid""&client_mac=""$clientmac""&wlan=""$wlanid""&sessionid=""$session_id"""
 	# Unduh halaman welcome page
-	wp="$(curl --resolve "welcome2.wifi.id:443:10.233.16.32,10.233.16.13" --resolve "welcome3.wifi.id:443:118.98.34.148" --silent --interface "$wandevice" --retry 1 --connect-timeout 10 "$curladditionalparameter" "$urllanding")"
+	wp="$(curl --resolve "welcome2.wifi.id:443:10.233.16.13" --resolve "welcome3.wifi.id:443:118.98.34.148" --silent --interface "$wandevice" --retry 1 --connect-timeout 10 "$curladditionalparameter" "$urllanding")"
 	
 	# Jika digunakan di jaringan WMS
 	if [[ "$wifivariant" = "wms" ]] || [[ "$wifivariant" = "wms-lite" ]] || [[ "$wifivariant" = "wms-lanjutkan" ]]; then
@@ -1103,7 +1107,7 @@ logout_wifi() {
 	curl_additionalparameter
 	
 	# Lakukan logout sesuai dengan parameter konfigurasi autologin
-	attempt="$(curl --resolve "welcome2.wifi.id:443:10.233.16.32,10.233.16.13" --resolve "welcome3.wifi.id:443:118.98.34.148" --silent --interface "$wandevice" "$curladditionalparameter" """https://$server_id/authnew/logout/logoutx.php""" \
+	attempt="$(curl --resolve "welcome2.wifi.id:443:10.233.16.13" --resolve "welcome3.wifi.id:443:118.98.34.148" --silent --interface "$wandevice" "$curladditionalparameter" """https://$server_id/authnew/logout/logoutx.php""" \
 	-H "accept: application/json, text/javascript, */*; q=0.01" \
 	-H "accept-language: en-US,en;q=0.9,id;q=0.8" \
 	-H "connection: keep-alive" \
@@ -1149,7 +1153,7 @@ login_wifi() {
 	
 	# Lakukan login sesuai dengan parameter konfigurasi autologin
 	if [[ "$loginfromfile" != "true" ]]; then
-		attempt="$(curl --resolve "welcome2.wifi.id:443:10.233.16.32,10.233.16.13" --resolve "welcome3.wifi.id:443:118.98.34.148" --silent --interface "$wandevice" "$curladditionalparameter" """$loginurl""?ipc=""$iprouter""&gw_id=""$gwid""&client_mac=""$clientmac""&redirect=&wlan=""$wlanid""&load_wp=""$loadwp_value""" \
+		attempt="$(curl --resolve "welcome2.wifi.id:443:10.233.16.13" --resolve "welcome3.wifi.id:443:118.98.34.148" --silent --interface "$wandevice" "$curladditionalparameter" """$loginurl""?ipc=""$iprouter""&gw_id=""$gwid""&client_mac=""$clientmac""&redirect=&wlan=""$wlanid""&load_wp=""$loadwp_value""" \
 		-H "accept: application/json, text/javascript, */*; q=0.01" \
 		-H "accept-language: en-US,en;q=0.9,id;q=0.8" \
 		-H "connection: keep-alive" \
