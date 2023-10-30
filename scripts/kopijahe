@@ -17,7 +17,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="2.6.4"
+	ver="2.6.5"
 }
 
 bantuan() {
@@ -869,7 +869,7 @@ login_folder() {
 			else
 				# Jika digunakan di varian jaringan wms dan wms lite, maka:
 				# Tentukan wms_url
-				wms_url="$(echo "$wp" | grep url | awk -F'[:]' '{print $2}' | awk -F'[?]' '{print $1}' | sed s/\'//g | sed s/\ //g | head -n 1)"
+				wms_url="$(echo "$wp" | grep "url:" | awk -F'[:]' '{print $2}' | awk -F'[?]' '{print $1}' | sed s/\'//g | sed s/\ //g | head -n 1)"
 				# Tentukan URL login yang sesuai dengan hasil dari wms_url
 				loginurl="https://$server_id/$tipelogin/$wms_url"
 				if [[ "$loginurl" = "https://$server_id/$tipelogin/" ]] || [[ "$loginurl" = "" ]] || [[ "$wms_url" = "" ]] || [[ "$wms_url" = "//welcome2.wifi.id/wms/" ]]; then
@@ -1030,17 +1030,19 @@ loadwelcomepage() {
 	# Tentukan url welcome page
 	urllanding="https://""$server_id""/""$tipelogin""/?gw_id=""$gwid""&client_mac=""$clientmac""&wlan=""$wlanid""&sessionid=""$session_id"""
 	# Unduh halaman welcome page
-	wp="$(curl --resolve "welcome2.wifi.id:443:10.233.16.13" --resolve "welcome3.wifi.id:443:118.98.34.148" --silent --interface "$wandevice" --retry 1 --connect-timeout 10 "$curladditionalparameter" "$urllanding")"
+	wp="$(curl --resolve "welcome2.wifi.id:443:10.233.16.13" --resolve "welcome3.wifi.id:443:118.98.34.148" --silent --interface "$wandevice" --retry 1 --connect-timeout 10 -c - "$curladditionalparameter" "$urllanding")"
 	
 	# Jika digunakan di jaringan WMS
 	if [[ "$wifivariant" = "wms" ]] || [[ "$wifivariant" = "wms-lite" ]] || [[ "$wifivariant" = "wms-lanjutkan" ]]; then
 		# Maka  kosongi nilai "loadwp"
 		loadwp_value=""
+		loadwp_defaultwifi="$(echo "$wp" | grep default_wifi | awk -F'[\t]'  '{print $7}')"
 	else
 		# Jika tidak, maka:
 		# Cari dan kalkulasi nilai parameter "load_wp"
 		loadwp_value="$(echo "$wp" | grep load_time | awk -F'[=]' '{print $2}' | sed s/\'//g | sed s/\"//g | head -n 1 | awk -F '[*]' '{print $1*10000}')"
-		loadwp_token="$(echo "$wp" | grep token_wp_login | awk -F'[=]' '{print $4}' | sed s/\"//g | sed s/\>//g | head -n 1)"
+		loadwp_token="$(echo "$wp" | grep csrf_token_wp | awk -F'[\t]'  '{print $7}')"
+		loadwp_defaultwifi="$(echo "$wp" | grep default_wifi | awk -F'[\t]'  '{print $7}')"
 	fi
 }
 
@@ -1072,13 +1074,13 @@ hasil_loginout() {
 	# Jika digunakan di mode lanjutan, maka:
 	if [[ "$advancedmode" = "true" ]]; then
 		# Beritahu pengguna melalui layar terminal/stdout
-		echo "Percobaan $function. Interface: $waninterface. Hasil: $loginout"
+		echo "Percobaan $function. Interface: $waninterface. Jawaban server: $loginout"
 		# Simpan juga hasilnya di berkas "/tmp/last.login.$waninterface" dan beritahu pengguna melalui System Log
-		echo "Percobaan $function. Interface: $waninterface. Hasil: $loginout" | tee -a "/tmp/last.login.$waninterface" | logger -t "kopijahe $ver"
+		echo "Percobaan $function. Interface: $waninterface. Jawaban server: $loginout" | tee -a "/tmp/last.login.$waninterface" | logger -t "kopijahe $ver"
 	# Jika tidak, maka:
 	else
 		# Simpan hasilnya di berkas "/tmp/last.login.$waninterface" dan beritahu pengguna melalui System Log
-		echo "Percobaan $function. Interface: $waninterface. Hasil: $loginout" | tee -a "/tmp/last.login.$waninterface" | logger -t "kopijahe $ver"
+		echo "Percobaan $function. Interface: $waninterface. Jawaban server: $loginout" | tee -a "/tmp/last.login.$waninterface" | logger -t "kopijahe $ver"
 	fi
 	
 	# Jika kode status hasil login tidak berhasil (bukan 0), maka:
@@ -1169,7 +1171,7 @@ login_wifi() {
 		-H "origin: https://""$server_id""" \
 		-H "sec-ch-ua-mobile: ?0" \
 		-H "sec-ch-ua-platform: Windows" \
-		-H "Cookie: csrf_token_wp=""$loadwp_token""" \
+		-H "Cookie: csrf_token_wp=$loadwp_token; default_wifi=$loadwp_defaultwifi" \
 		-H "referer: https://""$server_id""/""$tipelogin""/?gw_id=""$gwid""&client_mac=""$clientmac""&wlan=""$wlanid""&sessionid=""$session_id""" \
 		--data-raw "$login_cred")"
 	else
