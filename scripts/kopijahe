@@ -17,7 +17,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="2.6.6"
+	ver="2.6.7"
 }
 
 bantuan() {
@@ -1040,7 +1040,7 @@ loadwelcomepage() {
 	# Tentukan url welcome page
 	urllanding="https://""$server_id""/""$tipelogin""/?gw_id=""$gwid""&client_mac=""$clientmac""&wlan=""$wlanid""&sessionid=""$session_id"""
 	# Unduh halaman welcome page
-	wp="$(curl --resolve "welcome2.wifi.id:443:10.233.16.13" --resolve "welcome3.wifi.id:443:118.98.34.148" --silent --interface "$wandevice" --retry 1 --connect-timeout 10 -c - "$curladditionalparameter" "$urllanding")"
+	wp="$(curl --resolve "welcome2.wifi.id:443:10.233.16.13" --resolve "welcome3.wifi.id:443:118.98.34.148" --silent --interface "$wandevice" --retry 1 --connect-timeout 1 -c - "$curladditionalparameter" "$urllanding")"
 	
 	# Jika digunakan di jaringan WMS
 	if [[ "$wifivariant" = "wms" ]] || [[ "$wifivariant" = "wms-lite" ]] || [[ "$wifivariant" = "wms-lanjutkan" ]]; then
