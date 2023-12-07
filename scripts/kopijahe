@@ -17,7 +17,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="2.6.7"
+	ver="2.6.8"
 }
 
 bantuan() {
@@ -416,13 +416,25 @@ loginblock() {
 	fi
 	
 	# Jika di dalam berkas ditemukan hasil "Silahkan lakukan koneksi kembali", maka:
-	if [[ "$(grep -o "Silahkan lakukan koneksi kembali" "/tmp/last.login.$waninterface")" = "Gagal Login" ]]; then
+	if [[ "$(grep -o "Silahkan lakukan koneksi kembali" "/tmp/last.login.$waninterface")" = "Silahkan lakukan koneksi kembali" ]]; then
 		# Tentukan bahwa login diblokir
 		needsessionidrefresh="yes"
 	# Jika tidak ditemukan, maka:
 	else
 		# Tentukan bahwa login tidak diblokir
 		needsessionidrefresh="no"
+	fi
+	
+	# Jika di dalam berkas ditemukan hasil "Login gagal, SSID wifi yang dipilih tidak sesuai", maka:
+	if [[ "$(grep -o "Login gagal, SSID wifi yang dipilih tidak sesuai" "/tmp/last.login.$waninterface")" = "Login gagal, SSID wifi yang dipilih tidak sesuai" ]]; then
+		# Tentukan bahwa login diblokir
+		needsessionidrefresh="yes"
+		needgwidrefresh="yes"
+	# Jika tidak ditemukan, maka:
+	else
+		# Tentukan bahwa login tidak diblokir
+		needsessionidrefresh="no"
+		needgwidrefresh="no"
 	fi
 }
 
@@ -1070,13 +1082,47 @@ loadsessionid() {
 		else
 			session_id="$(echo "$deteksi" | awk -F'[=&]' '{print $8}' | tr -dc "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-")"
 		fi
-		# Dan simpan nilainya
-		uci set kopijahe.@autologin["$multiautologinnum"].sessionid="$session_id"
-		uci commit kopijahe
+		# Dan simpan nilainya, jika bukan kosong
+		if [[ "$session_id" != "" ]]; then
+			uci set kopijahe.@autologin["$multiautologinnum"].sessionid="$session_id"
+			uci commit kopijahe
+			needsessionidrefresh="no"
+		else
+			# Jika tidak, maka:
+			# Gunakan nilai session_id yang sudah tersimpan
+			session_id="$(uci -q get kopijahe.@autologin["$multiautologinnum"].sessionid)"
+		fi
 	else
 		# Jika tidak, maka:
 		# Gunakan nilai session_id yang sudah tersimpan
 		session_id="$(uci -q get kopijahe.@autologin["$multiautologinnum"].sessionid)"
+	fi
+}
+
+loadgwid() {
+	# Fungsi memperbarui gwid (jika diperlukan)
+	
+	# Cek apakah ada tanda perlu memperbarui gwid
+	if [[ "$needgwidrefresh" = "yes" ]]; then
+		# Jika iya, maka:
+		# Lalukan deteksi ulang
+		detecturl
+		# Ambil nilai gwid saja
+		gwid="$(echo "$deteksi" | awk -F'[=&]' '{print $2}')"
+		# Dan simpan nilainya, jika bukan kosong:
+		if [[ "$gwid" != "" ]]; then
+			uci set kopijahe.@autologin["$multiautologinnum"].gwid="$gwid"
+			uci commit kopijahe
+			needgwidrefresh="no"
+		else
+			# Jika tidak, maka:
+			# Gunakan nilai gwid yang sudah tersimpan
+			gwid="$(uci -q get kopijahe.@autologin["$multiautologinnum"].gwid)"
+		fi
+	else
+		# Jika tidak, maka:
+		# Gunakan nilai gwid yang sudah tersimpan
+		gwid="$(uci -q get kopijahe.@autologin["$multiautologinnum"].gwid)"
 	fi
 }
 
@@ -1176,11 +1222,11 @@ login_wifi() {
 	username2="$(echo "$username" | awk -F'[@]' '{print $1}')"
 	password="$(uci -q get kopijahe.@autologin["$multiautologinnum"].password)"
 	tipelogin="$(uci -q get kopijahe.@autologin["$multiautologinnum"].tipelogin)"
-	gwid="$(uci -q get kopijahe.@autologin["$multiautologinnum"].gwid)"
 	wlanid="$(uci -q get kopijahe.@autologin["$multiautologinnum"].wlanid)"
 	wifivariant="$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)"
 	server_id="$(uci -q get kopijahe.@autologin["$multiautologinnum"].serverid)"
 	loadsessionid
+	loadgwid
 	loadwelcomepage
 	login_folder
 	wificommunity
@@ -1551,6 +1597,21 @@ while [[ "$advancedmode" = "" ]]; do
 			fi
 			# Istirahat sebelum mencoba kembali
 			sleep "$sleeptime"
+		# Jika berkali-kali gagal sehingga diblokir, maka
+		elif [[ "$loginout" = "Login Gagal [Silahkan coba kembali setelah 10 menit (10)]" ]]; then
+			# Coba logout terlebih dahulu
+			logout_wifi
+			# Lalu minta penggantian alamat IP
+			releaseobtainnewip
+			# Lalu coba login kembali
+			login_wifi
+			# Jika masih gagal, maka tunggu 10 menit
+			if [[ "$loginout" = "Login Gagal [Silahkan coba kembali setelah 10 menit (10)]" ]]; then
+				sleep "600"
+			else
+				# Istirahat sebelum mencoba kembali
+				sleep "$sleeptime"
+			fi
 		# Jika login sebelumnya tidak diblokir, maka:
 		else
 			login_wifi
