@@ -17,7 +17,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="2.6.9"
+	ver="2.7.0"
 }
 
 bantuan() {
@@ -982,7 +982,7 @@ wificommunity() {
 		"wifi.id" | "@wifi.id" | "wifiid")
 			# Jika wifi.id, maka:
 			# Periksa apakah akun yang digunakan adalah akun violet*/giga.wigo/boingo/sooltan.id, jika iya, maka:
-			if [[ "$(echo "$username" | awk -F'[@]' '{print $2}')" = "violet" ]] ||  [[ "$(echo "$username" | awk -F'[@]' '{print $2}')" = "violet.unp" ]] ||  [[ "$(echo "$username" | awk -F'[@]' '{print $2}')" = "violet.unm" ]] ||  [[ "$(echo "$username" | awk -F'[@]' '{print $2}')" = "violet.ugm" ]] ||  [[ "$(echo "$username" | awk -F'[@]' '{print $2}')" = "violet.unpatti" ]] ||  [[ "$(echo "$username" | awk -F'[@]' '{print $2}')" = "violet.uho" ]] ||  [[ "$(echo "$username" | awk -F'[@]' '{print $2}')" = "violet.gamer" ]] ||  [[ "$(echo "$username" | awk -F'[@]' '{print $2}')" = "giga.wigo" ]] ||  [[ "$(echo "$username" | awk -F'[@]' '{print $2}')" = "mb.boingo.com" ]] ||  [[ "$(echo "$username" | awk -F'[@]' '{print $2}')" = "boingo.com" ]] ||  [[ "$(echo "$username" | awk -F'[@]' '{print $2}')" = "sooltan.id" ]]; then
+			if [[ "$(echo "$username" | awk -F'[@]' '{print $2}')" = "violet" ]] ||  [[ "$(echo "$username" | awk -F'[@]' '{print $2}')" = "violet.unp" ]] ||  [[ "$(echo "$username" | awk -F'[@]' '{print $2}')" = "violet.unm" ]] ||  [[ "$(echo "$username" | awk -F'[@]' '{print $2}')" = "violet.ugm" ]] ||  [[ "$(echo "$username" | awk -F'[@]' '{print $2}')" = "violet.unpatti" ]] ||  [[ "$(echo "$username" | awk -F'[@]' '{print $2}')" = "violet.uho" ]] ||  [[ "$(echo "$username" | awk -F'[@]' '{print $2}')" = "violet.gamer" ]] ||  [[ "$(echo "$username" | awk -F'[@]' '{print $2}')" = "violet.on" ]] ||  [[ "$(echo "$username" | awk -F'[@]' '{print $2}')" = "giga.wigo" ]] ||  [[ "$(echo "$username" | awk -F'[@]' '{print $2}')" = "mb.boingo.com" ]] ||  [[ "$(echo "$username" | awk -F'[@]' '{print $2}')" = "boingo.com" ]] ||  [[ "$(echo "$username" | awk -F'[@]' '{print $2}')" = "sooltan.id" ]]; then
 				# Tidak perlu diberi tambahan akhiran
 				username2="$username"
 			else
