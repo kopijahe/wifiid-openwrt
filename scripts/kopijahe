@@ -17,7 +17,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="2.7.0"
+	ver="2.7.1"
 }
 
 bantuan() {
@@ -269,6 +269,34 @@ generaterandomhostname() {
 	randomhostname="true"
 }
 
+generaterandommac() {
+	# Dapatkan konfigurasi perangkat dari berkas konfigurasi
+	waninterface="$(uci -q get kopijahe.@autologin["$multiautologinnum"].waninterface)"
+	wandevice="$(ifstatus "$waninterface" | jsonfilter -e '@["device"]')"
+	# Dapatkan konfigurasi MAC address saat ini
+	wanmac="$(ifconfig "$wandevice" | grep "HWaddr" | awk '{print$5}')"
+	# Buat 2 karakter acak
+	randommac="$(head -2 /dev/urandom | tr -dc "0123456789ABCDEF" | head -c2)"
+	# Potong 2 karakter akhir di MAC lama, dan masukkan 2 karakter baru yang dibuat di atas
+	# shellcheck disable=2116
+	# shellcheck disable=3057
+	newwanmac="$(echo "${wanmac::-2}""$randommac")"
+	
+	# Matikan interface terlebih dahulu
+	ifconfig "$wandevice" down
+	# Ganti MAC address lama dengan yang baru
+	ifconfig "$wandevice" hw ether "$newwanmac"
+	# Simpan MAC baru di pengaturan autologin
+	uci set kopijahe.@autologin["$multiautologinnum"].clientmac="$newwanmac"
+	uci commit kopijahe
+	# Simpan MAC baru di pengaturan wireless
+	wifinetx="$(uci show wireless | grep -w "$waninterface" | awk -F'[.]' '{print $2}')"
+	uci set wireless."$wifinetx".macaddr="$newwanmac"
+	uci commit wireless
+	# Hidupkan kembali interface
+	ifconfig "$wandevice" up
+}
+
 detectwan() {
 	# Deteksi perangkat jaringan WAN yang akan digunakan untuk login
 	# Cek terlebih dahulu apakah menggunakan load-balance atau tidak, jika iya, maka:
@@ -425,11 +453,21 @@ loginblock() {
 		needsessionidrefresh="no"
 	fi
 	
-	# Jika di dalam berkas ditemukan hasil "Login gagal, SSID wifi yang dipilih tidak sesuai", maka:
-	if [[ "$(grep -o "Login gagal, SSID wifi yang dipilih tidak sesuai" "/tmp/last.login.$waninterface")" = "Login gagal, SSID wifi yang dipilih tidak sesuai" ]]; then
+	# Jika di dalam berkas ditemukan hasil "Login gagal, SSID wifi yang dipilih tidak sesuai", dan sebelumnya sudah pernah gagal, maka:
+	if [[ "$needmacrefresh" = "yes" ]] && [[ "$(grep -o "Login gagal, SSID wifi yang dipilih tidak sesuai" "/tmp/last.login.$waninterface")" = "Login gagal, SSID wifi yang dipilih tidak sesuai" ]]; then
+		# Coba ganti akhiran MAC address dengan yang baru
+		generaterandommac
+		# Reset variabel, supaya tidak terjadi pengulangan
+		needmacrefresh=""
 		# Tentukan bahwa perlu refresh session_id dan gw_id
 		needsessionidrefresh="yes"
 		needgwidrefresh="yes"
+	# Jika di dalam berkas ditemukan hasil "Login gagal, SSID wifi yang dipilih tidak sesuai", maka:
+	elif [[ "$(grep -o "Login gagal, SSID wifi yang dipilih tidak sesuai" "/tmp/last.login.$waninterface")" = "Login gagal, SSID wifi yang dipilih tidak sesuai" ]]; then
+		# Tentukan bahwa perlu refresh session_id, gw_id, dan MAC address
+		needsessionidrefresh="yes"
+		needgwidrefresh="yes"
+		needmacrefresh="yes"
 	# Jika tidak ditemukan, maka:
 	else
 		# Tentukan bahwa tidak perlu refresh session_id dan gw_id
