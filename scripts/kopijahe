@@ -17,7 +17,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="2.7.1"
+	ver="2.7.2"
 }
 
 bantuan() {
@@ -984,6 +984,10 @@ wificommunity() {
 					# Akun Adibuana mengikuti format komunitas generik
 					username2="$username@$cfgkampus.vmgmt@wms.00000000.000"
 					;;
+				"ecampus.id")
+					# Akun ecampus.id mengikuti format komunitas generik
+					username2="$username@$cfgkampus.vmgmt@wms.00000000.000"
+					;;
 				*)
 					# Selain itu, gunakan format standard
 					# Termasuk akun kampus dengan akhiran: "@itdel", "@polije", "@umaha", "@unej", "@unsiq"
@@ -1487,7 +1491,7 @@ do
 				exit 1
 			fi
 			if [[ "$wifivariant" = "kampus" ]]; then
-				echo "Silahkan masukkan nama kampus anda (misal: \"ut.ac.id\", \"unsiq\", \"trisakti\", \"adibuana\")"
+				echo "Silahkan masukkan nama kampus anda (misal: \"ut.ac.id\", \"unsiq\", \"trisakti\", \"adibuana\", \"ecampus.id\")"
 				read -r kampus
 				kampus="$(echo "$kampus" | tr -dc "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.")"
 				uci set kopijahe.@autologin["$multiautologinnum"].kampus="$kampus"
