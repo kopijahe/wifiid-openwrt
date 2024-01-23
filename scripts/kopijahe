@@ -17,7 +17,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="2.7.2"
+	ver="2.7.3"
 }
 
 bantuan() {
@@ -463,7 +463,7 @@ loginblock() {
 		needsessionidrefresh="yes"
 		needgwidrefresh="yes"
 	# Jika di dalam berkas ditemukan hasil "Login gagal, SSID wifi yang dipilih tidak sesuai", maka:
-	elif [[ "$(grep -o "Login gagal, SSID wifi yang dipilih tidak sesuai" "/tmp/last.login.$waninterface")" = "Login gagal, SSID wifi yang dipilih tidak sesuai" ]]; then
+	elif [[ "$(grep -o "Login gagal, SSID wifi yang dipilih tidak sesuai" "/tmp/last.login.$waninterface")" = "Login gagal, SSID wifi yang dipilih tidak sesuai" ]] || [[ "$(grep -o "Login Gagal Limit (Masukkan Username dan Password Anda)" "/tmp/last.login.$waninterface")" = "Login Gagal Limit (Masukkan Username dan Password Anda)" ]]; then
 		# Tentukan bahwa perlu refresh session_id, gw_id, dan MAC address
 		needsessionidrefresh="yes"
 		needgwidrefresh="yes"
