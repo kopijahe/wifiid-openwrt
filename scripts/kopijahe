@@ -17,7 +17,7 @@ touch /etc/config/kopijahe
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="2.7.7"
+	ver="2.7.8"
 }
 
 bantuan() {
@@ -1634,7 +1634,7 @@ while [[ "$advancedmode" = "" ]]; do
 			# Istirahat sebelum mencoba kembali
 			sleep "$sleeptime"
 		# Jika status SSID tidak sesuai padahal sebenarnya sudah sesuai di jaringan WMS, maka:
-		elif [[ "$loginout" = "Login Gagal (SSID Tidak Sesuai)" ]] && [[ "$wifivariant" = "wms" ]]; then
+		elif [[ "$loginout" = "Login Gagal (SSID Tidak Sesuai)" ]] && [[ "$wifivariant" = "wms" ]] || [[ "$wifivariant" = "wms-lite" ]]; then
 			# Coba logout terlebih dahulu
 			logout_wifi
 			# Lalu minta penggantian alamat IP
