@@ -11,13 +11,16 @@
 # Buat berkas baru untuk menyimpan konfigurasi autologin
 touch /etc/config/kopijahe
 
+# Cek apakah perangkat tidak punya MAC tetap
+detectrandommac="$(dmesg | grep 'generated random MAC address')"
+
 # variabel advancedmode="true" adalah penanda agar
 # fungsi loop autologin tidak dijalankan
 
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="2.7.8"
+	ver="2.7.9"
 }
 
 bantuan() {
@@ -444,7 +447,7 @@ loginblock() {
 	fi
 	
 	# Jika di dalam berkas ditemukan hasil "Silahkan lakukan koneksi kembali", maka:
-	if [[ "$(grep -o "Silahkan lakukan koneksi kembali" "/tmp/last.login.$waninterface")" = "Silahkan lakukan koneksi kembali" ]] || [[ "$(grep -o "No Session found" "/tmp/last.login.$waninterface")" = "No Session found" ]]; then
+	if [[ "$(grep -o "Login Gagal [Silahkan lakukan koneksi kembali]" "/tmp/last.login.$waninterface")" = "Login Gagal [Silahkan lakukan koneksi kembali]" ]] || [[ "$(grep -o "No Session found" "/tmp/last.login.$waninterface")" = "No Session found" ]]; then
 		# Tentukan bahwa perlu refresh session_id
 		needsessionidrefresh="yes"
 	# Jika tidak ditemukan, maka:
@@ -1539,16 +1542,13 @@ do
 	esac
 done
 
-# Cek versi sistem operasi terlebih dahulu
-osversioncheck
-# Cek apakah perangkat tidak punya MAC tetap
-detectrandommac="$(dmesg | grep 'generated random MAC address')"
-
 # Fungsi autologin
 # Deteksi apakah variabel advancedmode hidup, jika tidak, maka lakukan autologin:
 while [[ "$advancedmode" = "" ]]; do
 	# Cek nomor pengaturan terlebih dahulu
 	multiautologin
+	# Cek versi sistem operasi
+	osversioncheck
 	# Deteksi antarmuka jaringan yang dipakai
 	detectwan
 	# Cek kondisi antarmuka jaringan yang dipakai
