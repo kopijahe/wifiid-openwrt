@@ -20,7 +20,7 @@ detectrandommac="$(dmesg | grep 'generated random MAC address')"
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="2.7.9"
+	ver="2.8.0"
 }
 
 bantuan() {
@@ -1629,6 +1629,14 @@ while [[ "$advancedmode" = "" ]]; do
 		elif [[ "$loginout" = "Gagal Login (User Anda Sedang Aktif)" ]]; then
 			# Coba logout terlebih dahulu
 			logout_wifi
+			# Lalu coba login kembali
+			login_wifi
+			# Istirahat sebelum mencoba kembali
+			sleep "$sleeptime"
+		# Jika Login gagal dan untuk melakukan koneksi kembali di jaringan WMS, maka:
+		elif [[ "$loginout" = "Login Gagal [Silahkan lakukan koneksi kembali]" ]] && [[ "$wifivariant" = "wms" ]] || [[ "$wifivariant" = "wms-lite" ]]; then
+			# Tentukan bahwa perlu refresh session_id
+			needsessionidrefresh="yes"
 			# Lalu coba login kembali
 			login_wifi
 			# Istirahat sebelum mencoba kembali
