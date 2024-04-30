@@ -20,7 +20,7 @@ detectrandommac="$(dmesg | grep 'generated random MAC address')"
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="2.8.1"
+	ver="2.8.2"
 }
 
 bantuan() {
@@ -1434,8 +1434,8 @@ status_parser() {
 			# Istirahat sebelum mengecek kembali
 			sleep "$sleeptime"
 			;;
-		# Jika status login gagal karena SSID tidak sesuai di jaringan WMS atau terkena limit login, maka:
-		"Login Gagal (SSID Tidak Sesuai):wms"|"Login Gagal (SSID Tidak Sesuai):wms-lite"|"Login Gagal Limit (Masukkan Username dan Password Anda):"*)
+		# Jika status login gagal karena SSID tidak sesuai atau terkena limit login, maka:
+		"Login Gagal (SSID Tidak Sesuai):wms"|"Login Gagal (SSID Tidak Sesuai):wms-lite"|"Login gagal, SSID wifi yang dipilih tidak sesuai:"*|"Login Gagal Limit (Masukkan Username dan Password Anda):"*)
 			# Coba logout terlebih dahulu
 			logout_wifi
 			# Buat MAC address baru
