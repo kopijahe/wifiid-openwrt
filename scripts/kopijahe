@@ -20,7 +20,7 @@ detectrandommac="$(dmesg | grep 'generated random MAC address')"
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="2.8.3"
+	ver="2.8.4"
 }
 
 bantuan() {
@@ -1163,26 +1163,45 @@ hasil_loginout() {
 		loginout="$(echo "$attempt" | awk 'END{print}' | jsonfilter -e '@["message"]' 2> /dev/null)"
 	fi
 
-	# Jika variabel hasil kosong, maka login tidak berhasil
-	# Cek apakah mode bypass (parameter -z) hidup, jika tidak, maka:
-	if [[ "$loginout" = "" ]] && [[ "$bypassmode" = "" ]]; then
-		# Laporkan hasil login tidak berhasil, berikut kode status CURL untuk halaman login/landing dan percobaan login
-		loginout="$function tidak berhasil, kode status CURL: $kodestatuslanding & $kodestatus"
-	elif [[ "$loginout" = "" ]] && [[ "$bypassmode" = "true" ]]; then
-		# Laporkan hasil login tidak berhasil, berikut kode status CURL untuk percobaan login
-		loginout="$function tidak berhasil, kode status CURL: $kodestatus"
-	fi
+	# Cek apakah mode bypass (parameter -z) hidup atau tidak:
+	case "$bypassmode" in
+    "") # Jika mode bypass tidak aktif
+        case "$loginout" in
+            "") # Jika variabel hasil kosong
+                # Laporkan hasil login tidak berhasil, berikut kode status CURL untuk halaman login/landing dan percobaan login
+                loginout="$function tidak berhasil, kode status CURL: $kodestatuslanding & $kodestatus"
+                ;;
+            *) # Jika variabel hasil tidak kosong
+                # Laporkan jawaban dari server
+                loginout="Jawaban server: $loginout"
+                ;;
+        esac
+        ;;
+    "true") # Jika mode bypass aktif
+        case "$loginout" in
+            "") # Jika variabel hasil kosong
+                # Laporkan hasil login tidak berhasil, berikut kode status CURL untuk percobaan login
+                loginout="$function tidak berhasil, kode status CURL: $kodestatus"
+                ;;
+            *) # Jika variabel hasil tidak kosong
+                # Laporkan jawaban dari server, berikut kode status CURL untuk percobaan login
+                loginout="Jawaban dari server: $loginout"
+                ;;
+        esac
+        ;;
+	esac
+	
 	
 	# Jika digunakan di mode lanjutan, maka:
 	if [[ "$advancedmode" = "true" ]]; then
 		# Beritahu pengguna melalui layar terminal/stdout
-		echo "Percobaan $function. Interface: $waninterface. Jawaban server: $loginout"
+		echo "Percobaan $function. Interface: $waninterface. $loginout"
 		# Simpan juga hasilnya di berkas "/tmp/last.login.$waninterface" dan beritahu pengguna melalui System Log
-		echo "Percobaan $function. Interface: $waninterface. Jawaban server: $loginout" | tee -a "/tmp/last.login.$waninterface" | logger -t "kopijahe $ver"
+		echo "Percobaan $function. Interface: $waninterface. $loginout" | tee -a "/tmp/last.login.$waninterface" | logger -t "kopijahe $ver"
 	# Jika tidak, maka:
 	else
 		# Simpan hasilnya di berkas "/tmp/last.login.$waninterface" dan beritahu pengguna melalui System Log
-		echo "Percobaan $function. Interface: $waninterface. Jawaban server: $loginout" | tee -a "/tmp/last.login.$waninterface" | logger -t "kopijahe $ver"
+		echo "Percobaan $function. Interface: $waninterface. $loginout" | tee -a "/tmp/last.login.$waninterface" | logger -t "kopijahe $ver"
 	fi
 	
 	# Jika kode status hasil login tidak berhasil (bukan 0), maka:
