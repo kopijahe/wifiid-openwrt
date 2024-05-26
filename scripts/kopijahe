@@ -20,7 +20,7 @@ detectrandommac="$(dmesg | grep 'generated random MAC address')"
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="2.8.2"
+	ver="2.8.3"
 }
 
 bantuan() {
@@ -1397,20 +1397,14 @@ status_parser() {
 
 	# Cek status kode cURL
 	case "$kodestatus:$kodestatuslanding" in
-		# Jika terdeteksi cURL 0 & 7, maka:
-		"0:7")
+		# Jika terdeteksi error cURL berikut, maka:
+		"6:7"|"0:7"|"28:7"|"28:28"|"28:1"|"45:"*|"7:"*)
 			# Coba refresh interface terlebih dahulu
 			refreshinterface
 			# Tunggu selama 3 detik sebelum lanjut
 			sleep 3
 			# Lakukan login, lalu langsung cek status kembali
 			login_wifi
-			;;
-		"6:7"|"28:28"|"28:1"|"45:"*|"7:"*)
-			# Coba refresh interface terlebih dahulu
-			refreshinterface
-			# Istirahat sebelum mencoba kembali
-			sleep "$sleeptime"
 			;;
 	esac
 
@@ -1471,6 +1465,11 @@ status_parser() {
 				# Istirahat sebelum mencoba kembali
 				sleep "$sleeptime"
 			fi
+			;;
+		# Jika status login gagal dan digunakan di varian kampus, maka:
+		"Login Gagal []:kampus")
+			# Coba login kembali terlebih dahulu
+			login_wifi
 			;;
 		*)
 			login_wifi
