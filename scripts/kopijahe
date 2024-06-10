@@ -20,7 +20,7 @@ detectrandommac="$(dmesg | grep 'generated random MAC address')"
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="2.8.5"
+	ver="2.8.6"
 }
 
 bantuan() {
@@ -1204,7 +1204,7 @@ logout_wifi() {
 	curl_additionalparameter
 	
 	# Lakukan logout sesuai dengan parameter konfigurasi autologin
-	attempt="$($curladditionalparameter --resolve "welcome2.wifi.id:443:10.233.16.13" --resolve "welcome3.wifi.id:443:118.98.34.148" --silent --interface "$wandevice" """https://$server_id/authnew/logout/logoutx.php""" \
+	attempt="$($curladditionalparameter --resolve "welcome2.wifi.id:443:10.233.16.13" --resolve "welcome3.wifi.id:443:118.98.34.148" --silent --retry 1 --connect-timeout 3 --interface "$wandevice" """https://$server_id/authnew/logout/logoutx.php""" \
 	-H "accept: application/json, text/javascript, */*; q=0.01" \
 	-H "accept-language: en-US,en;q=0.9,id;q=0.8" \
 	-H "connection: keep-alive" \
@@ -1250,7 +1250,7 @@ login_wifi() {
 	
 	# Lakukan login sesuai dengan parameter konfigurasi autologin
 	if [[ "$loginfromfile" != "true" ]]; then
-		attempt="$($curladditionalparameter --resolve "welcome2.wifi.id:443:10.233.16.13" --resolve "welcome3.wifi.id:443:118.98.34.148" --silent --interface "$wandevice" """$loginurl""?ipc=""$iprouter""&gw_id=""$gwid""&client_mac=""$clientmac""&redirect=&wlan=""$wlanid""&load_wp=""$loadwp_value""" \
+		attempt="$($curladditionalparameter --resolve "welcome2.wifi.id:443:10.233.16.13" --resolve "welcome3.wifi.id:443:118.98.34.148" --silent --retry 1 --connect-timeout 3 --interface "$wandevice" """$loginurl""?ipc=""$iprouter""&gw_id=""$gwid""&client_mac=""$clientmac""&redirect=&wlan=""$wlanid""&load_wp=""$loadwp_value""" \
 		-H "accept: application/json, text/javascript, */*; q=0.01" \
 		-H "accept-language: en-US,en;q=0.9,id;q=0.8" \
 		-H "connection: keep-alive" \
@@ -1351,7 +1351,7 @@ status_parser() {
 	# Cek status kode cURL
 	case "$kodestatus:$kodestatuslanding" in
 		# Jika terdeteksi error cURL berikut, maka:
-		"6:7"|"0:7"|"28:7"|"28:28"|"28:1"|"45:"*|"7:"*)
+		"6:7"|"0:7"|"28:6"|"28:7"|"28:28"|"28:1"|"45:"*|"7:"*)
 			# Coba refresh interface terlebih dahulu
 			refreshinterface
 			# Tunggu selama 3 detik sebelum lanjut
