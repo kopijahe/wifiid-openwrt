@@ -20,7 +20,7 @@ detectrandommac="$(dmesg | grep 'generated random MAC address')"
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="2.8.7"
+	ver="2.8.8"
 }
 
 bantuan() {
@@ -153,7 +153,7 @@ mwan3check() {
 	fi
 	
 	# Cek apakah mwan3 berjalan di sistem
-	checkmwan3status="$(/etc/init.d/mwan3 status)"
+	checkmwan3status="$(/etc/init.d/mwan3 status 2> /dev/null)"
 	if [[ "$checkmwan3status" != "running" ]]; then
 		# Jika tidak, maka:
 		# set variabel checkmwan3 ke "no"
