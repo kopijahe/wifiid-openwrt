@@ -20,7 +20,7 @@ detectrandommac="$(dmesg | grep 'generated random MAC address')"
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="2.8.8"
+	ver="2.8.9"
 }
 
 bantuan() {
@@ -794,13 +794,35 @@ captiveportalcheck() {
 		# Beritahu pengguna bahwa CURL belum terpasang
 		echo "CURL belum terpasang" | logger -t "kopijahe $ver"
 		# Jika perangkat dalam keadaan terkoneksi ke internet, maka:
-		if [[ "$(ifstatus "$wandevice" | jsonfilter -e '@["up"]')" = "true" ]]; then
+		# cek status koneksi:
+		connection_status
+		if [[ "$statuskoneksi" = "terkoneksi" ]]; then
 			# Lakukan pembaruan daftar aplikasi
 			opkg update
 			# Lalu unduh dan instal CURL
-			opkg install curl
+			opkg install curl libcurl4
 		fi
 	fi
+}
+
+connection_status() {
+	 # Fitur pengecekan status koneksi
+	 statuskoneksi="$(ifstatus "$waninterface" | jsonfilter -e '@["up"]')"
+	 
+	case "$statuskoneksi" in
+		true)
+			statuskoneksi='terkoneksi'
+			;;
+		false)
+			statuskoneksi='tidak terkoneksi'
+			;;
+		*)
+			statuskoneksi='tidak diketahui'
+			;;
+	esac
+	
+	# Cek juga SSID yang digunakan
+	connection_ssid="$(echo "$wlanid" | awk -F '[:]' '{print $NF}')"
 }
 
 curl_statuscodes() {
@@ -1182,13 +1204,15 @@ hasil_loginout() {
 	if [[ "$function" = "login" ]] && [[ "$kodestatus" != "0" ]]; then
 		# Muat penjelasan kode cURL
 		curl_statuscodes
+		# Muat status koneksi
+		connection_status
 		# Beritahu pengguna bahwa lewat stdout dan System log jika melalui mode lanjutan
 		if [[ "$advancedmode" = "true" ]]; then
-			echo "$curl_status"
-			echo "$curl_status" | logger -t "kopijahe $ver"
+			echo "$curl_status. Status koneksi ke $connection_ssid: $statuskoneksi"
+			echo "$curl_status. Status koneksi ke $connection_ssid: $statuskoneksi" | logger -t "kopijahe $ver"
 		# Jika tidak, maka beritahu pengguna lewat System Log saja
 		else
-			echo "$curl_status" | logger -t "kopijahe $ver"
+			echo "$curl_status. Status koneksi ke $connection_ssid: $statuskoneksi" | logger -t "kopijahe $ver"
 		fi
 	fi
 }
