@@ -20,7 +20,7 @@ detectrandommac="$(dmesg | grep 'generated random MAC address')"
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="2.9.1"
+	ver="2.9.2"
 }
 
 bantuan() {
@@ -884,7 +884,7 @@ login_folder() {
 	# Fungsi penentuan folder dan url login
 	
 	case "$(uci -q get kopijahe.@autologin["$multiautologinnum"].tipelogin)" in
-		"login")
+		"login" | "home")
 			# Jika tipelogin wifi.id, maka:
 			loginurl="$(echo "$wp" | grep urlx | awk -F'[=]' '{print $2}' | awk -F'[?]' '{print $1}' | sed s/\'//g | sed s/\ //g | head -n 1)"
 			if [[ "$loginurl" = "https://$server_id/" ]] || [[ "$loginurl" = "" ]]; then
