@@ -20,7 +20,7 @@ detectrandommac="$(dmesg | grep 'generated random MAC address')"
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="2.9.2"
+	ver="2.9.3"
 }
 
 bantuan() {
@@ -1476,6 +1476,27 @@ status_parser() {
 					login_wifi
 					# Jika masih saja, maka:
 					if [[ "$loginout" = "Login Gagal [Radius Timeout.]" ]]; then
+						# Istirahat sebelum mencoba kembali
+						sleep "$sleeptime"
+					fi
+					;;
+				*)
+					login_wifi
+					# Istirahat sebelum mencoba kembali
+					sleep "$sleeptime"
+					;;
+			esac
+			;;
+		# Jika status login gagal karena username/password tidak benar dan digunakan di varian kampus unsiq dan ut, maka:
+		"Login Gagal (Masukkan Username dan Password dengan Benar):kampus")
+			case "$cfgkampus" in
+				"unsiq"|"ut.ac.id")
+					# Tentukan bahwa perlu refresh session_id
+					needsessionidrefresh="yes"
+					# Coba login kembali
+					login_wifi
+					# Jika masih saja, maka:
+					if [[ "$loginout" = "Login Gagal (Masukkan Username dan Password dengan Benar)" ]]; then
 						# Istirahat sebelum mencoba kembali
 						sleep "$sleeptime"
 					fi
