@@ -20,7 +20,7 @@ detectrandommac="$(dmesg | grep 'generated random MAC address')"
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="2.9.4"
+	ver="2.9.5"
 }
 
 bantuan() {
@@ -1415,7 +1415,7 @@ status_parser() {
 			sleep "$sleeptime"
 			;;
 		# Jika status login gagal karena SSID tidak sesuai atau terkena limit login, maka:
-		"Login Gagal (SSID Tidak Sesuai):wms"|"Login Gagal (SSID Tidak Sesuai):wms-lite"|"Login gagal, SSID wifi yang dipilih tidak sesuai:"*|"Login Gagal Limit (Masukkan Username dan Password Anda):"*|"Login Gagal [1]:pegadaian"|"Login Gagal (Masukkan Username dan Password Anda dengan Benar):"*)
+		"Login Gagal (SSID Tidak Sesuai):wms"|"Login Gagal (SSID Tidak Sesuai):wms-lite"|"Login gagal, SSID wifi yang dipilih tidak sesuai:"*|"Login Gagal Limit (Masukkan Username dan Password Anda):"*|"Login Gagal [1]:pegadaian")
 			# Coba logout terlebih dahulu
 			logout_wifi
 			# Buat MAC address baru
@@ -1507,6 +1507,38 @@ status_parser() {
 					sleep "$sleeptime"
 					;;
 			esac
+			;;
+		# Jika status login gagal karena username/password tidak benar dan digunakan di varian wms dan wms-lite, maka:
+		"Login Gagal (Masukkan Username dan Password Anda dengan Benar):wms"|"Login Gagal (Masukkan Username dan Password Anda dengan Benar):wms-lite")
+			# Lalukan deteksi ulang
+			detecturl
+			# Ambil nilai wlanid saja
+			wlanidcheck="$(echo "$deteksi" | awk -F'[=&]' '{print $6}')"
+			# Cek apakah wlanid berubah menjadi "__NOT__SET__"
+			if [[ "$wlanidcheck" = "__NOT__SET__" ]]; then
+				# Coba logout terlebih dahulu
+				logout_wifi
+				# Dapatkan IP baru
+				releaseobtainnewip
+				# Lalu lakukan login
+				login_wifi
+				# Jika masih saja, maka:
+				if [[ "$loginout" = "Login Gagal (Masukkan Username dan Password Anda dengan Benar)" ]]; then
+					# Coba logout terlebih dahulu
+					logout_wifi
+					# Buat MAC address baru
+					generaterandommac
+					# Tentukan bahwa perlu refresh session_id dan gw_id
+					needsessionidrefresh="yes"
+					needgwidrefresh="yes"
+					# Dapatkan IP baru
+					releaseobtainnewip
+					# Lalu lakukan login
+					login_wifi
+				fi
+			fi
+			# Istirahat sebelum mencoba kembali
+			sleep "$sleeptime"
 			;;
 		*)
 			login_wifi
