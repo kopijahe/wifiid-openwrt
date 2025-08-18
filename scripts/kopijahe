@@ -20,7 +20,7 @@ detectrandommac="$(dmesg | grep 'generated random MAC address')"
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="2.9.5"
+	ver="2.9.6"
 }
 
 bantuan() {
@@ -55,7 +55,7 @@ bantuan() {
 	echo "Coba gunakan \"komunitas-generik\" jika komunitas atau kampus anda belum didukung secara langsung oleh script."
 	echo ""
 	echo "Penyedia layanan cek captive portal yang didukung:"
-	echo "\"kopijahe\" (default), \"kopijahe2\", \"firefox\", \"google\", \"google2\", \"apple\", \"apple2\", \"microsoft\", \"microsoft2\", \"xiaomi\", \"httpforever\", \"neverssl\", \"ubuntu\", \"archlinux\"""\"kopijahe\" (default), \"firefox\", \"google\", \"google2\", \"apple\", \"apple2\", \"microsoft\", \"microsoft2\", \"xiaomi\", \"httpforever\", \"neverssl\", \"ubuntu\", \"archlinux\", \"examplecom\""
+	echo "\"kopijahe\" (default), \"kopijahe2\", \"firefox\", \"google\", \"google2\", \"apple\", \"apple2\", \"microsoft\", \"microsoft2\", \"xiaomi\", \"httpforever\", \"ubuntu\", \"archlinux\"""\"kopijahe\" (default), \"firefox\", \"google\", \"google2\", \"apple\", \"apple2\", \"microsoft\", \"microsoft2\", \"xiaomi\", \"httpforever\", \"ubuntu\", \"archlinux\", \"examplecom\""
 	echo ""
 	echo "=========================================================================="
 	echo ""
@@ -557,9 +557,6 @@ cpctesting() {
 	cpcprovider="httpforever"
 	captiveportalcheck
 	echo "$cpcprovider: $cpcstatus"
-	cpcprovider="neverssl"
-	captiveportalcheck
-	echo "$cpcprovider: $cpcstatus"
 	cpcprovider="ubuntu"
 	captiveportalcheck
 	echo "$cpcprovider: $cpcstatus"
@@ -716,13 +713,6 @@ captiveportalcheck() {
 			kodestatuslanding="$?"
 			hasil="A reliably insecure connection"
 			dnsserver="$dnsgoogle"
-			;;
-		"neverssl")
-			# Layanan cek captive portal dari Colm MacCárthaigh (https://github.com/colmmacc/neverssl.com)
-			cekkoneksi="$(curl --interface "$wandevice" --silent --retry "$cpcretry" --max-redirs 1 --connect-timeout "$cpctimeout" "http://neverssl.com/" | grep -o "helping you get online")"
-			kodestatuslanding="$?"
-			hasil="helping you get online"
-			dnsserver="$dnsopendns"
 			;;
 		"ubuntu")
 			# Layanan cek captive portal bawaan sistem operasi ubuntu
@@ -1371,6 +1361,8 @@ status_parser() {
 	wifivariant="$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)"
 	# Cek dan buat berkas "/tmp/last.login.$waninterface" untuk menghindari error
 	touch "/tmp/last.login.$waninterface"
+	# Tentukan bahwa belum login
+	didlogin="false"
 
 	# Cek status kode cURL
 	case "$kodestatus:$kodestatuslanding" in
@@ -1382,6 +1374,8 @@ status_parser() {
 			sleep 3
 			# Lakukan login, lalu langsung cek status kembali
 			login_wifi
+			# Tentukan bahwa sudah login
+			didlogin="true"
 			;;
 		"28:28")
 			# Coba logout terlebih dahulu
@@ -1392,8 +1386,11 @@ status_parser() {
 			sleep 3
 			# Lakukan login, lalu langsung cek status kembali
 			login_wifi
+			# Tentukan bahwa sudah login
+			didlogin="true"
 	esac
 
+if [[ "$didlogin" = "false" ]]; then
 	# Cek status login/logout terakhir
 	case "$loginout:$wifivariant" in
 		# Jika status user sedang aktif, maka:
@@ -1546,7 +1543,7 @@ status_parser() {
 			sleep "$sleeptime"
 			;;
 	esac
-
+fi
 }
 
 # Fungsi mendapatkan parameter aplikasi
@@ -1566,7 +1563,7 @@ do
 			icpcprovider="$OPTARG"
 			advancedmode="true"
 			multiautologin
-			if [[ "$icpcprovider" = "kopijahe" ]] || [[ "$icpcprovider" = "kopijahe2" ]] || [[ "$icpcprovider" = "firefox" ]] || [[ "$icpcprovider" = "google" ]] || [[ "$icpcprovider" = "google2" ]] || [[ "$icpcprovider" = "apple" ]] || [[ "$icpcprovider" = "apple2" ]] || [[ "$icpcprovider" = "microsoft" ]] || [[ "$icpcprovider" = "microsoft2" ]] || [[ "$icpcprovider" = "xiaomi" ]] || [[ "$icpcprovider" = "httpforever" ]] || [[ "$icpcprovider" = "neverssl" ]] || [[ "$icpcprovider" = "ubuntu" ]] || [[ "$icpcprovider" = "archlinux" ]] || [[ "$icpcprovider" = "examplecom" ]]; then
+			if [[ "$icpcprovider" = "kopijahe" ]] || [[ "$icpcprovider" = "kopijahe2" ]] || [[ "$icpcprovider" = "firefox" ]] || [[ "$icpcprovider" = "google" ]] || [[ "$icpcprovider" = "google2" ]] || [[ "$icpcprovider" = "apple" ]] || [[ "$icpcprovider" = "apple2" ]] || [[ "$icpcprovider" = "microsoft" ]] || [[ "$icpcprovider" = "microsoft2" ]] || [[ "$icpcprovider" = "xiaomi" ]] || [[ "$icpcprovider" = "httpforever" ]] || [[ "$icpcprovider" = "ubuntu" ]] || [[ "$icpcprovider" = "archlinux" ]] || [[ "$icpcprovider" = "examplecom" ]]; then
 				uci set kopijahe.@autologin["$multiautologinnum"].cpcprovider="$icpcprovider"
 				uci commit kopijahe
 			elif [[ "$icpcprovider" = "test" ]]; then
@@ -1575,7 +1572,7 @@ do
 				exit 0
 			else
 				echo "Penyedia layanan yang didukung:"
-				echo "\"kopijahe\" (default), \"kopijahe2\", \"firefox\", \"google\", \"google2\", \"apple\", \"apple2\", \"microsoft\", \"microsoft2\", \"xiaomi\", \"httpforever\", \"neverssl\", \"ubuntu\", \"archlinux\", \"examplecom\""
+				echo "\"kopijahe\" (default), \"kopijahe2\", \"firefox\", \"google\", \"google2\", \"apple\", \"apple2\", \"microsoft\", \"microsoft2\", \"xiaomi\", \"httpforever\", \"ubuntu\", \"archlinux\", \"examplecom\""
 				echo ""
 				echo "Untuk menguji penyedia layanan yang bisa dipakai, bisa menggunakan -c test"
 				exit 1
