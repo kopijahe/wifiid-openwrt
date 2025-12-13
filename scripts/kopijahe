@@ -20,7 +20,7 @@ detectrandommac="$(dmesg | grep 'generated random MAC address')"
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="2.9.7"
+	ver="2.9.8"
 }
 
 bantuan() {
@@ -253,11 +253,21 @@ update() {
 	sh /etc/rc.local
 }
 
+loginuseragent(){
+	# Tetapkan User Agent yang dipakai
+	autologinuseragent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36'
+}
+
 generaterandomid() {
 	# Buat 2 pasang karakter acak untuk keperluan login di jaringan WMS
 	randomid="$(head -4 /dev/urandom | tr -dc "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" | head -c4)"
 }
 
+generaterandompassword() {
+	# Buat 5 pasang karakter acak untuk keperluan login di jaringan "lanjutkan"
+	# Kecualikan angka 0 dari hasil
+	randompassword="$(head -4 /dev/urandom | tr -dc "123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" | head -c10)"
+}
 
 generaterandomhostname() {
 	# Buat 16 karakter acak
@@ -298,6 +308,15 @@ generaterandommac() {
 	uci commit wireless
 	# Hidupkan kembali interface
 	ifconfig "$wandevice" up
+}
+
+generatexauth(){
+	# Buat X-Auth
+	loginuseragent
+	auth_time="$(TZ=Asia/Jakarta date '+%Y-%m-%d %H:%M:%S')"
+	auth_secret='foJ8gEuuMWG4NgKjBSooOAnDr3g0rawU'
+	user_agent="$autologinuseragent"
+	auth_token="$(printf '%s' "${auth_secret}${auth_time}${user_agent}" | md5sum | awk '{print $1}')"
 }
 
 detectwan() {
@@ -342,18 +361,18 @@ detecturl() {
 		fi
 		
 		# Deteksi URL login dengan cara melihat jawaban redirect dari halaman periksa koneksi
-		deteksi="$(curl -k -I --silent --interface "$wandevice" --max-redirs 1 --connect-timeout 10 "$urldetect" | grep "Location" | sed -e 's/http/https/g' | sed -e 's/httpss/https/g')"
+		deteksi="$(curl -k -I --silent --interface "$wandevice" --max-redirs 1 --connect-timeout 10 "$urldetect" | grep "Location" | sed 's/http/https/g' | sed 's/httpss/https/g')"
 		
 		# Jika gagal mendeteksi menggunakan teknik di atas, maka:
 		if [[ "$deteksi" = "" ]]; then
 			# Deteksi URL login dengan cara melihat URL landing di halaman redirect
-			urllanding="$(curl -k -I --silent --interface "$wandevice" --max-redirs 1 --connect-timeout 10 "$urldetect" | grep URL | awk -F'[;]' '{print $2}' | head -c -3 | sed -e 's/ /%20/g' | sed -e 's/http/https/g' | sed -e 's/httpss/https/g')"
+			urllanding="$(curl -k -I --silent --interface "$wandevice" --max-redirs 1 --connect-timeout 10 "$urldetect" | grep URL | awk -F'[;]' '{print $2}' | head -c -3 | sed 's/ /%20/g' | sed 's/http/https/g' | sed 's/httpss/https/g')"
 			deteksi=" Location: $urllanding"
 		fi
 		
 		# Jika masih saja gagal, maka:
 		if [[ "$deteksi" = "" ]]; then
-			urllanding="$(curl -k -I --silent --interface "$wandevice" --max-redirs 1 --connect-timeout 10 "$urldetect" | grep URL | awk -F'[;]' '{print $2}' | head -c -3 | awk -F'[=]' '{print $2"="$3"="$4"="$5"="$6"="$7}' | sed -e 's/http/https/g' | sed -e 's/httpss/https/g')"
+			urllanding="$(curl -k -I --silent --interface "$wandevice" --max-redirs 1 --connect-timeout 10 "$urldetect" | grep URL | awk -F'[;]' '{print $2}' | head -c -3 | awk -F'[=]' '{print $2"="$3"="$4"="$5"="$6"="$7}' | sed 's/http/https/g' | sed 's/httpss/https/g')"
 			deteksi=" Location: $urllanding"
 		fi
 		
@@ -410,12 +429,28 @@ setup() {
 	uci set kopijahe.@autologin["$multiautologinnum"].sessionid="$session_id"
 	uci set kopijahe.@autologin["$multiautologinnum"].serverid="$server_id"
 	
+	case "$tipelogin" in
+		"loginjs" | "wmsjs")
+			uci set kopijahe.@autologin["$multiautologinnum"].jslanding='yes'
+			;;
+		*)
+			;;
+	esac
+	
 	# Jika digunakan di jaringan WMS, maka tentukan variabel wms_id
-	if [[ "$tipelogin" = "wms" ]]; then
-		# shellcheck disable=2020
-		wms_id="$(curl --resolve "welcome2.wifi.id:443:10.233.16.13" --resolve "welcome3.wifi.id:443:118.98.34.148" -k --silent -L --interface "$wandevice" "$urllanding" | grep makeId | awk -F'[.]' '{print $4}' | tr -dc "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\n" | awk '!a[$0]++' | tr -d "\n")"
-		uci set kopijahe.@autologin["$multiautologinnum"].wmsid="$wms_id"
-	fi
+	case "$tipelogin:$jslanding" in
+		"wms:yes")
+			wms_id="$(curl --resolve "welcome2.wifi.id:443:10.233.16.13" --resolve "welcome3.wifi.id:443:118.98.34.148" -k --silent -L --interface "$wandevice" "$urllanding" | awk -F'\\\\+"SID\\\\+":\\\\+"' 'NF>1{split($2,a,"\\\\\"");sub(/\\\\+$/,"",a[1]);print a[1];exit}')"
+			uci set kopijahe.@autologin["$multiautologinnum"].wmsid="$wms_id"
+			;;
+		"wms:*")
+			# shellcheck disable=2020
+			wms_id="$(curl --resolve "welcome2.wifi.id:443:10.233.16.13" --resolve "welcome3.wifi.id:443:118.98.34.148" -k --silent -L --interface "$wandevice" "$urllanding" | grep makeId | awk -F'[.]' '{print $4}' | tr -dc "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\n" | awk '!a[$0]++' | tr -d "\n")"
+			uci set kopijahe.@autologin["$multiautologinnum"].wmsid="$wms_id"
+			;;
+		*)
+			;;
+	esac
 	
 	# Simpan konfigurasi
 	uci commit kopijahe
@@ -873,12 +908,21 @@ curl_additionalparameter() {
 login_folder() {
 	# Fungsi penentuan folder dan url login
 	
+	case "$server_id" in
+		"welcome3.wifi.id")
+			server_id2="americano"
+			;;
+		*)
+			server_id2="americano2"
+			;;
+	esac
+	
 	case "$(uci -q get kopijahe.@autologin["$multiautologinnum"].tipelogin)" in
 		"login" | "home")
 			# Jika tipelogin wifi.id, maka:
 			loginurl="$(echo "$wp" | grep urlx | awk -F'[=]' '{print $2}' | awk -F'[?]' '{print $1}' | sed s/\'//g | sed s/\ //g | head -n 1)"
 			if [[ "$loginurl" = "https://$server_id/" ]] || [[ "$loginurl" = "" ]]; then
-				loginurl="https://$server_id/authnew/login/check_login.php"
+				loginurl="https://$server_id/authnew/login/check_login.php?ipc=""$iprouter""&gw_id=""$gwid""&client_mac=""$clientmac""&redirect=&wlan=""$wlanid""&load_wp=""$loadwp_value"""
 			fi
 			;;
 		"wms")
@@ -886,11 +930,11 @@ login_folder() {
 			if [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "wms-lanjutkan" ]]; then
 				# Cek apakah di varian wms-lanjutkan, jika iya, maka:
 				# Tentukan URL login yang sesuai
-				loginurl="https://$server_id/wms/auth/authnew/autologin-free/quarantine.php"
+				loginurl="https://$server_id/wms/auth/authnew/autologin-free/quarantine.php?ipc=""$iprouter""&gw_id=""$gwid""&client_mac=""$clientmac""&redirect=&wlan=""$wlanid""&load_wp=""$loadwp_value"""
 			elif [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "wifi.id-lanjutkan" ]] || [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "pegadaian" ]]; then
 				# Jika digunakan di varian wifi.id-lanjutkan atau pegadaian, maka:
 				# Tentukan URL login yang sesuai
-				loginurl="https://$server_id/authnew/login-free/check_login.php"
+				loginurl="https://$server_id/authnew/login-free/check_login.php?ipc=""$iprouter""&gw_id=""$gwid""&client_mac=""$clientmac""&redirect=&wlan=""$wlanid""&load_wp=""$loadwp_value"""
 			else
 				# Jika digunakan di varian jaringan wms dan wms lite, maka:
 				# Tentukan wms_url
@@ -904,6 +948,14 @@ login_folder() {
 				fi
 			fi
 			;;
+		"loginjs")
+			# Jika menggunakan halaman login berbasis nextjs, maka:
+			loginurl="https://$server_id2.wifi.id/luwak_wifi/wpdefault/check-login"
+			;;
+		"wmsjs")
+			# Jika menggunakan halaman login berbasis nextjs, maka:
+			loginurl="https://$server_id2.wifi.id/luwak_wifi/wpwms/check-login"
+			;;
 		*)
 			# Jika tipe login tidak diketahui, maka kemungkinan konfigurasi masih belum lengkap, silahkan ulangi deteksi otomatis jaringan
 			echo "Ada kesalahan konfigurasi jaringan"
@@ -911,18 +963,45 @@ login_folder() {
 	esac
 }
 
+jsparser() {
+	# Fungsi pengolah data halaman login berbasis nextjs
+	
+	# Kumpulkan nilai-nilai yang diperlukan
+	loadwelcomepage
+	wprealm="$(echo "$wp" | awk -F'\\\\+"realm\\\\+":\\\\+"' 'NF>1{split($2,a,"\\\\\"");sub(/\\\\+$/,"",a[1]);print a[1];exit}')"
+	wpsessionkey="$(echo "$wp" | awk -F'\\\\+"session_key\\\\+":\\\\+"' 'NF>1{split($2,a,"\\\\\"");sub(/\\\\+$/,"",a[1]);print a[1];exit}')"
+	#wpsession_id="$(echo "$wp" | awk -F'\\\\+"sessionid\\\\+":\\\\+"' 'NF>1{split($2,a,"\\\\\"");sub(/\\\\+$/,"",a[1]);print a[1];exit}')"
+	wpwlan="$wlanid"
+	wpapname="$(echo "$wpwlan" | awk -F'[:]' '{print $1}')"
+	wpssid="$(echo "$wpwlan" | awk -F'[:]' '{print $2}')"
+}
+
 wplanjutkan() {
 	# Fungsi mencari username dan password untuk sistem "lanjutkan"
 	
-	# Cari username
-	if [[ "$wifivariant" = "wms-lanjutkan" ]] || [[ "$wifivariant" = "pegadaian" ]] || [[ "$wifivariant" = "wifi.id-lanjutkan" ]]; then
-		username2="$(echo "$wp" | grep username | grep username | awk -F'[=]' '{print $2}' | awk -F '[&]' '{print $1}')"
-	else
-		username2="pass-$clientmac@wms.00000000.000"
-	fi
-	
-	# Cari password
-	password_lanjutkan="$(echo "$wp" | grep username | grep username | awk -F'[=]' '{print $3}' | awk -F '[&]' '{print $1}' | sed s/\'//g | sed s/\,//g)"
+	# Cek apakah perlu menggunakan fungsi jsparser
+	case "$wifivariant:$jslanding" in
+		"wms-lanjutkan:yes" | "pegadaian:yes" | "wifi.id-lanjutkan:yes")
+			jsparser
+			generaterandompassword
+			# Tentukan username
+			username2="pass-$clientmac$wprealm"
+			# Tentukan password
+			password_lanjutkan="$randompassword"
+			;;
+		"wms-lanjutkan:*" | "pegadaian:*" | "wifi.id-lanjutkan:*")
+			# Cari username
+			username2="$(echo "$wp" | grep username | grep username | awk -F'[=]' '{print $2}' | awk -F '[&]' '{print $1}')"
+			# Cari password
+			password_lanjutkan="$(echo "$wp" | grep username | grep username | awk -F'[=]' '{print $3}' | awk -F '[&]' '{print $1}' | sed s/\'//g | sed s/\,//g)"
+			;;
+		*)
+			# Tentukan username
+			username2="pass-$clientmac@wms.00000000.000"
+			# Cari password
+			password_lanjutkan="$(echo "$wp" | grep username | grep username | awk -F'[=]' '{print $3}' | awk -F '[&]' '{print $1}' | sed s/\'//g | sed s/\,//g)"
+			;;
+	esac
 }
 
 wificommunity() {
@@ -944,6 +1023,9 @@ wificommunity() {
 					# Akun UT punya format berbeda dibandingkan dengan kampus lainnya
 					kampus="$(echo "$cfgkampus" | awk -F'[.]' '{print $1}')"
 					username2="$username@$cfgkampus@com.$kampus"
+					if [[ "$jslanding" = "yes" ]]; then
+						username2="$username@com.$kampus"
+					fi
 					;;
 				"adibuana")
 					# Akun Adibuana mengikuti format komunitas generik
@@ -1032,24 +1114,78 @@ wificommunity() {
 
 dataraw() {
 	# Fungsi untuk menyesuaikan format identitas login berdasarkan hasil dari fungsi wificommunity di atas
+	loginuseragent
 	
-	case "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" in
-	"wms" | "wms-lite")
-		# Jika digunakan untuk jaringan WMS atau WMS Lite, maka:
-		login_cred="username_=""$username2""&autologin_time=86000&username=""$username"".""$randomid""$username3""&password=""$password"""
-		;;
-	"wico")
-		# Jika digunakan untuk jaringan WICO, maka:
-		login_cred="username_=""$username""&username=""$username2""&password=""$password"""
-		;;
-	"wms-lanjutkan" | "wifi.id-lanjutkan" | "pegadaian")
-		# Jika digunakan untuk jaringan "lanjutkan", maka:
-		login_cred="username=""$username2""&password=""$password_lanjutkan""&autologin_time="
-		;;
-	*)
-		# Jika digunakan untuk jaringan lain, maka:
-		login_cred="username=""$username2""&password=""$password"""
-		;;
+	case "$jslanding" in
+		"yes")
+			case "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" in
+			"wms" | "wms-lite" | "wms-lanjutkan" | "wifi.id-lanjutkan" | "pegadaian")
+				# Jika digunakan untuk jaringan wms, wms-lite dan "lanjutkan", maka:
+				case "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" in
+					"wms-lanjutkan" | "wifi.id-lanjutkan" | "pegadaian")
+						password2="$password"
+						;;
+					*)
+						password2="$password"
+						;;
+				esac
+				json_payload="$(printf '{"username":"%s","password":"%s","gw_id":"%s","ipc":"%s","url":"%s","useragent":"%s","key":"%s","otp":"%s","ssid":"%s","mac":"%s","apname":"%s","wlan":"%s","sessionid":"%s","session_key":"%s","load_time":"%s","latitude":null,"longitude":null}' \
+				  "$username2" \
+				  "$password2" \
+				  "$gwid" \
+				  "$iprouter" \
+				  "$urllanding" \
+				  "$autologinuseragent" \
+				  "" \
+				  "" \
+				  "$wpssid" \
+				  "$clientmac" \
+				  "$wpapname" \
+				  "$wpwlan" \
+				  "$session_id" \
+				  "$wpsessionkey" \
+				  "$loadwp_value"				  
+				)"
+				login_cred="$json_payload"
+				;;
+			*)
+				# Jika digunakan untuk jaringan lain, maka:
+				json_payload="$(printf '{"username":"%s","password":"%s","gw_id":"%s","ipc":"%s","url":"%s","useragent":"%s","ssid":"%s","mac":"%s","apname":"%s","wlan":"%s"}' \
+				  "$username2" \
+				  "$password" \
+				  "$gwid" \
+				  "$iprouter" \
+				  "https://$server_id2.wifi.id/luwak_wifi/" \
+				  "$autologinuseragent" \
+				  "$wpssid" \
+				  "$clientmac" \
+				  "$wpapname" \
+				  "$wpwlan"
+				)"
+				login_cred="$json_payload"
+				;;
+			esac
+			;;
+		*)
+			case "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" in
+			"wms" | "wms-lite")
+				# Jika digunakan untuk jaringan WMS atau WMS Lite, maka:
+				login_cred="username_=""$username2""&autologin_time=86000&username=""$username"".""$randomid""$username3""&password=""$password"""
+				;;
+			"wico")
+				# Jika digunakan untuk jaringan WICO, maka:
+				login_cred="username_=""$username""&username=""$username2""&password=""$password"""
+				;;
+			"wms-lanjutkan" | "wifi.id-lanjutkan" | "pegadaian")
+				# Jika digunakan untuk jaringan "lanjutkan", maka:
+				login_cred="username=""$username2""&password=""$password_lanjutkan""&autologin_time="
+				;;
+			*)
+				# Jika digunakan untuk jaringan lain, maka:
+				login_cred="username=""$username2""&password=""$password"""
+				;;
+			esac
+			;;
 	esac
 }
 
@@ -1060,17 +1196,13 @@ loadwelcomepage() {
 	# Tentukan url welcome page
 	urllanding="https://""$server_id""/""$tipelogin""/?gw_id=""$gwid""&client_mac=""$clientmac""&wlan=""$wlanid""&sessionid=""$session_id"""
 	# Unduh halaman welcome page
-	wp="$($curladditionalparameter --resolve "welcome2.wifi.id:443:10.233.16.13" --resolve "welcome3.wifi.id:443:118.98.34.148" --silent --interface "$wandevice" --retry 1 --connect-timeout 1 -c - "$urllanding")"
+	wp="$($curladditionalparameter --resolve "welcome2.wifi.id:443:10.233.16.13" --resolve "welcome3.wifi.id:443:118.98.34.148" --resolve "americano.wifi.id:443:10.1.64.161" --resolve "americano2.wifi.id:443:10.233.16.51" --silent --interface "$wandevice" --retry 1 --connect-timeout 1 -c - "$urllanding")"
 	
-	# Jika digunakan di jaringan WMS
-	if [[ "$wifivariant" = "wms" ]] || [[ "$wifivariant" = "wms-lite" ]] || [[ "$wifivariant" = "wms-lanjutkan" ]]; then
-		# Maka  kosongi nilai "loadwp"
-		loadwp_value=""
-		loadwp_defaultwifi="$(echo "$wp" | grep default_wifi | awk -F'[\t]'  '{print $7}')"
-	else
-		# Jika tidak, maka:
-		# Cari dan kalkulasi nilai parameter "load_wp"
-		loadwp_value="$(echo "$wp" | grep load_time | awk -F'[=]' '{print $2}' | sed s/\'//g | sed s/\"//g | head -n 1 | awk -F '[*]' '{print $1*10000}')"
+	# Cari dan kalkulasi nilai parameter "load_wp"
+	loadwp_value="$(echo "$wp" | grep load_time | awk -F'[=]' '{print $2}' | sed s/\'//g | sed s/\"//g | head -n 1 | awk -F '[*]' '{print $1*10000}')"
+	
+	# Jika tidak digunakan di halaman login berbasis NextJS, maka:
+	if [[ "$jslanding" = "" ]]; then
 		loadwp_token="$(echo "$wp" | grep csrf_token_wp | awk -F'[\t]'  '{print $7}')"
 		loadwp_defaultwifi="$(echo "$wp" | grep default_wifi | awk -F'[\t]'  '{print $7}')"
 	fi
@@ -1216,6 +1348,8 @@ logout_wifi() {
 	server_id="$(uci -q get kopijahe.@autologin["$multiautologinnum"].serverid)"
 	versi
 	curl_additionalparameter
+	loginuseragent
+	generatexauth
 	
 	# Lakukan logout sesuai dengan parameter konfigurasi autologin
 	attempt="$($curladditionalparameter --resolve "welcome2.wifi.id:443:10.233.16.13" --resolve "welcome3.wifi.id:443:118.98.34.148" --silent --retry 1 --connect-timeout 3 --interface "$wandevice" """https://$server_id/authnew/logout/logoutx.php""" \
@@ -1227,8 +1361,10 @@ logout_wifi() {
 	-H "sec-fetch-dest: empty" \
 	-H "sec-fetch-mode: cors" \
 	-H "sec-fetch-site: same-origin" \
-	-H "user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36" \
+	-H "user-agent: $autologinuseragent" \
 	-H "x-requested-with: XMLHttpRequest" \
+	-H "X-Authorization-Token: $auth_token" \
+	-H "X-Authorization-Time: $auth_time" \
 	-H 'sec-ch-ua: "Not_A Brand";v="99", "Google Chrome";v="109", "Chromium";v="109"' \
 	-H "sec-ch-ua-mobile: ?0" \
 	-H "sec-ch-ua-platform: Windows" \
@@ -1254,35 +1390,49 @@ login_wifi() {
 	wlanid="$(uci -q get kopijahe.@autologin["$multiautologinnum"].wlanid)"
 	wifivariant="$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)"
 	server_id="$(uci -q get kopijahe.@autologin["$multiautologinnum"].serverid)"
+	jslanding="$(uci -q get kopijahe.@autologin["$multiautologinnum"].jslanding)"
 	loadsessionid
 	loadgwid
 	loadwelcomepage
 	login_folder
 	wificommunity
+	jsparser
 	dataraw
 	curl_additionalparameter
+	loginuseragent
+	generatexauth
 	
 	# Lakukan login sesuai dengan parameter konfigurasi autologin
 	if [[ "$loginfromfile" != "true" ]]; then
-		attempt="$($curladditionalparameter --resolve "welcome2.wifi.id:443:10.233.16.13" --resolve "welcome3.wifi.id:443:118.98.34.148" --silent --retry 1 --connect-timeout 3 --interface "$wandevice" """$loginurl""?ipc=""$iprouter""&gw_id=""$gwid""&client_mac=""$clientmac""&redirect=&wlan=""$wlanid""&load_wp=""$loadwp_value""" \
-		-H "accept: application/json, text/javascript, */*; q=0.01" \
-		-H "accept-language: en-US,en;q=0.9,id;q=0.8" \
-		-H "connection: keep-alive" \
-		-H "content-type: application/x-www-form-urlencoded; charset=UTF-8" \
-		-H "origin: ""$server_id""" \
-		-H "referer: $loginurl?ipc=$iprouter&gw_id=$gwid&client_mac=$clientmac&redirect=&wlan=$wlanid&load_wp=$loadwp_value" \
-		-H "sec-fetch-dest: empty" \
-		-H "sec-fetch-mode: cors" \
-		-H "sec-fetch-site: same-origin" \
-		-H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36' \
-		-H "x-requested-with: XMLHttpRequest" \
-		-H 'sec-ch-ua: "Not_A Brand";v="8", "Google Chrome";v="117", "Chromium";v="117"' \
-		-H "origin: https://""$server_id""" \
-		-H "sec-ch-ua-mobile: ?0" \
-		-H "sec-ch-ua-platform: Windows" \
-		-H "Cookie: csrf_token_wp=$loadwp_token; default_wifi=$loadwp_defaultwifi" \
-		-H "referer: https://""$server_id""/""$tipelogin""/?gw_id=""$gwid""&client_mac=""$clientmac""&wlan=""$wlanid""&sessionid=""$session_id""" \
-		--data-raw "$login_cred")"
+		case "$jslanding" in
+		"yes")
+			attempt="$($curladditionalparameter --resolve "welcome2.wifi.id:443:10.233.16.13" --resolve "welcome3.wifi.id:443:118.98.34.148" --resolve "americano.wifi.id:443:10.1.64.161" --resolve "americano2.wifi.id:443:10.233.16.51" --silent --retry 1 --connect-timeout 3 --interface "$wandevice" "$loginurl" \
+			-H "origin: ""$server_id""" \
+			-H "referer: https://""$server_id""" \
+			-H "X-Authorization-Token: $auth_token" \
+			-H "X-Authorization-Time: $auth_time" \
+			-H "User-Agent: $autologinuseragent" \
+			-H 'sec-ch-ua-platform: "Windows"' \
+			-H 'sec-ch-ua: "Not:A-Brand";v="99", "Google Chrome";v="145", "Chromium";v="145"' \
+			-H 'sec-ch-ua-mobile: ?0' \
+			-H 'Accept: application/json' \
+			-H 'Content-Type: application/json' \
+			--data-raw "$login_cred")"
+			;;
+		*)
+			attempt="$($curladditionalparameter --resolve "welcome2.wifi.id:443:10.233.16.13" --resolve "welcome3.wifi.id:443:118.98.34.148" --resolve "americano.wifi.id:443:10.1.64.161" --resolve "americano2.wifi.id:443:10.233.16.51" --silent --retry 1 --connect-timeout 3 --interface "$wandevice" "$loginurl" \
+			-H "origin: ""$server_id""" \
+			-H "referer: https://""$server_id""" \
+			-H "X-Authorization-Token: $auth_token" \
+			-H "X-Authorization-Time: $auth_time" \
+			-H "User-Agent: $autologinuseragent" \
+			-H "Cookie: csrf_token_wp=$loadwp_token; default_wifi=$loadwp_defaultwifi" \
+			-H 'sec-ch-ua-platform: "Windows"' \
+			-H 'sec-ch-ua: "Not:A-Brand";v="99", "Google Chrome";v="145", "Chromium";v="145"' \
+			-H 'sec-ch-ua-mobile: ?0' \
+			--data-raw "$login_cred")"
+			;;
+		esac
 	else
 		# Tentukan lokasi berkas login
 		loginwifi="/tmp/login.$waninterface"
@@ -1583,7 +1733,7 @@ do
 			detectwan
 			echo "Silahkan masukkan URL halaman landing:"
 			read -r "urllanding"
-			urllanding="$(echo "$urllanding" | sed -e 's/ /%20/g')"
+			urllanding="$(echo "$urllanding" | sed 's/ /%20/g')"
 			deteksi=" Location: $urllanding"
 			setup
 			;;
