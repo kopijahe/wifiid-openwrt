@@ -20,7 +20,7 @@ detectrandommac="$(dmesg | grep 'generated random MAC address')"
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="2.9.8"
+	ver="2.9.9"
 }
 
 bantuan() {
@@ -313,7 +313,7 @@ generaterandommac() {
 generatexauth(){
 	# Buat X-Auth
 	loginuseragent
-	auth_time="$(TZ=Asia/Jakarta date '+%Y-%m-%d %H:%M:%S')"
+	auth_time="$(TZ=WIB-7 date '+%Y-%m-%d %H:%M:%S')"
 	auth_secret='foJ8gEuuMWG4NgKjBSooOAnDr3g0rawU'
 	user_agent="$autologinuseragent"
 	auth_token="$(printf '%s' "${auth_secret}${auth_time}${user_agent}" | md5sum | awk '{print $1}')"
