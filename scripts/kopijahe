@@ -20,7 +20,7 @@ detectrandommac="$(dmesg | grep 'generated random MAC address')"
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="3.0.0"
+	ver="3.0.1"
 }
 
 bantuan() {
@@ -1007,38 +1007,40 @@ wplanjutkan() {
 wificommunity() {
 	# Tentukan akhiran username sesuai dengan varian jaringan yang dipilih:
 	#
+	# Cek awalan akun yang dipakai, dan untuk menghindari error jika penulisan akun kampus tidak ditulis NIM saja:
+	usernamebase="$(echo "$username" | awk -F'[@]' '{print $1}')"
+	# Cek akhiran akun yang dipakai:
+	usernametrail="$(echo "$username" | awk -F'[@]' '{print $2}')"
 	case "$wifivariant" in
 		"smartbisnis")
 			# Jika smartbisnis, maka:
-			username2="$username@com.smartbisnis"
+			username2="$usernamebase@com.smartbisnis"
 			;;
 		"kampus")
 			# Jika kampus, maka:
-			# Hindari error jika penulisan akun kampus tidak ditulis NIM saja
-			username="$(echo "$username" | awk -F'[@]' '{print $1}')"
 			# Tentukan akhiran username sesuai dengan konfigurasi kampus yang tersimpan
 			cfgkampus="$(uci -q get kopijahe.@autologin["$multiautologinnum"].kampus)"
 			case "$cfgkampus" in
 				"ut.ac.id")
 					# Akun UT punya format berbeda dibandingkan dengan kampus lainnya
 					kampus="$(echo "$cfgkampus" | awk -F'[.]' '{print $1}')"
-					username2="$username@$cfgkampus@com.$kampus"
-					if [[ "$jslanding" = "yes" ]]; then
-						username2="$username@com.$kampus"
-					fi
+					# Cek apakah digunakan di halaman login berbasis NextJS atau tidak, dan gunakan format yang benar
+					case "$jslanding" in
+						"yes")
+							username2="$usernamebase@com.$kampus"
+							;;
+						*)
+							username2="$usernamebase@$cfgkampus@com.$kampus"
+							;;
+					esac
 					;;
-				"adibuana")
-					# Akun Adibuana mengikuti format komunitas generik
-					username2="$username@$cfgkampus.vmgmt@wms.00000000.000"
-					;;
-				"ecampus.id")
-					# Akun ecampus.id mengikuti format komunitas generik
-					username2="$username@$cfgkampus.vmgmt@wms.00000000.000"
+				"unej" | "umaha" | "trisakti" | "itdel" | "polije" | "unsiq" )
+					# Gunakan format standard
+					username2="$usernamebase@com.$cfgkampus"
 					;;
 				*)
-					# Selain itu, gunakan format standard
-					# Termasuk akun kampus dengan akhiran: "@itdel", "@polije", "@umaha", "@unej", "@unsiq"
-					username2="$username@com.$cfgkampus"
+					# Selain itu, format komunitas generik
+					username2="$usernamebase.vmgmt@wms.00000000.000"
 					;;
 			esac
 			;;
@@ -1066,43 +1068,55 @@ wificommunity() {
 			;;
 		"wico")
 			# Jika WICO 2.0, maka:
-			username2="$username@violet"
+			username2="$usernamebase@violet"
 			;;
 		"wifi.id" | "@wifi.id" | "wifiid")
 			# Jika wifi.id, maka:
-			# Periksa apakah akun yang digunakan adalah akun violet*/giga.wigo/boingo/sooltan.id, jika iya, maka:
-			if [[ "$(echo "$username" | awk -F'[@]' '{print $2}')" = "violet" ]] ||  [[ "$(echo "$username" | awk -F'[@]' '{print $2}')" = "violet.unp" ]] ||  [[ "$(echo "$username" | awk -F'[@]' '{print $2}')" = "violet.unm" ]] ||  [[ "$(echo "$username" | awk -F'[@]' '{print $2}')" = "violet.ugm" ]] ||  [[ "$(echo "$username" | awk -F'[@]' '{print $2}')" = "violet.unpatti" ]] ||  [[ "$(echo "$username" | awk -F'[@]' '{print $2}')" = "violet.uho" ]] ||  [[ "$(echo "$username" | awk -F'[@]' '{print $2}')" = "violet.gamer" ]] ||  [[ "$(echo "$username" | awk -F'[@]' '{print $2}')" = "violet.on" ]] ||  [[ "$(echo "$username" | awk -F'[@]' '{print $2}')" = "giga.wigo" ]] ||  [[ "$(echo "$username" | awk -F'[@]' '{print $2}')" = "mb.boingo.com" ]] ||  [[ "$(echo "$username" | awk -F'[@]' '{print $2}')" = "boingo.com" ]] ||  [[ "$(echo "$username" | awk -F'[@]' '{print $2}')" = "sooltan.id" ]]; then
-				# Tidak perlu diberi tambahan akhiran
-				username2="$username"
-			else
-				# Jika tidak, maka:
-				# Beri tambahan akhiran "@spin2"
-				username2="$username@spin2"
-			fi
+			case "$usernametrail" in
+				# Periksa apakah akun yang digunakan adalah akun violet*/giga.wigo/boingo/sooltan.id, jika iya, maka tidak perlu dirubah formatnya:
+				"violet" | "violet.unp" | "violet.unm" | "violet.ugm" | "violet.unpatti" | "violet.uho" | "violet.gamer" | "violet.on" | "giga.wigo" | "mb.boingo.com" | "boingo.com" | "sooltan.id")
+					username2="$username"
+					;;
+				*)
+					# Jika tidak, maka:
+					# Beri tambahan akhiran "@spin2"
+					username2="$usernamebase@spin2"
+					;;
+			esac
 			;;
 		"grosirbersama")
 			# Jika grosirbersama, maka:
-			username2="$username@com.grosirbersama"
+			username2="$usernamebase@com.grosirbersama"
 			;;
 		"internetku")
 			# Jika internetku, maka:
-			username2="$username@com.internetku"
+			username2="$usernamebase@com.internetku"
 			;;
 		"gift")
 			# Jika gift, maka:
-			username2="$username@gift"
+			username2="$usernamebase@gift"
 			;;
 		"homewifi")
 			# Jika homewifi, maka:
-			username2="$username"
+			username2="$usernamebase"
 			;;
 		"starwifi")
 			# Jika starwifi, maka:
-			username2="$username.starwifi@event"
+			username2="$usernamebase.starwifi@event"
 			;;
 		"sso" | "rumah-sakit" | "komunitas-generik")
 			# Jika SSO atau Rumah Sakit atau komunitas generik lainnya, maka:
-			username2="$username.vmgmt@wms.00000000.000"
+			case "$usernametrail" in
+				# Periksa apakah akun yang digunakan adalah akun violet, jika iya, maka tidak perlu dirubah formatnya:
+				"violet")
+					username2="$usernamebase"
+					;;
+				*)
+					# Jika tidak, maka:
+					# Beri tambahan akhiran ".vmgmt@wms.00000000.000"
+					username2="$usernamebase.vmgmt@wms.00000000.000"
+					;;
+			esac
 			;;
 		"wms-lanjutkan" | "wifi.id-lanjutkan" | "pegadaian")
 			# Jika "lanjutkan", maka:
