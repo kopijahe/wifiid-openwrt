@@ -20,7 +20,7 @@ detectrandommac="$(dmesg | grep 'generated random MAC address')"
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="2.9.9"
+	ver="3.0.0"
 }
 
 bantuan() {
@@ -1268,13 +1268,27 @@ loadgwid() {
 
 hasil_loginout() {
 	# Fungsi output hasil login dan logout
-
-	# Filter hasil hanya di bagian yang relevan saja sesuai dengan fungsi yang digunakan
-	if [[ "$function" = "login" ]]; then
-		loginout="$(echo "$attempt" | jsonfilter -e '@["message"]' 2> /dev/null)"
-	elif [[ "$function" = "logout" ]]; then
-		loginout="$(echo "$attempt" | awk -F'[<>]' '{print $5}' 2> /dev/null)"
-	fi
+	
+	# Cek apakah menggunakan halaman login berbasis nextjs:
+	jslanding="$(uci -q get kopijahe.@autologin["$multiautologinnum"].jslanding)"
+	
+	# Filter hasil hanya di bagian yang relevan saja sesuai dengan fungsi dan tipe halaman login yang digunakan
+	case "$function:$jslanding" in
+		"login:yes")
+			loginout="$(echo "$attempt" | sed -n -e 's/.*<reply_message>\([^<]*\)<\\\/reply_message>.*/\1/p' -e 's/.*"reply_message":"\([^"]*\)".*/\1/p' -e 's/.*"message":"\([^"]*\)".*/\1/p')"
+			;;
+		"login:*")
+			loginout="$(echo "$attempt" | jsonfilter -e '@["message"]' 2> /dev/null)"
+			;;
+		"logout:yes")
+			loginout="$(echo "$attempt" | awk -F'<b>|</b>' 'NF>1{print $2; exit}')"
+			;;
+		"logout:*")
+			loginout="$(echo "$attempt" | awk -F'[<>]' '{print $5}' 2> /dev/null)"
+			;;
+		*)
+			;;
+	esac
 
 	# Deteksi error "Radius Timeout.", karena perlu pengolahan lebih lanjut:
 	if [[ "$loginout" = "" ]] && [[ "$kodestatus" = "0" ]]; then
