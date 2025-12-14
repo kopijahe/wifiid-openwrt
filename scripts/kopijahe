@@ -20,7 +20,7 @@ detectrandommac="$(dmesg | grep 'generated random MAC address')"
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="3.0.1"
+	ver="3.0.2"
 }
 
 bantuan() {
@@ -312,11 +312,13 @@ generaterandommac() {
 
 generatexauth(){
 	# Buat X-Auth
-	loginuseragent
+	
+	# Catat waktu saat ini dengan zona waktu WIB-7 (Asia/Jakarta) dan format yang sesuai (YYYY-MM-DD<spasi>HH:MM:SS)
 	auth_time="$(TZ=WIB-7 date '+%Y-%m-%d %H:%M:%S')"
+	# magic.gif
 	auth_secret='foJ8gEuuMWG4NgKjBSooOAnDr3g0rawU'
-	user_agent="$autologinuseragent"
-	auth_token="$(printf '%s' "${auth_secret}${auth_time}${user_agent}" | md5sum | awk '{print $1}')"
+	# Kalkulasikan nilai token
+	auth_token="$(printf '%s' "${auth_secret}${auth_time}${autologinuseragent}" | md5sum | awk '{print $1}')"
 }
 
 detectwan() {
@@ -967,7 +969,6 @@ jsparser() {
 	# Fungsi pengolah data halaman login berbasis nextjs
 	
 	# Kumpulkan nilai-nilai yang diperlukan
-	loadwelcomepage
 	wprealm="$(echo "$wp" | awk -F'\\\\+"realm\\\\+":\\\\+"' 'NF>1{split($2,a,"\\\\\"");sub(/\\\\+$/,"",a[1]);print a[1];exit}')"
 	wpsessionkey="$(echo "$wp" | awk -F'\\\\+"session_key\\\\+":\\\\+"' 'NF>1{split($2,a,"\\\\\"");sub(/\\\\+$/,"",a[1]);print a[1];exit}')"
 	#wpsession_id="$(echo "$wp" | awk -F'\\\\+"sessionid\\\\+":\\\\+"' 'NF>1{split($2,a,"\\\\\"");sub(/\\\\+$/,"",a[1]);print a[1];exit}')"
@@ -1209,15 +1210,24 @@ loadwelcomepage() {
 	
 	# Tentukan url welcome page
 	urllanding="https://""$server_id""/""$tipelogin""/?gw_id=""$gwid""&client_mac=""$clientmac""&wlan=""$wlanid""&sessionid=""$session_id"""
-	# Unduh halaman welcome page
+	# Unduh halaman welcome page dan catat waktu sebelum dan sesudahnya
+	beforeloadwp="$(awk '{print $1}' < /proc/uptime)"
 	wp="$($curladditionalparameter --resolve "welcome2.wifi.id:443:10.233.16.13" --resolve "welcome3.wifi.id:443:118.98.34.148" --resolve "americano.wifi.id:443:10.1.64.161" --resolve "americano2.wifi.id:443:10.233.16.51" --silent --interface "$wandevice" --retry 1 --connect-timeout 1 -c - "$urllanding")"
+	afterloadwp="$(awk '{print $1}' < /proc/uptime)"
 	
 	# Cari dan kalkulasi nilai parameter "load_wp"
 	loadwp_value="$(echo "$wp" | grep load_time | awk -F'[=]' '{print $2}' | sed s/\'//g | sed s/\"//g | head -n 1 | awk -F '[*]' '{print $1*10000}')"
+	# Jika hasilnya kosong, maka:
+	if [[ "$loadwp_value" = "" ]]; then
+		# Kalkulasi sendiri nilainya:
+		loadwp_value="$(awk 'BEGIN {print ("'"$afterloadwp"'"-"'"$beforeloadwp"'") * 100 }')"
+	fi
 	
 	# Jika tidak digunakan di halaman login berbasis NextJS, maka:
 	if [[ "$jslanding" = "" ]]; then
+		# Cari nilai dari csrf_token_wp
 		loadwp_token="$(echo "$wp" | grep csrf_token_wp | awk -F'[\t]'  '{print $7}')"
+		# Cari nilai dari default_wifi
 		loadwp_defaultwifi="$(echo "$wp" | grep default_wifi | awk -F'[\t]'  '{print $7}')"
 	fi
 }
