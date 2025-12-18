@@ -20,7 +20,7 @@ detectrandommac="$(dmesg | grep 'generated random MAC address')"
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="3.0.2"
+	ver="3.0.3"
 }
 
 bantuan() {
@@ -129,10 +129,15 @@ randommaccheck() {
 	if [[ "$detectrandommac" = "" ]]; then
 		# Tentukan MAC address dari berkas pengaturan
 		clientmac="$(uci -q get kopijahe.@autologin["$multiautologinnum"].clientmac)"
+		# Jika barisnya tidak ada atau nilainya kosong, maka:
+		# Tentukan MAC address dari hasil ifconfig
+		if [[ "$clientmac" = "" ]]; then
+			clientmac="$(ifconfig "$wandevice" | grep HWaddr | sed -n 's/.*HWaddr \([0-9A-Fa-f:]\{17\}\).*/\1/p')"
+		fi
 	# Jika terdeteksi MAC address acak, maka:
 	else
 		# Tentukan MAC address dari hasil ifconfig
-		clientmac="$(ifconfig "$wandevice" | grep HWaddr | awk -F'[ ]' '{print $10}')"
+		clientmac="$(ifconfig "$wandevice" | grep HWaddr | sed -n 's/.*HWaddr \([0-9A-Fa-f:]\{17\}\).*/\1/p')"
 	fi
 }
 
