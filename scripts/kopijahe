@@ -20,7 +20,7 @@ detectrandommac="$(dmesg | grep 'generated random MAC address')"
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="3.0.3"
+	ver="3.0.4"
 }
 
 bantuan() {
@@ -979,7 +979,7 @@ jsparser() {
 	#wpsession_id="$(echo "$wp" | awk -F'\\\\+"sessionid\\\\+":\\\\+"' 'NF>1{split($2,a,"\\\\\"");sub(/\\\\+$/,"",a[1]);print a[1];exit}')"
 	wpwlan="$wlanid"
 	wpapname="$(echo "$wpwlan" | awk -F'[:]' '{print $1}')"
-	wpssid="$(echo "$wpwlan" | awk -F'[:]' '{print $2}')"
+	wpssid="$(echo "$wpwlan" | awk -F '[:]' '{print $NF}')"
 }
 
 wplanjutkan() {
@@ -1143,6 +1143,10 @@ dataraw() {
 				# Jika digunakan untuk jaringan wms, wms-lite dan "lanjutkan", maka:
 				case "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" in
 					"wms-lanjutkan" | "wifi.id-lanjutkan" | "pegadaian")
+						password2="$password"
+						;;
+					"wms" | "wms-lite")
+						username2="$username.$randomid$username3"
 						password2="$password"
 						;;
 					*)
