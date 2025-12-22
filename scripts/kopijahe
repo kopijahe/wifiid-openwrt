@@ -20,7 +20,7 @@ detectrandommac="$(dmesg | grep 'generated random MAC address')"
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="3.0.4"
+	ver="3.0.5"
 }
 
 bantuan() {
@@ -265,7 +265,7 @@ loginuseragent(){
 
 generaterandomid() {
 	# Buat 2 pasang karakter acak untuk keperluan login di jaringan WMS
-	randomid="$(head -4 /dev/urandom | tr -dc "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" | head -c4)"
+	randomid="$(head -4 /dev/urandom | tr -dc "123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" | head -c4)"
 }
 
 generaterandompassword() {
@@ -445,12 +445,12 @@ setup() {
 	esac
 	
 	# Jika digunakan di jaringan WMS, maka tentukan variabel wms_id
-	case "$tipelogin:$jslanding" in
-		"wms:yes")
+	case "$tipelogin" in
+		"wmsjs")
 			wms_id="$(curl --resolve "welcome2.wifi.id:443:10.233.16.13" --resolve "welcome3.wifi.id:443:118.98.34.148" -k --silent -L --interface "$wandevice" "$urllanding" | awk -F'\\\\+"SID\\\\+":\\\\+"' 'NF>1{split($2,a,"\\\\\"");sub(/\\\\+$/,"",a[1]);print a[1];exit}')"
 			uci set kopijahe.@autologin["$multiautologinnum"].wmsid="$wms_id"
 			;;
-		"wms:*")
+		"wms")
 			# shellcheck disable=2020
 			wms_id="$(curl --resolve "welcome2.wifi.id:443:10.233.16.13" --resolve "welcome3.wifi.id:443:118.98.34.148" -k --silent -L --interface "$wandevice" "$urllanding" | grep makeId | awk -F'[.]' '{print $4}' | tr -dc "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\n" | awk '!a[$0]++' | tr -d "\n")"
 			uci set kopijahe.@autologin["$multiautologinnum"].wmsid="$wms_id"
@@ -1055,15 +1055,14 @@ wificommunity() {
 			generaterandomid
 			# Cek apakah tipe login wmslite baru
 			wmsid="$(uci -q get kopijahe.@autologin["$multiautologinnum"].wmsid)"
-			if [[ "$tipelogin" = "wmslite" ]]; then
-				# Jika iya, maka:
-				# Tentukan akhiran username login untuk jaringan WMS Lite baru
-				username3="@wmslite.$wmsid.000"
-			else
-				# Jika tipe lama, maka:
-				# Tentukan akhiran username login untuk jaringan WMS Lite lama
-				username3="@wmslite.$wmsid"
-			fi
+			case "$jslanding" in
+				"yes")
+					username3="@wmslite.$wmsid.000"
+					;;
+				*)
+					username3="@wmslite.$wmsid"
+					;;
+			esac
 			;;
 		"wms")
 			# Jika WMS, maka:
