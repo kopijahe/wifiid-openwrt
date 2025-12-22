@@ -20,7 +20,7 @@ detectrandommac="$(dmesg | grep 'generated random MAC address')"
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="3.0.6"
+	ver="3.0.7"
 }
 
 bantuan() {
@@ -990,10 +990,16 @@ jsparser() {
 	# Kumpulkan nilai-nilai yang diperlukan
 	wprealm="$(echo "$wp" | awk -F'\\\\+"realm\\\\+":\\\\+"' 'NF>1{split($2,a,"\\\\\"");sub(/\\\\+$/,"",a[1]);print a[1];exit}')"
 	wpsessionkey="$(echo "$wp" | awk -F'\\\\+"session_key\\\\+":\\\\+"' 'NF>1{split($2,a,"\\\\\"");sub(/\\\\+$/,"",a[1]);print a[1];exit}')"
-	#wpsession_id="$(echo "$wp" | awk -F'\\\\+"sessionid\\\\+":\\\\+"' 'NF>1{split($2,a,"\\\\\"");sub(/\\\\+$/,"",a[1]);print a[1];exit}')"
-	wpwlan="$wlanid"
+	wpsession_id="$(echo "$wp" | awk -F'\\\\+"sessionid\\\\+":\\\\+"' 'NF>1{split($2,a,"\\\\\"");sub(/\\\\+$/,"",a[1]);print a[1];exit}')"
+	wpwlan="$(echo "$wlanid" | sed 's/%20/ /g')"
 	wpapname="$(echo "$wpwlan" | awk -F'[:]' '{print $1}')"
 	wpssid="$(echo "$wpwlan" | awk -F '[:]' '{print $NF}')"
+	
+	# Jika nilai session_id di halaman login tidak sama dengan session_id yang tersimpan, maka perbarui nilainya:
+	if [[ "$session_id" != "$wpsession_id" ]]; then
+		uci set kopijahe.@autologin["$multiautologinnum"].sessionid="$wpsession_id"
+			uci commit kopijahe
+	fi
 }
 
 wplanjutkan() {
@@ -1156,7 +1162,7 @@ dataraw() {
 				# Jika digunakan untuk jaringan wms, wms-lite dan "lanjutkan", maka:
 				case "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" in
 					"wms-lanjutkan" | "wifi.id-lanjutkan" | "pegadaian")
-						password2="$password"
+						password2="$password_lanjutkan"
 						;;
 					"wms" | "wms-lite")
 						username2="$username.$randomid$username3"
@@ -1166,22 +1172,20 @@ dataraw() {
 						password2="$password"
 						;;
 				esac
-				json_payload="$(printf '{"username":"%s","password":"%s","gw_id":"%s","ipc":"%s","url":"%s","useragent":"%s","key":"%s","otp":"%s","ssid":"%s","mac":"%s","apname":"%s","wlan":"%s","sessionid":"%s","session_key":"%s","load_time":"%s","latitude":null,"longitude":null}' \
+				json_payload="$(printf '{"username":"%s","password":"%s","gw_id":"%s","ipc":"%s","url":"%s","useragent":"%s","key":"","otp":"","ssid":"%s","mac":"%s","apname":"%s","wlan":"%s","sessionid":"%s","session_key":"%s","load_time":%s,"latitude":null,"longitude":null}' \
 				  "$username2" \
 				  "$password2" \
 				  "$gwid" \
 				  "$iprouter" \
-				  "$urllanding" \
+				  "$(echo "$urllanding" | sed 's/%20/ /g')" \
 				  "$autologinuseragent" \
-				  "" \
-				  "" \
 				  "$wpssid" \
 				  "$clientmac" \
 				  "$wpapname" \
 				  "$wpwlan" \
 				  "$session_id" \
 				  "$wpsessionkey" \
-				  "$loadwp_value"				  
+				  "$loadwp_value"
 				)"
 				login_cred="$json_payload"
 				;;
@@ -1467,7 +1471,8 @@ login_wifi() {
 		case "$jslanding" in
 		"yes")
 			attempt="$($curladditionalparameter --resolve "welcome2.wifi.id:443:10.233.16.13" --resolve "welcome3.wifi.id:443:118.98.34.148" --resolve "americano.wifi.id:443:10.1.64.161" --resolve "americano2.wifi.id:443:10.233.16.51" --silent --retry 1 --connect-timeout 3 --interface "$wandevice" "$loginurl" \
-			-H "origin: ""$server_id""" \
+			-X POST \
+			-H "origin: https://""$server_id""" \
 			-H "referer: https://""$server_id""" \
 			-H "X-Authorization-Token: $auth_token" \
 			-H "X-Authorization-Time: $auth_time" \
@@ -1475,8 +1480,13 @@ login_wifi() {
 			-H 'sec-ch-ua-platform: "Windows"' \
 			-H 'sec-ch-ua: "Not:A-Brand";v="99", "Google Chrome";v="145", "Chromium";v="145"' \
 			-H 'sec-ch-ua-mobile: ?0' \
-			-H 'Accept: application/json' \
+			-H 'accept: application/json, text/plain, */*' \
 			-H 'Content-Type: application/json' \
+			-H 'cache-control: no-cache' \
+			-H 'Sec-Fetch-Dest: empty' \
+			-H 'Sec-Fetch-Mode: cors' \
+			-H 'Sec-Fetch-Site: same-site' \
+			-H 'priority: u=1, i' \
 			--data-raw "$login_cred")"
 			;;
 		*)
