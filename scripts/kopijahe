@@ -20,7 +20,7 @@ detectrandommac="$(dmesg | grep 'generated random MAC address')"
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="3.0.5"
+	ver="3.0.6"
 }
 
 bantuan() {
@@ -427,6 +427,20 @@ setup() {
 		# Deteksi variabel server_id
 		server_id="$(echo "$deteksi" | awk -F'[/]' '{print $3}')"
 	fi
+	
+	# Pembantu sementara dalam masa transisi dari tipelogin lama ke tipe login baru
+	# Karena terkadang pengguna tidak memasukkan URL login terbaru, tapi menggunakan URL login lama, sehingga terjadi error
+	# Jadi rubah secara manual semua tipe login lama ke tipe login baru
+	case "$tipelogin" in
+		"login")
+			tipelogin="loginjs"
+			;;
+		"wms")
+			tipelogin="wmsjs"
+			;;
+		*)
+			;;
+	esac
 	
 	# Masukkan konfigurasi sesuai dengan hasil di atas dan sesuai dengan nomor konfigurasi multi-autologin
 	uci set kopijahe.@autologin["$multiautologinnum"].tipelogin="$tipelogin"
