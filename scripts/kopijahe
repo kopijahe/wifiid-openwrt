@@ -20,7 +20,7 @@ detectrandommac="$(dmesg | grep 'generated random MAC address')"
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="3.0.7"
+	ver="3.0.8"
 }
 
 bantuan() {
@@ -128,16 +128,16 @@ randommaccheck() {
 	# Jika tidak terdeteksi perangkat memiliki MAC address acak, maka:
 	if [[ "$detectrandommac" = "" ]]; then
 		# Tentukan MAC address dari berkas pengaturan
-		clientmac="$(uci -q get kopijahe.@autologin["$multiautologinnum"].clientmac)"
+		clientmac="$(uci -q get kopijahe.@autologin["$multiautologinnum"].clientmac | tr 'A-F' 'a-f')"
 		# Jika barisnya tidak ada atau nilainya kosong, maka:
 		# Tentukan MAC address dari hasil ifconfig
 		if [[ "$clientmac" = "" ]]; then
-			clientmac="$(ifconfig "$wandevice" | grep HWaddr | sed -n 's/.*HWaddr \([0-9A-Fa-f:]\{17\}\).*/\1/p')"
+			clientmac="$(ifconfig "$wandevice" | grep HWaddr | sed -n 's/.*HWaddr \([0-9A-Fa-f:]\{17\}\).*/\1/p' | tr 'A-F' 'a-f')"
 		fi
 	# Jika terdeteksi MAC address acak, maka:
 	else
 		# Tentukan MAC address dari hasil ifconfig
-		clientmac="$(ifconfig "$wandevice" | grep HWaddr | sed -n 's/.*HWaddr \([0-9A-Fa-f:]\{17\}\).*/\1/p')"
+		clientmac="$(ifconfig "$wandevice" | grep HWaddr | sed -n 's/.*HWaddr \([0-9A-Fa-f:]\{17\}\).*/\1/p' | tr 'A-F' 'a-f')"
 	fi
 }
 
@@ -265,7 +265,7 @@ loginuseragent(){
 
 generaterandomid() {
 	# Buat 2 pasang karakter acak untuk keperluan login di jaringan WMS
-	randomid="$(head -4 /dev/urandom | tr -dc "123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" | head -c4)"
+	randomid="$(head -4 /dev/urandom | tr -dc "123456789abcdefghjkmnpqrstuvwxyzABCDEFGHIJKLMNPQRSTUVWXYZ" | head -c4)"
 }
 
 generaterandompassword() {
@@ -298,7 +298,7 @@ generaterandommac() {
 	# Potong 2 karakter akhir di MAC lama, dan masukkan 2 karakter baru yang dibuat di atas
 	# shellcheck disable=2116
 	# shellcheck disable=3057
-	newwanmac="$(echo "${wanmac::-2}""$randommac")"
+	newwanmac="$(echo "${wanmac::-2}""$randommac" | tr 'A-F' 'a-f')"
 	
 	# Matikan interface terlebih dahulu
 	ifconfig "$wandevice" down
@@ -405,7 +405,7 @@ setup() {
 		# Deteksi variabel gw_id
 		gwid="$(echo "$deteksi" | awk -F'[=&]' '{print $2}')"
 		# Deteksi MAC address yang digunakan
-		clientmac="$(echo "$deteksi" | awk -F'[=&]' '{print $8}')"
+		clientmac="$(echo "$deteksi" | awk -F'[=&]' '{print $8}' | tr 'A-F' 'a-f')"
 		# Deteksi variabel wlan_id
 		wlanid="$(echo "$deteksi" | awk -F'[=&]' '{print $6}')"
 		# Deteksi variabel session_id, filter hasilnya agar tidak ada error
@@ -419,7 +419,7 @@ setup() {
 		# Deteksi variabel gw_id
 		gwid="$(echo "$deteksi" | awk -F'[=&]' '{print $2}')"
 		# Deteksi MAC address yang digunakan
-		clientmac="$(echo "$deteksi" | awk -F'[=&]' '{print $4}')"
+		clientmac="$(echo "$deteksi" | awk -F'[=&]' '{print $4}' | tr 'A-F' 'a-f')"
 		# Deteksi variabel wlan_id
 		wlanid="$(echo "$deteksi" | awk -F'[=&]' '{print $6}')"
 		# Deteksi variabel session_id, filter hasilnya agar tidak ada error
@@ -1180,7 +1180,7 @@ dataraw() {
 				  "$(echo "$urllanding" | sed 's/%20/ /g')" \
 				  "$autologinuseragent" \
 				  "$wpssid" \
-				  "$clientmac" \
+				  "$(echo $clientmac | tr 'A-F' 'a-f')" \
 				  "$wpapname" \
 				  "$wpwlan" \
 				  "$session_id" \
@@ -1246,7 +1246,7 @@ loadwelcomepage() {
 	# Jika hasilnya kosong, maka:
 	if [[ "$loadwp_value" = "" ]]; then
 		# Kalkulasi sendiri nilainya:
-		loadwp_value="$(awk 'BEGIN {print ("'"$afterloadwp"'"-"'"$beforeloadwp"'") * 100 }')"
+		loadwp_value="$(awk 'BEGIN {print ("'"$afterloadwp"'"-"'"$beforeloadwp"'") * 100 + 5000 }')"
 	fi
 	
 	# Jika tidak digunakan di halaman login berbasis NextJS, maka:
