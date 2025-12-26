@@ -20,7 +20,7 @@ detectrandommac="$(dmesg | grep 'generated random MAC address')"
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="3.0.9"
+	ver="3.1.0"
 }
 
 bantuan() {
@@ -428,6 +428,21 @@ setup() {
 		server_id="$(echo "$deteksi" | awk -F'[/]' '{print $3}')"
 	fi
 	
+	# Jika digunakan di jaringan WMS, maka tentukan variabel wms_id
+	case "$tipelogin" in
+		"wmsjs")
+			wms_id="$(curl --resolve "welcome2.wifi.id:443:10.233.16.13" --resolve "welcome3.wifi.id:443:118.98.34.148" -k --silent -L --interface "$wandevice" "$urllanding" | awk -F'\\\\+"SID\\\\+":\\\\+"' 'NF>1{split($2,a,"\\\\\"");sub(/\\\\+$/,"",a[1]);print a[1];exit}')"
+			uci set kopijahe.@autologin["$multiautologinnum"].wmsid="$wms_id"
+			;;
+		"wms")
+			# shellcheck disable=2020
+			wms_id="$(curl --resolve "welcome2.wifi.id:443:10.233.16.13" --resolve "welcome3.wifi.id:443:118.98.34.148" -k --silent -L --interface "$wandevice" "$urllanding" | grep makeId | awk -F'[.]' '{print $4}' | tr -dc "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\n" | awk '!a[$0]++' | tr -d "\n")"
+			uci set kopijahe.@autologin["$multiautologinnum"].wmsid="$wms_id"
+			;;
+		*)
+			;;
+	esac
+	
 	# Pembantu sementara dalam masa transisi dari tipelogin lama ke tipe login baru
 	# Karena terkadang pengguna tidak memasukkan URL login terbaru, tapi menggunakan URL login lama, sehingga terjadi error
 	# Jadi rubah secara manual semua tipe login lama ke tipe login baru
@@ -453,21 +468,6 @@ setup() {
 	case "$tipelogin" in
 		"loginjs" | "wmsjs")
 			uci set kopijahe.@autologin["$multiautologinnum"].jslanding='yes'
-			;;
-		*)
-			;;
-	esac
-	
-	# Jika digunakan di jaringan WMS, maka tentukan variabel wms_id
-	case "$tipelogin" in
-		"wmsjs")
-			wms_id="$(curl --resolve "welcome2.wifi.id:443:10.233.16.13" --resolve "welcome3.wifi.id:443:118.98.34.148" -k --silent -L --interface "$wandevice" "$urllanding" | awk -F'\\\\+"SID\\\\+":\\\\+"' 'NF>1{split($2,a,"\\\\\"");sub(/\\\\+$/,"",a[1]);print a[1];exit}')"
-			uci set kopijahe.@autologin["$multiautologinnum"].wmsid="$wms_id"
-			;;
-		"wms")
-			# shellcheck disable=2020
-			wms_id="$(curl --resolve "welcome2.wifi.id:443:10.233.16.13" --resolve "welcome3.wifi.id:443:118.98.34.148" -k --silent -L --interface "$wandevice" "$urllanding" | grep makeId | awk -F'[.]' '{print $4}' | tr -dc "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\n" | awk '!a[$0]++' | tr -d "\n")"
-			uci set kopijahe.@autologin["$multiautologinnum"].wmsid="$wms_id"
 			;;
 		*)
 			;;
@@ -973,7 +973,7 @@ login_folder() {
 		"wmsjs")
 			# Jika menggunakan halaman login berbasis nextjs, maka:
 			loginurl="https://$server_id2.wifi.id/luwak_wifi/wpwms/check-login"
-			storeurl="https://$server_id.wifi.id/wmsjs/api/store-autologin/"
+			storeurl="https://$server_id/wmsjs/api/store-autologin/"
 			;;
 		*)
 			# Jika tipe login tidak diketahui, maka kemungkinan konfigurasi masih belum lengkap, silahkan ulangi deteksi otomatis jaringan
@@ -1446,6 +1446,63 @@ hasil_loginout() {
 			echo "$curl_status. Status koneksi ke $wpssid: $statuskoneksi" | logger -t "kopijahe $ver"
 		fi
 	fi
+	
+	# Jika digunakan di tipe login baru, sukses login, dan di jaringan wms, wms-lite, *-lanjutkan, pegadaian:
+	case "$loginout:$wifivariant" in
+		"Sukses Login":"wms"|"Sukses Login":"wms-lite"|"Sukses Login":"wms-lanjutkan"|"Sukses Login":"wifi.id-lanjutkan"|"Sukses Login":"pegadaian")
+			# Kirim data autologin ke server
+			wmsstoreautologin
+			storeautologin_value="$(echo "$storeautologin" | awk 'END{print}' | jsonfilter -e '@["message"]' 2> /dev/null)"
+			# Jika digunakan di jaringan yang juga perlu check-in di store-autologin, maka:
+			case "$loginout:$storeautologin_value" in				
+				"Sukses Login":"")
+					;;
+				"Sukses Login":*)
+					# Beritahu pengguna hasilnya
+					case "$advancedmode" in
+						"true")
+							# Beritahu pengguna melalui layar terminal/stdout
+							echo "Penyimpanan autologin ke server. Interface: $waninterface. status: $storeautologin_value"
+							# Simpan juga hasilnya di berkas "/tmp/last.login.$waninterface" dan beritahu pengguna melalui System Log
+							echo "Penyimpanan autologin ke server. Interface: $waninterface. status: $storeautologin_value" | tee -a "/tmp/last.login.$waninterface" | logger -t "kopijahe $ver"
+							;;
+						# Jika tidak, maka:
+						*)
+							# Simpan hasilnya di berkas "/tmp/last.login.$waninterface" dan beritahu pengguna melalui System Log
+							echo "Penyimpanan autologin ke server. Interface: $waninterface. status: $storeautologin_value" | tee -a "/tmp/last.login.$waninterface" | logger -t "kopijahe $ver"
+							;;
+					esac
+					;;
+				*)
+					;;
+			esac
+			;;
+		*)
+			;;
+	esac
+}
+
+wmsstoreautologin() {
+	# Fungsi pengiriman data autologin ke server
+	
+	# Lakukan langkah tambahan pengiriman data ke server
+	storeautologin="$($curladditionalparameter --resolve "welcome2.wifi.id:443:10.233.16.13" --resolve "welcome3.wifi.id:443:118.98.34.148" --resolve "americano.wifi.id:443:10.1.64.161" --resolve "americano2.wifi.id:443:10.233.16.51" --silent --retry 1 --connect-timeout 3 --interface "$wandevice" "$storeurl" \
+	-X POST \
+	-H "origin: https://""$server_id""" \
+	-H "referer: https://""$server_id""" \
+	-H "User-Agent: $autologinuseragent" \
+	-H "Cookie: wp-wms-js.csrf-token=$loadwp_token; wp-wms-js.callback-url=$loadwp_callback" \
+	-H 'sec-ch-ua-platform: "Windows"' \
+	-H 'sec-ch-ua: "Not:A-Brand";v="99", "Google Chrome";v="145", "Chromium";v="145"' \
+	-H 'sec-ch-ua-mobile: ?0' \
+	-H 'accept: application/json, text/plain, */*' \
+	-H 'Content-Type: application/json' \
+	-H 'cache-control: no-cache' \
+	-H 'Sec-Fetch-Dest: empty' \
+	-H 'Sec-Fetch-Mode: cors' \
+	-H 'Sec-Fetch-Site: same-site' \
+	-H 'priority: u=1, i' \
+	--data-raw "$storeautologin_cred")"
 }
 
 logout_wifi() {
@@ -1801,45 +1858,6 @@ if [[ "$didlogin" = "false" ]]; then
 					login_wifi
 				fi
 			fi
-			# Istirahat sebelum mencoba kembali
-			sleep "$sleeptime"
-			;;
-		# Jika status login sukses dan digunakan di jaringan WMS, WMS Lite, *-lanjutkan dan pegadaian:
-		"Sukses Login:wms"|"Sukses Login:wms-lite"|"Sukses Login:wms-lanjutkan"|"Sukses Login:wifi.id-lanjutkan"|"Sukses Login:pegadaian")
-			# Lakukan langkah tambahan pengiriman data ke server
-			storeautologin="$($curladditionalparameter --resolve "welcome2.wifi.id:443:10.233.16.13" --resolve "welcome3.wifi.id:443:118.98.34.148" --resolve "americano.wifi.id:443:10.1.64.161" --resolve "americano2.wifi.id:443:10.233.16.51" --silent --retry 1 --connect-timeout 3 --interface "$wandevice" "$storeurl" \
-			-X POST \
-			-H "origin: https://""$server_id""" \
-			-H "referer: https://""$server_id""" \
-			-H "User-Agent: $autologinuseragent" \
-			-H "Cookie: wp-wms-js.csrf-token=$loadwp_token; wp-wms-js.callback-url=$loadwp_callback" \
-			-H 'sec-ch-ua-platform: "Windows"' \
-			-H 'sec-ch-ua: "Not:A-Brand";v="99", "Google Chrome";v="145", "Chromium";v="145"' \
-			-H 'sec-ch-ua-mobile: ?0' \
-			-H 'accept: application/json, text/plain, */*' \
-			-H 'Content-Type: application/json' \
-			-H 'cache-control: no-cache' \
-			-H 'Sec-Fetch-Dest: empty' \
-			-H 'Sec-Fetch-Mode: cors' \
-			-H 'Sec-Fetch-Site: same-site' \
-			-H 'priority: u=1, i' \
-			--data-raw "$storeautologin_cred")"
-			
-			# Beritahu pengguna hasilnya
-			storeautologin_value="$(echo "$storeautologin" | awk 'END{print}' | jsonfilter -e '@["message"]' 2> /dev/null)"
-			case "$advancedmode" in
-				"true")
-					# Beritahu pengguna melalui layar terminal/stdout
-					echo "Penyimpanan autologin ke server. Interface: $waninterface. status: $storeautologin_value"
-					# Simpan juga hasilnya di berkas "/tmp/last.login.$waninterface" dan beritahu pengguna melalui System Log
-					echo "Penyimpanan autologin ke server. Interface: $waninterface. status: $storeautologin_value" | tee -a "/tmp/last.login.$waninterface" | logger -t "kopijahe $ver"
-					;;
-				# Jika tidak, maka:
-				*)
-					# Simpan hasilnya di berkas "/tmp/last.login.$waninterface" dan beritahu pengguna melalui System Log
-					echo "Penyimpanan autologin ke server. Interface: $waninterface. status: $storeautologin_value" | tee -a "/tmp/last.login.$waninterface" | logger -t "kopijahe $ver"
-					;;
-			esac
 			# Istirahat sebelum mencoba kembali
 			sleep "$sleeptime"
 			;;
