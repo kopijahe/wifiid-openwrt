@@ -20,7 +20,7 @@ detectrandommac="$(dmesg | grep 'generated random MAC address')"
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="3.1.0"
+	ver="3.1.1"
 }
 
 bantuan() {
@@ -355,43 +355,57 @@ detecturl() {
 	
 	# Lakukan pengulangan fungsi jika gagal
 	while [[ "$detecturlcount" -lt 2 ]]; do
+		# Kosongkan nilai deteksi dan urllanding sebelum melanjutkan
+		deteksi=""
+		urllanding=""
 		
 		# Cek apakah sebelumnya gagal
-		if [[ "$deteksi" = "gagal" ]]; then
-			# Jika iya, maka:
-			# Tentukan URL deteksi
-			urldetect="http://8.8.8.8/"
-		else
+		if [[ "$detecturlcount" -eq 0 ]]; then
 			# Jika tidak, maka:
 			# Tentukan URL deteksi
 			urldetect="http://periksakoneksi.kopijahe.my.id/cek"
+		else
+			# Jika iya, maka:
+			# Tentukan URL deteksi
+			urldetect="http://8.8.8.8/"
 		fi
 		
 		# Deteksi URL login dengan cara melihat jawaban redirect dari halaman periksa koneksi
-		deteksi="$(curl -k -I --silent --interface "$wandevice" --max-redirs 1 --connect-timeout 10 "$urldetect" | grep "Location" | sed 's/http/https/g' | sed 's/httpss/https/g')"
+		detectheaders="$(curl -k -I --silent --interface "$wandevice" --max-redirs 1 --connect-timeout 10 "$urldetect")"
+		
+		# Deteksi URL login yang muncul, lalu ganti http dengan https, bersiap juga dengan typo dari pengguna
+		deteksi="$(printf '%s\n' "$detectheaders" | grep "Location" | sed 's/http/https/g' | sed 's/httpss/https/g')"
 		
 		# Jika gagal mendeteksi menggunakan teknik di atas, maka:
 		if [[ "$deteksi" = "" ]]; then
 			# Deteksi URL login dengan cara melihat URL landing di halaman redirect
-			urllanding="$(curl -k -I --silent --interface "$wandevice" --max-redirs 1 --connect-timeout 10 "$urldetect" | grep URL | awk -F'[;]' '{print $2}' | head -c -3 | sed 's/ /%20/g' | sed 's/http/https/g' | sed 's/httpss/https/g')"
+			urllanding="$(printf '%s\n' "$detectheaders" | grep URL | awk -F'[;]' '{print $2}' | head -c -3 | sed 's/ /%20/g' | sed 's/http/https/g' | sed 's/httpss/https/g')"
 			deteksi=" Location: $urllanding"
 		fi
 		
 		# Jika masih saja gagal, maka:
 		if [[ "$deteksi" = "" ]]; then
-			urllanding="$(curl -k -I --silent --interface "$wandevice" --max-redirs 1 --connect-timeout 10 "$urldetect" | grep URL | awk -F'[;]' '{print $2}' | head -c -3 | awk -F'[=]' '{print $2"="$3"="$4"="$5"="$6"="$7}' | sed 's/http/https/g' | sed 's/httpss/https/g')"
+			urllanding="$(printf '%s\n' "$detectheaders" | grep URL | awk -F'[;]' '{print $2}' | head -c -3 | awk -F'[=]' '{print $2"="$3"="$4"="$5"="$6"="$7}' | sed 's/http/https/g' | sed 's/httpss/https/g')"
 			deteksi=" Location: $urllanding"
 		fi
 		
-		# Jika ternyata masih saja gagal, maka:
-		if [[ "$deteksi" = "" ]]; then
-			# Nyatakan deteksi gagal
-			deteksi="gagal"
-			detecturlcount="$((detecturlcount+1))"
-		else
-			detecturlcount=2
+		# Jika nilai deteksi sudah bukan kosong, maka:
+		if [[ -n "$deteksi" ]]; then
+			# Hentikan loop
+			break
 		fi
+		
+		# Jika ternyata masih saja gagal, maka:
+		# Nyatakan deteksi gagal
+		deteksi="gagal"
+		detecturlcount="$((detecturlcount+1))"
 	done
+	
+	# Jika deteksi otomatis masih saja gagal, maka:
+	if [[ "$deteksi" = "gagal" ]]; then	
+		# Beritahu pengguna bahwa deteksi otomatis gagal, dan untuk mengisinya secara manual
+		echo "URL login tidak ditemukan secara otomatis di koneksi $waninterface, silahkan masukkan nilainya secara manual dengan perintah: kopijahe -d" | logger -t "kopijahe $ver"
+	fi
 }
 
 setup() {
@@ -428,16 +442,10 @@ setup() {
 		server_id="$(echo "$deteksi" | awk -F'[/]' '{print $3}')"
 	fi
 	
-	# Jika digunakan di jaringan WMS, maka tentukan variabel wms_id
+	# Jika digunakan di jaringan WMS, maka cari nilai dari wmsid
 	case "$tipelogin" in
-		"wmsjs")
-			wms_id="$(curl --resolve "welcome2.wifi.id:443:10.233.16.13" --resolve "welcome3.wifi.id:443:118.98.34.148" -k --silent -L --interface "$wandevice" "$urllanding" | awk -F'\\\\+"SID\\\\+":\\\\+"' 'NF>1{split($2,a,"\\\\\"");sub(/\\\\+$/,"",a[1]);print a[1];exit}')"
-			uci set kopijahe.@autologin["$multiautologinnum"].wmsid="$wms_id"
-			;;
-		"wms")
-			# shellcheck disable=2020
-			wms_id="$(curl --resolve "welcome2.wifi.id:443:10.233.16.13" --resolve "welcome3.wifi.id:443:118.98.34.148" -k --silent -L --interface "$wandevice" "$urllanding" | grep makeId | awk -F'[.]' '{print $4}' | tr -dc "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\n" | awk '!a[$0]++' | tr -d "\n")"
-			uci set kopijahe.@autologin["$multiautologinnum"].wmsid="$wms_id"
+		"wms"|"wmsjs")
+			loadwmsid
 			;;
 		*)
 			;;
@@ -1358,6 +1366,34 @@ loadgwid() {
 	fi
 }
 
+loadwmsid() {
+	# Fungsi memperbarui wmsid (jika diperlukan)
+	
+	# Ambil welcome page terlebih dahulu
+	wp="$($curladditionalparameter --resolve "welcome2.wifi.id:443:10.233.16.13" --resolve "welcome3.wifi.id:443:118.98.34.148" --resolve "americano.wifi.id:443:10.1.64.161" --resolve "americano2.wifi.id:443:10.233.16.51" --silent --interface "$wandevice" --retry 2 --connect-timeout 2 -c - "$urllanding")"
+	case "$tipelogin" in
+		"wmsjs")
+			# Kosongkan nilai "wms_id" sebelumnya jika ada:
+			wms_id=""
+			# Cari nilai "wms_id" di welcome page
+			wms_id="$(echo "$wp" | awk -F'\\\\+"SID\\\\+":\\\\+"' 'NF>1{split($2,a,"\\\\\"");sub(/\\\\+$/,"",a[1]);print a[1];exit}')"
+			# Simpan hasilnya
+			uci set kopijahe.@autologin["$multiautologinnum"].wmsid="$wms_id"
+			;;
+		"wms")
+			# Kosongkan nilai "wms_id" sebelumnya jika ada:
+			wms_id=""
+			# Cari nilai "wms_id" di welcome page
+			# shellcheck disable=2020
+			wms_id="$(echo "$wp" | grep makeId | awk -F'[.]' '{print $4}' | tr -dc "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\n" | awk '!a[$0]++' | tr -d "\n")"
+			# Simpan hasilnya
+			uci set kopijahe.@autologin["$multiautologinnum"].wmsid="$wms_id"
+			;;
+		*)
+			;;
+	esac
+}
+
 hasil_loginout() {
 	# Fungsi output hasil login dan logout
 	
@@ -1860,6 +1896,53 @@ if [[ "$didlogin" = "false" ]]; then
 			fi
 			# Istirahat sebelum mencoba kembali
 			sleep "$sleeptime"
+			;;
+		# Jika status login gagal dengan alasan "Bad Request" di jaringan wms, wms-lite, *-lanjutkan dan pegadaian, maka:
+		"Bad Request":"wms"|"Bad Request":"wms-lite"|"Bad Request":"wms-lanjutkan"|"Bad Request":"wifi.id-lanjutkan"|"Bad Request":"pegadaian")
+			# Cek apakah nilai wmsid kosong atau tidak
+			case "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wmsid)" in
+				# Jika kosong, maka:
+				"")
+					# Tentukan nilai variabel "emptywmsidcount" terlebih dahulu
+					emptywmsidcount=0
+					# Simpan tipe login asli terlebih dahulu
+					tipeloginasli="$tipelogin"
+					# Lakukan pencarian nilai "wmsid" secara otomatis di 
+					while [[ "$emptywmsidcount" -lt 2 ]] && [[ "$wms_id" = "" ]]; do
+						# Cari nilai wmsid kembali
+						loadwmsid
+						
+						# Cek apakah nilai wmsid masih kosong, jika iya, maka:
+						if [[ "$wms_id" = "" ]]; then
+							# Coba tukar nilai variabel tipelogin untuk sementara waktu
+							case "$tipelogin" in
+								"wms")
+									tipelogin="wmsjs"
+									;;
+								"wmsjs")
+									tipelogin="wms"
+									;;
+							esac
+						fi
+						# Tambahkan nilai jumlah deteksi wmsid
+						emptywmsidcount="$((emptywmsidcount+1))"
+					done
+					
+					# Kembalikan nilai variabel tipelogin ke nilai awal
+					tipelogin="$tipeloginasli"
+
+					# Jika nilainya masih saja kosong, maka:
+					if [[ "$wms_id" = "" ]]; then
+						# Beritahu pengguna bahwa deteksi otomatis gagal, dan untuk mengisinya secara manual
+						echo "Nilai 'wmsid' tidak ditemukan secara otomatis di koneksi $waninterface, silahkan masukkan nilainya secara manual dengan perintah: uci set kopijahe.@autologin[""$multiautologinnum""].wmsid='nilai wmsid'" | logger -t "kopijahe $ver"
+					else
+						# Lalu lakukan login
+						login_wifi
+					fi
+					;;
+			esac
+			# Istirahat sebelum mencoba kembali
+			sleep "$sleeptime" 
 			;;
 		*)
 			login_wifi
