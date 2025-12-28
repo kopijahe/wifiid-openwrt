@@ -20,7 +20,7 @@ detectrandommac="$(dmesg | grep 'generated random MAC address')"
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="3.1.1"
+	ver="3.1.2"
 }
 
 bantuan() {
@@ -1370,7 +1370,7 @@ loadwmsid() {
 	# Fungsi memperbarui wmsid (jika diperlukan)
 	
 	# Ambil welcome page terlebih dahulu
-	wp="$($curladditionalparameter --resolve "welcome2.wifi.id:443:10.233.16.13" --resolve "welcome3.wifi.id:443:118.98.34.148" --resolve "americano.wifi.id:443:10.1.64.161" --resolve "americano2.wifi.id:443:10.233.16.51" --silent --interface "$wandevice" --retry 2 --connect-timeout 2 -c - "$urllanding")"
+	wp="$(curl -k --resolve "welcome2.wifi.id:443:10.233.16.13" --resolve "welcome3.wifi.id:443:118.98.34.148" --resolve "americano.wifi.id:443:10.1.64.161" --resolve "americano2.wifi.id:443:10.233.16.51" --silent --interface "$wandevice" --retry 2 --connect-timeout 2 -c - "$urllanding")"
 	case "$tipelogin" in
 		"wmsjs")
 			# Kosongkan nilai "wms_id" sebelumnya jika ada:
@@ -1939,6 +1939,23 @@ if [[ "$didlogin" = "false" ]]; then
 						# Lalu lakukan login
 						login_wifi
 					fi
+					;;
+			esac
+			# Cek apakah nilai dari wpsessionkey kosong atau tidak
+			case "$wpsessionkey" in
+				"")
+					# Coba logout terlebih dahulu
+					logout_wifi
+					# Buat MAC address baru
+					generaterandommac
+					# Tentukan bahwa perlu refresh session_id
+					needsessionidrefresh="yes"
+					# Dapatkan IP baru
+					releaseobtainnewip
+					# Lalu lakukan login
+					login_wifi
+					;;
+				*)
 					;;
 			esac
 			# Istirahat sebelum mencoba kembali
