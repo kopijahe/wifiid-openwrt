@@ -20,7 +20,7 @@ detectrandommac="$(dmesg | grep 'generated random MAC address')"
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="3.1.2"
+	ver="3.1.3"
 }
 
 bantuan() {
@@ -1223,7 +1223,7 @@ dataraw() {
 				  "$password" \
 				  "$gwid" \
 				  "$iprouter" \
-				  "https://$server_id2.wifi.id/luwak_wifi/" \
+				  "https://$server_id2.wifi.id/luwak_wifi/?gw_id=""$gwid""&client_mac=""$clientmac""&wlan=""$wlanid""&sessionid=""$session_id""" \
 				  "$autologinuseragent" \
 				  "$wpssid" \
 				  "$clientmac" \
@@ -1459,11 +1459,23 @@ hasil_loginout() {
 			echo "Percobaan $function. Interface: $waninterface. $hasilloginout"
 			# Simpan juga hasilnya di berkas "/tmp/last.login.$waninterface" dan beritahu pengguna melalui System Log
 			echo "Percobaan $function. Interface: $waninterface. $hasilloginout" | tee -a "/tmp/last.login.$waninterface" | logger -t "kopijahe $ver"
+			# Simpan juga nilai variabel percobaan login dan jawaban lengkap server di berkas "/tmp/last.login.$waninterface"
+			# shellcheck disable=3037
+			echo -e "\nVariabel login:" >> "/tmp/last.login.$waninterface"
+			echo "$login_cred" >> "/tmp/last.login.$waninterface"
+			echo "Jawaban lengkap server:" >> "/tmp/last.login.$waninterface"
+			echo "$attempt" >> "/tmp/last.login.$waninterface"
 			;;
 		# Jika tidak, maka:
 		*)
 			# Simpan hasilnya di berkas "/tmp/last.login.$waninterface" dan beritahu pengguna melalui System Log
 			echo "Percobaan $function. Interface: $waninterface. $hasilloginout" | tee -a "/tmp/last.login.$waninterface" | logger -t "kopijahe $ver"
+			# Simpan juga nilai variabel percobaan login dan jawaban lengkap server di berkas "/tmp/last.login.$waninterface"
+			# shellcheck disable=3037 
+			echo -e "\nVariabel login:" >> "/tmp/last.login.$waninterface"
+			echo "$login_cred" >> "/tmp/last.login.$waninterface"
+			echo "Jawaban lengkap server:" >> "/tmp/last.login.$waninterface"
+			echo "$attempt" >> "/tmp/last.login.$waninterface"
 			;;
 	esac
 	
@@ -1501,11 +1513,15 @@ hasil_loginout() {
 							echo "Penyimpanan autologin ke server. Interface: $waninterface. status: $storeautologin_value"
 							# Simpan juga hasilnya di berkas "/tmp/last.login.$waninterface" dan beritahu pengguna melalui System Log
 							echo "Penyimpanan autologin ke server. Interface: $waninterface. status: $storeautologin_value" | tee -a "/tmp/last.login.$waninterface" | logger -t "kopijahe $ver"
+							# Simpan juga nilai variabel store autologin di berkas "/tmp/last.login.$waninterface"
+							echo "$storeautologin" | tee -a "/tmp/last.login.$waninterface"
 							;;
 						# Jika tidak, maka:
 						*)
 							# Simpan hasilnya di berkas "/tmp/last.login.$waninterface" dan beritahu pengguna melalui System Log
 							echo "Penyimpanan autologin ke server. Interface: $waninterface. status: $storeautologin_value" | tee -a "/tmp/last.login.$waninterface" | logger -t "kopijahe $ver"
+							# Simpan juga nilai variabel store autologin di berkas "/tmp/last.login.$waninterface"
+							echo "$storeautologin" | tee -a "/tmp/last.login.$waninterface"
 							;;
 					esac
 					;;
@@ -1763,11 +1779,24 @@ if [[ "$didlogin" = "false" ]]; then
 			;;
 		# Jika status login gagal dan agar melakukan koneksi ulang, maka:
 		"Login Gagal [Silahkan lakukan koneksi kembali]:"*|"No Session found:"*|"Parameter not completed":*)
+			# Coba logout terlebih dahulu
+			logout_wifi
 			# Tentukan bahwa perlu refresh session_id dan gw_id
 			needsessionidrefresh="yes"
 			needgwidrefresh="yes"
 			# Lalu lakukan login
 			login_wifi
+			# Jika masih saja, maka:
+			case "$loginout" in
+				"No Session found:"*)
+					# Beritahu pengguna bahwa pembaruan sessionid gagal
+					echo "Nilai 'sessionid' sepertinya sudah kadaluarsa di koneksi $waninterface, dan pembaruan otomatisnya gagal, silahkan perbarui secara manual dengan perintah: kopijahe -a atau kopijahe -d dengan URL yang terbaru." | logger -t "kopijahe $ver"
+					;;
+				"Parameter not completed":*)
+					# Beritahu pengguna bahwa ada parameter login yang tidak dapat dilengkapi
+					echo "Sebagian parameter login gagal didapatkan/dikirim ke server, script akan mencoba kembali, jika masih berulang, silahkan kirim hasil perintah ini ke email halo@kopijahe.my.id: cat /tmp/last.login.""$waninterface""" | logger -t "kopijahe $ver"
+					;;
+			esac
 			# Istirahat sebelum mengecek kembali
 			sleep "$sleeptime"
 			;;
