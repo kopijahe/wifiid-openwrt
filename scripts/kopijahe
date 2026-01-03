@@ -20,7 +20,7 @@ detectrandommac="$(dmesg | grep 'generated random MAC address')"
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="3.1.3"
+	ver="3.1.4"
 }
 
 bantuan() {
@@ -214,10 +214,12 @@ install() {
 	multiautologin
 	versi
 	echo "Memasang Autologin KopiJahe..."
-	# Kopi berkas ke folder /usr/bin/
-	cp -f "$0" /usr/bin/kopijahe
+	# Salin berkas ke folder /etc/
+	cp -f "$0" /etc/kopijahe
+	# Buat symlink di folder /usr/bin/
+	ln /etc/kopijahe /usr/bin/kopijahe 2>/dev/null
 	# Beri izin eksekusi
-	chmod +x /usr/bin/kopijahe
+	chmod +x /etc/kopijahe
 	# Beritahu pengguna versi autologin saat ini
 	echo "Versi aplikasi autologin saat ini: $ver"
 	
@@ -245,17 +247,24 @@ update() {
 	# Fungsi pembaruan aplikasi autologin
 	# Unduh versi terbaru dari github
 	# dan letakkan hasilnya di folder /tmp terlebih dahulu
-	curl --silent https://raw.githubusercontent.com/kopijahe/wifiid-openwrt/master/scripts/kopijahe -o /tmp/kopijahe-update
-	# Beritahu pengguna versi autologin sebelum diperbarui
-	echo "Versi aplikasi autologin sebelumnya: $ver"
-	# Lakukan instalasi aplikasi
-	sh /tmp/kopijahe-update -i
-	# Bersihkan sisa berkas update
-	rm /tmp/kopijahe-update
-	# Matikan dulu semua proses autologin KopiJahe
-	killkopijahe
-	# Jalankan kembali proses autologin
-	sh /etc/rc.local
+	curl --silent --fail https://raw.githubusercontent.com/kopijahe/wifiid-openwrt/master/scripts/kopijahe -o /tmp/kopijahe-update
+	# Cek apakah ukuran berkas update lebih besar dari 0 byte dan berhasil diunduh, jika iya, maka:
+	if [[ -s /tmp/kopijahe-update ]]; then
+		# Beritahu pengguna versi autologin sebelum diperbarui
+		echo "Versi aplikasi autologin sebelumnya: $ver"
+		# Lakukan instalasi aplikasi
+		sh /tmp/kopijahe-update -i
+		# Bersihkan sisa berkas update
+		rm /tmp/kopijahe-update
+		# Matikan dulu semua proses autologin KopiJahe
+		killkopijahe
+		# Jalankan kembali proses autologin
+		sh /etc/rc.local
+	else
+		# Jika tidak, maka:
+		# Beritahu pengguna bahwa pembaruan gagal dilakukan
+		echo "Pembaruan aplikasi autologin gagal dilakukan, pastikan perangkat openwrt terkoneksi ke internet dan bisa mengakses github.com"
+	fi
 }
 
 loginuseragent(){
