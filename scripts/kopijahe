@@ -20,7 +20,7 @@ detectrandommac="$(dmesg | grep 'generated random MAC address')"
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="3.1.4"
+	ver="3.1.5"
 }
 
 bantuan() {
@@ -1990,6 +1990,8 @@ if [[ "$didlogin" = "false" ]]; then
 					needsessionidrefresh="yes"
 					# Dapatkan IP baru
 					releaseobtainnewip
+					# Istirahat dulu selama 2 detik
+					sleep 2
 					# Lalu lakukan login
 					login_wifi
 					;;
