@@ -20,7 +20,7 @@ detectrandommac="$(dmesg | grep 'generated random MAC address')"
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="3.1.5"
+	ver="3.1.6"
 }
 
 bantuan() {
@@ -216,6 +216,8 @@ install() {
 	echo "Memasang Autologin KopiJahe..."
 	# Salin berkas ke folder /etc/
 	cp -f "$0" /etc/kopijahe
+	# Hapus berkas ataupun symlink lama
+	rm /usr/bin/kopijahe 2>/dev/null
 	# Buat symlink di folder /usr/bin/
 	ln /etc/kopijahe /usr/bin/kopijahe 2>/dev/null
 	# Beri izin eksekusi
