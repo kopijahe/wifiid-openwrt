@@ -20,7 +20,7 @@ detectrandommac="$(dmesg | grep 'generated random MAC address')"
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="3.1.7"
+	ver="3.1.8"
 }
 
 bantuan() {
@@ -1506,6 +1506,25 @@ hasil_loginout() {
 		fi
 	fi
 	
+	# Coba deteksi apakah terdeteksi sukses login palsu
+	if [[ "$loginout" = "Sukses Login" ]] || [[ "$loginout" = "Login Sukses" ]]; then
+		# Deteksi koneksi internet
+		captiveportalcheck
+		# Jika tidak terdeteksi koneksi internet, maka
+		if [[ "$internetconnected" = "no" ]]; then
+			# Beri tanda bahwa terdeteksi sukses login palsu
+			loginout="Palsu"
+			# Beri tahu pengguna bahwa terdeteksi sukses login palsu lewat stdout dan System Log
+			if [[ "$advancedmode" = "true" ]]; then
+				echo "Terdeteksi sukses login palsu di interface: $waninterface."
+				echo "Terdeteksi sukses login palsu di interface: $waninterface." | logger -t "kopijahe $ver"
+			# Jika tidak dijalankan secara manual, maka beritahu pengguna lewat System Log saja
+			else
+				echo "Terdeteksi sukses login palsu di interface: $waninterface." | logger -t "kopijahe $ver"
+			fi
+		fi
+	fi
+	
 	# Jika digunakan di tipe login baru, sukses login, dan di jaringan wms, wms-lite, *-lanjutkan, pegadaian:
 	case "$loginout:$wifivariant" in
 		"Sukses Login":"wms"|"Sukses Login":"wms-lite"|"Sukses Login":"wms-lanjutkan"|"Sukses Login":"wifi.id-lanjutkan"|"Sukses Login":"pegadaian")
@@ -2002,6 +2021,20 @@ if [[ "$didlogin" = "false" ]]; then
 			esac
 			# Istirahat sebelum mencoba kembali
 			sleep "$sleeptime" 
+			;;
+		"Palsu":*)
+			# Coba logout terlebih dahulu
+			logout_wifi
+			# Buat MAC address baru
+			generaterandommac
+			# Tentukan bahwa perlu refresh session_id
+			needsessionidrefresh="yes"
+			# Dapatkan IP baru
+			releaseobtainnewip
+			# Istirahat dulu selama 2 detik
+			sleep 2
+			# Lalu lakukan login
+			login_wifi
 			;;
 		*)
 			login_wifi
