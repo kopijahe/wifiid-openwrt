@@ -20,7 +20,7 @@ detectrandommac="$(dmesg | grep 'generated random MAC address')"
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="3.1.8"
+	ver="3.1.9"
 }
 
 bantuan() {
@@ -1491,39 +1491,57 @@ hasil_loginout() {
 	esac
 	
 	# Jika kode status hasil login tidak berhasil (bukan 0), maka:
-	if [[ "$function" = "login" ]] && [[ "$kodestatus" != "0" ]]; then
-		# Muat penjelasan kode cURL
-		curl_statuscodes
-		# Muat status koneksi
-		connection_status
-		# Beritahu pengguna bahwa lewat stdout dan System log jika melalui mode lanjutan
-		if [[ "$advancedmode" = "true" ]]; then
-			echo "$curl_status. Status koneksi ke $wpssid: $statuskoneksi"
-			echo "$curl_status. Status koneksi ke $wpssid: $statuskoneksi" | logger -t "kopijahe $ver"
-		# Jika tidak, maka beritahu pengguna lewat System Log saja
-		else
-			echo "$curl_status. Status koneksi ke $wpssid: $statuskoneksi" | logger -t "kopijahe $ver"
-		fi
-	fi
+	case "$function:$kodestatus" in
+		"login:0")
+			;;
+		"login":*)
+			# Muat penjelasan kode cURL
+			curl_statuscodes
+			# Muat status koneksi
+			connection_status
+			case "$advancedmode" in
+				# Beritahu pengguna bahwa lewat stdout dan System log jika melalui mode lanjutan
+				"true")
+					echo "$curl_status. Status koneksi ke $wpssid: $statuskoneksi"
+					echo "$curl_status. Status koneksi ke $wpssid: $statuskoneksi" | logger -t "kopijahe $ver"
+					;;
+				# Jika tidak, maka beritahu pengguna lewat System Log saja
+				*)
+					echo "$curl_status. Status koneksi ke $wpssid: $statuskoneksi" | logger -t "kopijahe $ver"
+					;;
+			esac
+			;;
+	esac
 	
 	# Coba deteksi apakah terdeteksi sukses login palsu
-	if [[ "$loginout" = "Sukses Login" ]] || [[ "$loginout" = "Login Sukses" ]]; then
-		# Deteksi koneksi internet
-		captiveportalcheck
-		# Jika tidak terdeteksi koneksi internet, maka
-		if [[ "$internetconnected" = "no" ]]; then
-			# Beri tanda bahwa terdeteksi sukses login palsu
-			loginout="Palsu"
-			# Beri tahu pengguna bahwa terdeteksi sukses login palsu lewat stdout dan System Log
-			if [[ "$advancedmode" = "true" ]]; then
-				echo "Terdeteksi sukses login palsu di interface: $waninterface."
-				echo "Terdeteksi sukses login palsu di interface: $waninterface." | logger -t "kopijahe $ver"
-			# Jika tidak dijalankan secara manual, maka beritahu pengguna lewat System Log saja
-			else
-				echo "Terdeteksi sukses login palsu di interface: $waninterface." | logger -t "kopijahe $ver"
-			fi
-		fi
-	fi
+	case "$loginout" in
+		"Sukses Login"|"Sukses Login (mocked)"|"Login Sukses")
+			# Deteksi koneksi internet
+			captiveportalcheck
+			# Jika tidak terdeteksi koneksi internet, maka
+			case "$internetconnected" in
+				"no")
+					# Beri tanda bahwa terdeteksi sukses login palsu
+					loginout="Palsu"
+					case "$advancedmode" in
+					# Beri tahu pengguna bahwa terdeteksi sukses login palsu lewat stdout dan System Log
+					"true")
+						echo "Terdeteksi sukses login palsu di interface: $waninterface."
+						echo "Terdeteksi sukses login palsu di interface: $waninterface." | logger -t "kopijahe $ver"
+						;;
+					# Jika tidak, maka beritahu pengguna lewat System Log saja
+					*)
+						echo "Terdeteksi sukses login palsu di interface: $waninterface." | logger -t "kopijahe $ver"
+						;;
+					esac
+					;;
+				*)
+					;;
+			esac
+			;;
+		*)
+			;;
+	esac
 	
 	# Jika digunakan di tipe login baru, sukses login, dan di jaringan wms, wms-lite, *-lanjutkan, pegadaian:
 	case "$loginout:$wifivariant" in
