@@ -20,7 +20,7 @@ detectrandommac="$(dmesg | grep 'generated random MAC address')"
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="3.2.0"
+	ver="3.2.1"
 }
 
 bantuan() {
@@ -932,13 +932,17 @@ curl_statuscodes() {
 	esac
 }
 
-curl_additionalparameter() {
+curl_parameters() {
+	# Fungsi pengaturan cURL
+	# Atur parameter umum cURL
+	curlcommonparameter="--interface $wandevice --silent --resolve welcome2.wifi.id:443:10.233.16.13 --resolve welcome3.wifi.id:443:118.98.34.148 --resolve americano.wifi.id:443:10.1.64.161 --resolve americano2.wifi.id:443:10.233.16.51"
+	
 	# Cek versi OS, jika menggunakan OpenWrt di bawah versi 22.03
 	# Maka perlu menggunakan tambahan parameter -k
 	if [[ "$osversion" -lt 22 ]]; then
-		curladditionalparameter='curl -k'
+		curlcommand="curl -k $curlcommonparameter"
 	else
-		curladditionalparameter='curl'
+		curlcommand="curl $curlcommonparameter"
 	fi
 }
 
@@ -1270,13 +1274,13 @@ dataraw() {
 
 loadwelcomepage() {
 	# Fungsi memuat welcome page
-	curl_additionalparameter
+	curl_parameters
 	
 	# Tentukan url welcome page
 	urllanding="https://""$server_id""/""$tipelogin""/?gw_id=""$gwid""&client_mac=""$clientmac""&wlan=""$wlanid""&sessionid=""$session_id"""
 	# Unduh halaman welcome page dan catat waktu sebelum dan sesudahnya
 	beforeloadwp="$(awk '{print $1}' < /proc/uptime)"
-	wp="$($curladditionalparameter --resolve "welcome2.wifi.id:443:10.233.16.13" --resolve "welcome3.wifi.id:443:118.98.34.148" --resolve "americano.wifi.id:443:10.1.64.161" --resolve "americano2.wifi.id:443:10.233.16.51" --silent --interface "$wandevice" --retry 1 --connect-timeout 1 -c - "$urllanding")"
+	wp="$($curlcommand --retry 1 --connect-timeout 1 -c - "$urllanding")"
 	afterloadwp="$(awk '{print $1}' < /proc/uptime)"
 	
 	# Cari dan kalkulasi nilai parameter "load_wp"
@@ -1290,7 +1294,7 @@ loadwelcomepage() {
 	# Cari cookie yang mungkin dibutuhkan untuk keperluan login
 	case "$jslanding:$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" in
 		"yes:wms" | "yes:wms-lite" | "yes:wms-lanjutkan" | "yes:wifi.id-lanjutkan" | "yes:pegadaian")
-			session_wp="$($curladditionalparameter --resolve "welcome2.wifi.id:443:10.233.16.13" --resolve "welcome3.wifi.id:443:118.98.34.148" --resolve "americano.wifi.id:443:10.1.64.161" --resolve "americano2.wifi.id:443:10.233.16.51" --silent --interface "$wandevice" --retry 1 --connect-timeout 1 -c - "https://$server_id/wmsjs/api/auth/session/")"
+			session_wp="$($curlcommand --retry 1 --connect-timeout 1 -c - "https://$server_id/wmsjs/api/auth/session/")"
 			loadwp_callback="$(echo "$session_wp" | grep wp-wms-js.callback-url | awk -F'[\t]'  '{print $7}' | sed 's/%3A/:/g' | sed 's/%2F/\//g')"
 			loadwp_token="$(echo "$session_wp" | grep wp-wms-js.csrf-token | awk -F'[\t]'  '{print $7}')"
 			;;
@@ -1381,7 +1385,7 @@ loadwmsid() {
 	# Fungsi memperbarui wmsid (jika diperlukan)
 	
 	# Ambil welcome page terlebih dahulu
-	wp="$(curl -k --resolve "welcome2.wifi.id:443:10.233.16.13" --resolve "welcome3.wifi.id:443:118.98.34.148" --resolve "americano.wifi.id:443:10.1.64.161" --resolve "americano2.wifi.id:443:10.233.16.51" --silent --interface "$wandevice" --retry 2 --connect-timeout 2 -c - "$urllanding")"
+	wp="$($curlcommand --retry 2 --connect-timeout 2 -c - "$urllanding")"
 	case "$tipelogin" in
 		"wmsjs")
 			# Kosongkan nilai "wms_id" sebelumnya jika ada:
@@ -1586,7 +1590,7 @@ wmsstoreautologin() {
 	# Fungsi pengiriman data autologin ke server
 	
 	# Lakukan langkah tambahan pengiriman data ke server
-	storeautologin="$($curladditionalparameter --resolve "welcome2.wifi.id:443:10.233.16.13" --resolve "welcome3.wifi.id:443:118.98.34.148" --resolve "americano.wifi.id:443:10.1.64.161" --resolve "americano2.wifi.id:443:10.233.16.51" --silent --retry 1 --connect-timeout 3 --interface "$wandevice" "$storeurl" \
+	storeautologin="$($curlcommand --retry 1 --connect-timeout 3 "$storeurl" \
 	-X POST \
 	-H "origin: https://""$server_id""" \
 	-H "referer: https://""$server_id""" \
@@ -1613,12 +1617,12 @@ logout_wifi() {
 	
 	server_id="$(uci -q get kopijahe.@autologin["$multiautologinnum"].serverid)"
 	versi
-	curl_additionalparameter
+	curl_parameters
 	loginuseragent
 	generatexauth
 	
 	# Lakukan logout sesuai dengan parameter konfigurasi autologin
-	attempt="$($curladditionalparameter --resolve "welcome2.wifi.id:443:10.233.16.13" --resolve "welcome3.wifi.id:443:118.98.34.148" --silent --retry 1 --connect-timeout 3 --interface "$wandevice" """https://$server_id/authnew/logout/logoutx.php""" \
+	attempt="$($curlcommand --retry 1 --connect-timeout 3 """https://$server_id/authnew/logout/logoutx.php""" \
 	-H "accept: application/json, text/javascript, */*; q=0.01" \
 	-H "accept-language: en-US,en;q=0.9,id;q=0.8" \
 	-H "connection: keep-alive" \
@@ -1664,7 +1668,7 @@ login_wifi() {
 	wificommunity
 	jsparser
 	dataraw
-	curl_additionalparameter
+	curl_parameters
 	loginuseragent
 	generatexauth
 	
@@ -1672,7 +1676,7 @@ login_wifi() {
 	if [[ "$loginfromfile" != "true" ]]; then
 		case "$jslanding" in
 		"yes")
-			attempt="$($curladditionalparameter --resolve "welcome2.wifi.id:443:10.233.16.13" --resolve "welcome3.wifi.id:443:118.98.34.148" --resolve "americano.wifi.id:443:10.1.64.161" --resolve "americano2.wifi.id:443:10.233.16.51" --silent --retry 1 --connect-timeout 3 --interface "$wandevice" "$loginurl" \
+			attempt="$($curlcommand --retry 1 --connect-timeout 3 "$loginurl" \
 			-X POST \
 			-H "origin: https://""$server_id""" \
 			-H "referer: https://""$server_id""" \
@@ -1693,7 +1697,7 @@ login_wifi() {
 			--data-raw "$login_cred")"
 			;;
 		*)
-			attempt="$($curladditionalparameter --resolve "welcome2.wifi.id:443:10.233.16.13" --resolve "welcome3.wifi.id:443:118.98.34.148" --resolve "americano.wifi.id:443:10.1.64.161" --resolve "americano2.wifi.id:443:10.233.16.51" --silent --retry 1 --connect-timeout 3 --interface "$wandevice" "$loginurl" \
+			attempt="$($curlcommand --retry 1 --connect-timeout 3 "$loginurl" \
 			-H "origin: ""$server_id""" \
 			-H "referer: https://""$server_id""" \
 			-H "X-Authorization-Token: $auth_token" \
