@@ -20,7 +20,7 @@ detectrandommac="$(dmesg | grep 'generated random MAC address')"
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="3.2.1"
+	ver="3.2.2"
 }
 
 bantuan() {
@@ -670,7 +670,7 @@ captiveportalcheck() {
 	fi
 	
 	# Jika konfigurasi penyedia jasa cek koneksi tidak ditemukan, maka:
-	if [[ "$cpcprovider" = "" ]]; then
+	if [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].cpcprovider)" = "" ]]; then
 		# Masukkan konfigurasi penyedia layanan KopiJahe sebagai penyedia layanan bawaan
 		uci set "kopijahe.@autologin[$multiautologinnum].cpcprovider=kopijahe"
 		# Simpan konfigurasi
