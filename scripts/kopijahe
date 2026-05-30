@@ -20,7 +20,7 @@ detectrandommac="$(dmesg | grep 'generated random MAC address')"
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="3.2.2"
+	ver="3.2.3"
 }
 
 bantuan() {
@@ -1385,6 +1385,7 @@ loadwmsid() {
 	# Fungsi memperbarui wmsid (jika diperlukan)
 	
 	# Ambil welcome page terlebih dahulu
+	curl_parameters
 	wp="$($curlcommand --retry 2 --connect-timeout 2 -c - "$urllanding")"
 	case "$tipelogin" in
 		"wmsjs")
