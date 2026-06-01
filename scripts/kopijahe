@@ -20,7 +20,7 @@ detectrandommac="$(dmesg | grep 'generated random MAC address')"
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="3.2.3"
+	ver="3.2.4"
 }
 
 bantuan() {
@@ -55,7 +55,7 @@ bantuan() {
 	echo "Coba gunakan \"komunitas-generik\" jika komunitas atau kampus anda belum didukung secara langsung oleh script."
 	echo ""
 	echo "Penyedia layanan cek captive portal yang didukung:"
-	echo "\"kopijahe\" (default), \"kopijahe2\", \"firefox\", \"google\", \"google2\", \"apple\", \"apple2\", \"microsoft\", \"microsoft2\", \"xiaomi\", \"httpforever\", \"ubuntu\", \"archlinux\""
+	echo "\"kopijahe\" (default), \"kopijahe2\", \"firefox\", \"google\", \"google2\", \"apple\", \"apple2\", \"microsoft\", \"microsoft2\", \"xiaomi\", \"grapheneos\", \"httpforever\", \"ubuntu\", \"archlinux\""
 	echo ""
 	echo "=========================================================================="
 	echo ""
@@ -629,6 +629,9 @@ cpctesting() {
 	cpcprovider="xiaomi"
 	captiveportalcheck
 	echo "$cpcprovider: $cpcstatus"
+	cpcprovider="grapheneos"
+	captiveportalcheck
+	echo "$cpcprovider: $cpcstatus"
 	cpcprovider="httpforever"
 	captiveportalcheck
 	echo "$cpcprovider: $cpcstatus"
@@ -778,6 +781,13 @@ captiveportalcheck() {
 		"xiaomi")
 			# Layanan cek captive portal bawaan sistem operasi MIUI
 			cekkoneksi="$(curl --interface "$wandevice" -LI --silent --retry "$cpcretry" --max-redirs 1 --connect-timeout "$cpctimeout" "http://connect.rom.miui.com/generate_204" | grep -o "204")"
+			kodestatuslanding="$?"
+			hasil="204"
+			dnsserver="$dnsquad9"
+			;;
+		"grapheneos")
+			# Layanan cek captive portal bawaan sistem operasi MIUI
+			cekkoneksi="$(curl --interface "$wandevice" -LI --silent --retry "$cpcretry" --max-redirs 1 --connect-timeout "$cpctimeout" "http://connectivitycheck.grapheneos.network/generate_204" | grep -o "204")"
 			kodestatuslanding="$?"
 			hasil="204"
 			dnsserver="$dnsquad9"
@@ -1393,8 +1403,10 @@ loadwmsid() {
 			wms_id=""
 			# Cari nilai "wms_id" di welcome page
 			wms_id="$(echo "$wp" | awk -F'\\\\+"SID\\\\+":\\\\+"' 'NF>1{split($2,a,"\\\\\"");sub(/\\\\+$/,"",a[1]);print a[1];exit}')"
-			# Simpan hasilnya
+			if [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wmsid)" = "" ]]; then
+			# Simpan hasilnya jika tidak ada nilai wmsid yang pernah tersimpan
 			uci set kopijahe.@autologin["$multiautologinnum"].wmsid="$wms_id"
+			fi
 			;;
 		"wms")
 			# Kosongkan nilai "wms_id" sebelumnya jika ada:
@@ -1402,8 +1414,10 @@ loadwmsid() {
 			# Cari nilai "wms_id" di welcome page
 			# shellcheck disable=2020
 			wms_id="$(echo "$wp" | grep makeId | awk -F'[.]' '{print $4}' | tr -dc "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\n" | awk '!a[$0]++' | tr -d "\n")"
+			if [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wmsid)" = "" ]]; then
 			# Simpan hasilnya
 			uci set kopijahe.@autologin["$multiautologinnum"].wmsid="$wms_id"
+			fi
 			;;
 		*)
 			;;
@@ -2085,7 +2099,7 @@ do
 			icpcprovider="$OPTARG"
 			advancedmode="true"
 			multiautologin
-			if [[ "$icpcprovider" = "kopijahe" ]] || [[ "$icpcprovider" = "kopijahe2" ]] || [[ "$icpcprovider" = "firefox" ]] || [[ "$icpcprovider" = "google" ]] || [[ "$icpcprovider" = "google2" ]] || [[ "$icpcprovider" = "apple" ]] || [[ "$icpcprovider" = "apple2" ]] || [[ "$icpcprovider" = "microsoft" ]] || [[ "$icpcprovider" = "microsoft2" ]] || [[ "$icpcprovider" = "xiaomi" ]] || [[ "$icpcprovider" = "httpforever" ]] || [[ "$icpcprovider" = "ubuntu" ]] || [[ "$icpcprovider" = "archlinux" ]] || [[ "$icpcprovider" = "examplecom" ]]; then
+			if [[ "$icpcprovider" = "kopijahe" ]] || [[ "$icpcprovider" = "kopijahe2" ]] || [[ "$icpcprovider" = "firefox" ]] || [[ "$icpcprovider" = "google" ]] || [[ "$icpcprovider" = "google2" ]] || [[ "$icpcprovider" = "apple" ]] || [[ "$icpcprovider" = "apple2" ]] || [[ "$icpcprovider" = "microsoft" ]] || [[ "$icpcprovider" = "microsoft2" ]] || [[ "$icpcprovider" = "xiaomi" ]] || [[ "$icpcprovider" = "grapheneos" ]] || [[ "$icpcprovider" = "httpforever" ]] || [[ "$icpcprovider" = "ubuntu" ]] || [[ "$icpcprovider" = "archlinux" ]] || [[ "$icpcprovider" = "examplecom" ]]; then
 				uci set kopijahe.@autologin["$multiautologinnum"].cpcprovider="$icpcprovider"
 				uci commit kopijahe
 			elif [[ "$icpcprovider" = "test" ]]; then
@@ -2094,7 +2108,7 @@ do
 				exit 0
 			else
 				echo "Penyedia layanan yang didukung:"
-				echo "\"kopijahe\" (default), \"kopijahe2\", \"firefox\", \"google\", \"google2\", \"apple\", \"apple2\", \"microsoft\", \"microsoft2\", \"xiaomi\", \"httpforever\", \"ubuntu\", \"archlinux\", \"examplecom\""
+				echo "\"kopijahe\" (default), \"kopijahe2\", \"firefox\", \"google\", \"google2\", \"apple\", \"apple2\", \"microsoft\", \"microsoft2\", \"xiaomi\", \"grapheneos\", \"httpforever\", \"ubuntu\", \"archlinux\", \"examplecom\""
 				echo ""
 				echo "Untuk menguji penyedia layanan yang bisa dipakai, bisa menggunakan -c test"
 				exit 1
