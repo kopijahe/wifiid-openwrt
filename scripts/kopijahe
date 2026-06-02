@@ -20,7 +20,7 @@ detectrandommac="$(dmesg | grep 'generated random MAC address')"
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="3.2.4"
+	ver="3.2.5"
 }
 
 bantuan() {
@@ -1027,9 +1027,9 @@ jsparser() {
 	wpssid="$(echo "$wpwlan" | awk -F '[:]' '{print $NF}')"
 	
 	# Jika nilai session_id di halaman login tidak sama dengan session_id yang tersimpan, maka perbarui nilainya:
-	if [[ "$session_id" != "$wpsession_id" ]]; then
+	if [[ "$session_id" != "$wpsession_id" ]] && [[ "$wpsession_id" != "" ]] ; then
 		uci set kopijahe.@autologin["$multiautologinnum"].sessionid="$wpsession_id"
-			uci commit kopijahe
+		uci commit kopijahe
 	fi
 }
 
@@ -1406,6 +1406,7 @@ loadwmsid() {
 			if [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wmsid)" = "" ]]; then
 			# Simpan hasilnya jika tidak ada nilai wmsid yang pernah tersimpan
 			uci set kopijahe.@autologin["$multiautologinnum"].wmsid="$wms_id"
+			uci commit kopijahe
 			fi
 			;;
 		"wms")
@@ -1417,6 +1418,7 @@ loadwmsid() {
 			if [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wmsid)" = "" ]]; then
 			# Simpan hasilnya
 			uci set kopijahe.@autologin["$multiautologinnum"].wmsid="$wms_id"
+			uci commit kopijahe
 			fi
 			;;
 		*)
