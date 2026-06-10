@@ -20,7 +20,7 @@ detectrandommac="$(dmesg | grep 'generated random MAC address')"
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="3.2.5"
+	ver="3.2.6"
 }
 
 bantuan() {
@@ -219,7 +219,7 @@ install() {
 	# Hapus berkas ataupun symlink lama
 	rm /usr/bin/kopijahe 2>/dev/null
 	# Buat symlink di folder /usr/bin/
-	ln /etc/kopijahe /usr/bin/kopijahe 2>/dev/null
+	ln -s /etc/kopijahe /usr/bin/kopijahe 2>/dev/null
 	# Beri izin eksekusi
 	chmod +x /etc/kopijahe
 	# Beritahu pengguna versi autologin saat ini
@@ -229,10 +229,22 @@ install() {
 	checkcurl="$(curl --version)"
 	# Jika hasil cek kosong, berarti curl belum tersedia, maka:
 	if [[ "$checkcurl" = "" ]]; then
-		# Perbarui daftar aplikasi
-		opkg update
-		# Unduh dan pasang curl
-		opkg install curl
+		# cek status koneksi:
+		connection_status
+		if [[ "$statuskoneksi" = "terkoneksi" ]] && [[ "$osversion" -lt 25 ]]; then
+			# Lakukan pembaruan daftar aplikasi
+			opkg update
+			# Lalu unduh dan instal cURL dan libcurl4
+			opkg install curl libcurl4
+		elif [[ "$statuskoneksi" = "terkoneksi" ]] && [[ "$osversion" -ge 25 ]]; then
+			# Lakukan pembaruan daftar aplikasi
+			apk update
+			# Lalu unduh dan instal cURL dan libcurl4
+			apk add curl libcurl4
+		elif [[ "$statuskoneksi" != "terkoneksi" ]]; then
+			# Peringatkan pengguna bahwa curl belum terpasang
+			echo "cURL belum terpasang, dan tidak ada koneksi internet. Silahkan pasang secara manual melalui menu software atau perintah opkg/apk"  | logger -t "kopijahe $ver"
+		fi
 	fi
 }
 
@@ -871,11 +883,16 @@ captiveportalcheck() {
 		# Jika perangkat dalam keadaan terkoneksi ke internet, maka:
 		# cek status koneksi:
 		connection_status
-		if [[ "$statuskoneksi" = "terkoneksi" ]]; then
+		if [[ "$statuskoneksi" = "terkoneksi" ]] && [[ "$osversion" -lt 25 ]]; then
 			# Lakukan pembaruan daftar aplikasi
 			opkg update
-			# Lalu unduh dan instal CURL
+			# Lalu unduh dan instal cURL dan libcurl4
 			opkg install curl libcurl4
+		else
+			# Lakukan pembaruan daftar aplikasi
+			apk update
+			# Lalu unduh dan instal cURL dan libcurl4
+			apk add curl libcurl4
 		fi
 	fi
 }
@@ -1334,29 +1351,19 @@ loadwelcomepage() {
 }
 
 loadsessionid() {
-	# Fungsi memperbarui session_id (jika diperlukan)
-	
-	# Cek apakah ada tanda perlu memperbarui session_id
-	if [[ "$needsessionidrefresh" = "yes" ]]; then
-		# Jika iya, maka:
-		# Lalukan deteksi ulang
-		detecturl
-		# Ambil nilai session_id saja
-		if [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "wifi.id-lanjutkan" ]]; then
-			session_id="$(echo "$deteksi" | awk -F'[=&]' '{print $10}' | tr -dc "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-")"
-		else
-			session_id="$(echo "$deteksi" | awk -F'[=&]' '{print $8}' | tr -dc "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-")"
-		fi
-		# Dan simpan nilainya, jika bukan kosong
-		if [[ "$session_id" != "" ]]; then
-			uci set kopijahe.@autologin["$multiautologinnum"].sessionid="$session_id"
-			uci commit kopijahe
-			needsessionidrefresh="no"
-		else
-			# Jika tidak, maka:
-			# Gunakan nilai session_id yang sudah tersimpan
-			session_id="$(uci -q get kopijahe.@autologin["$multiautologinnum"].sessionid)"
-		fi
+	# Fungsi memperbarui session_id
+	# Lakukan deteksi ulang
+	detecturl
+	# Ambil nilai session_id saja
+	if [[ "$(uci -q get kopijahe.@autologin["$multiautologinnum"].wifivariant)" = "wifi.id-lanjutkan" ]]; then
+		session_id="$(echo "$deteksi" | awk -F'[=&]' '{print $10}' | tr -dc "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-")"
+	else
+		session_id="$(echo "$deteksi" | awk -F'[=&]' '{print $8}' | tr -dc "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-")"
+	fi
+	# Dan simpan nilainya, jika bukan kosong
+	if [[ "$session_id" != "" ]]; then
+		uci set kopijahe.@autologin["$multiautologinnum"].sessionid="$session_id"
+		uci commit kopijahe
 	else
 		# Jika tidak, maka:
 		# Gunakan nilai session_id yang sudah tersimpan
@@ -1850,8 +1857,7 @@ if [[ "$didlogin" = "false" ]]; then
 		"Login Gagal [Silahkan lakukan koneksi kembali]:"*|"No Session found:"*|"Parameter not completed":*)
 			# Coba logout terlebih dahulu
 			logout_wifi
-			# Tentukan bahwa perlu refresh session_id dan gw_id
-			needsessionidrefresh="yes"
+			# Tentukan bahwa perlu refresh gw_id
 			needgwidrefresh="yes"
 			# Lalu lakukan login
 			login_wifi
@@ -1875,8 +1881,7 @@ if [[ "$didlogin" = "false" ]]; then
 			logout_wifi
 			# Buat MAC address baru
 			generaterandommac
-			# Tentukan bahwa perlu refresh session_id dan gw_id
-			needsessionidrefresh="yes"
+			# Tentukan bahwa perlu refresh gw_id
 			needgwidrefresh="yes"
 			# Dapatkan IP baru
 			releaseobtainnewip
@@ -1946,8 +1951,6 @@ if [[ "$didlogin" = "false" ]]; then
 		"Login Gagal (Masukkan Username dan Password dengan Benar):kampus")
 			case "$cfgkampus" in
 				"unsiq"|"ut.ac.id")
-					# Tentukan bahwa perlu refresh session_id
-					needsessionidrefresh="yes"
 					# Coba login kembali
 					login_wifi
 					# Jika masih saja, maka:
@@ -1983,8 +1986,7 @@ if [[ "$didlogin" = "false" ]]; then
 					logout_wifi
 					# Buat MAC address baru
 					generaterandommac
-					# Tentukan bahwa perlu refresh session_id dan gw_id
-					needsessionidrefresh="yes"
+					# Tentukan bahwa perlu refresh gw_id
 					needgwidrefresh="yes"
 					# Dapatkan IP baru
 					releaseobtainnewip
@@ -2046,8 +2048,6 @@ if [[ "$didlogin" = "false" ]]; then
 					logout_wifi
 					# Buat MAC address baru
 					generaterandommac
-					# Tentukan bahwa perlu refresh session_id
-					needsessionidrefresh="yes"
 					# Dapatkan IP baru
 					releaseobtainnewip
 					# Istirahat dulu selama 2 detik
@@ -2066,8 +2066,6 @@ if [[ "$didlogin" = "false" ]]; then
 			logout_wifi
 			# Buat MAC address baru
 			generaterandommac
-			# Tentukan bahwa perlu refresh session_id
-			needsessionidrefresh="yes"
 			# Dapatkan IP baru
 			releaseobtainnewip
 			# Istirahat dulu selama 4 detik
