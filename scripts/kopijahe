@@ -20,7 +20,7 @@ detectrandommac="$(dmesg | grep 'generated random MAC address')"
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="3.2.6"
+	ver="3.2.7"
 }
 
 bantuan() {
@@ -394,7 +394,8 @@ detecturl() {
 		fi
 		
 		# Deteksi URL login dengan cara melihat jawaban redirect dari halaman periksa koneksi
-		detectheaders="$(curl -k -I --silent --interface "$wandevice" --max-redirs 1 --connect-timeout 10 "$urldetect")"
+		connecttimeout="$(uci -q get kopijahe.@autologin["$multiautologinnum"].cpctimeout)"
+		detectheaders="$(curl -k -I --silent --interface "$wandevice" --max-redirs 1 --connect-timeout "$connecttimeout" "$urldetect")"
 		
 		# Deteksi URL login yang muncul, lalu ganti http dengan https, bersiap juga dengan typo dari pengguna
 		deteksi="$(printf '%s\n' "$detectheaders" | grep "Location" | sed 's/http/https/g' | sed 's/httpss/https/g')"
@@ -1821,8 +1822,8 @@ status_parser() {
 		"6:7"|"0:7"|"28:6"|"28:7"|"28:1"|"45:"*|"7:"*)
 			# Coba refresh interface terlebih dahulu
 			refreshinterface
-			# Tunggu selama 3 detik sebelum lanjut
-			sleep 3
+			# Tunggu selama 4 detik sebelum lanjut
+			sleep 4
 			# Lakukan login, lalu langsung cek status kembali
 			login_wifi
 			# Tentukan bahwa sudah login
@@ -1833,8 +1834,8 @@ status_parser() {
 			logout_wifi
 			# Dapatkan IP baru
 			releaseobtainnewip
-			# Tunggu selama 3 detik sebelum lanjut
-			sleep 3
+			# Tunggu selama 4 detik sebelum lanjut
+			sleep 4
 			# Lakukan login, lalu langsung cek status kembali
 			login_wifi
 			# Tentukan bahwa sudah login
