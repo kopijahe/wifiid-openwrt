@@ -20,7 +20,7 @@ detectrandommac="$(dmesg | grep 'generated random MAC address')"
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="3.2.7"
+	ver="3.2.8"
 }
 
 bantuan() {
@@ -55,7 +55,7 @@ bantuan() {
 	echo "Coba gunakan \"komunitas-generik\" jika komunitas atau kampus anda belum didukung secara langsung oleh script."
 	echo ""
 	echo "Penyedia layanan cek captive portal yang didukung:"
-	echo "\"kopijahe\" (default), \"kopijahe2\", \"firefox\", \"google\", \"google2\", \"apple\", \"apple2\", \"microsoft\", \"microsoft2\", \"xiaomi\", \"grapheneos\", \"httpforever\", \"ubuntu\", \"archlinux\""
+	echo "\"kopijahe\" (default), \"kopijahe2\", \"firefox\", \"firefox2\", \"google\", \"google2\", \"apple\", \"apple2\", \"microsoft\", \"microsoft2\", \"xiaomi\", \"grapheneos\", \"httpforever\", \"ubuntu\", \"archlinux\""
 	echo ""
 	echo "=========================================================================="
 	echo ""
@@ -621,6 +621,9 @@ cpctesting() {
 	cpcprovider="firefox"
 	captiveportalcheck
 	echo "$cpcprovider: $cpcstatus"
+	cpcprovider="firefox2"
+	captiveportalcheck
+	echo "$cpcprovider: $cpcstatus"
 	cpcprovider="google"
 	captiveportalcheck
 	echo "$cpcprovider: $cpcstatus"
@@ -748,6 +751,13 @@ captiveportalcheck() {
 			kodestatuslanding="$?"
 			hasil="success"
 			dnsserver="$dnsopendns2"
+			;;
+		"firefox2")
+			# Layanan cek captive portal alternatif browser Mozilla Firefox
+			cekkoneksi="$(curl --interface "$wandevice" -LI --silent --retry "$cpcretry" --max-redirs 1 --connect-timeout "$cpctimeout" "http://firefox-portal-detection.com/generate_204" | grep -o "204")"
+			kodestatuslanding="$?"
+			hasil="204"
+			dnsserver="$dnsopendns"
 			;;
 		"google")
 			# Layanan cek captive portal bawaan sistem operasi android
@@ -1828,8 +1838,13 @@ status_parser() {
 			login_wifi
 			# Tentukan bahwa sudah login
 			didlogin="true"
+			# Kosongkan semua kode status
+			kodestatus=""
+			kodestatuslanding=""
 			;;
 		"28:28")
+			# Tunggu 2 detik
+			sleep 2
 			# Coba logout terlebih dahulu
 			logout_wifi
 			# Dapatkan IP baru
@@ -1840,6 +1855,9 @@ status_parser() {
 			login_wifi
 			# Tentukan bahwa sudah login
 			didlogin="true"
+			# Kosongkan semua kode status
+			kodestatus=""
+			kodestatuslanding=""
 	esac
 
 if [[ "$didlogin" = "false" ]]; then
@@ -2100,7 +2118,7 @@ do
 			icpcprovider="$OPTARG"
 			advancedmode="true"
 			multiautologin
-			if [[ "$icpcprovider" = "kopijahe" ]] || [[ "$icpcprovider" = "kopijahe2" ]] || [[ "$icpcprovider" = "firefox" ]] || [[ "$icpcprovider" = "google" ]] || [[ "$icpcprovider" = "google2" ]] || [[ "$icpcprovider" = "apple" ]] || [[ "$icpcprovider" = "apple2" ]] || [[ "$icpcprovider" = "microsoft" ]] || [[ "$icpcprovider" = "microsoft2" ]] || [[ "$icpcprovider" = "xiaomi" ]] || [[ "$icpcprovider" = "grapheneos" ]] || [[ "$icpcprovider" = "httpforever" ]] || [[ "$icpcprovider" = "ubuntu" ]] || [[ "$icpcprovider" = "archlinux" ]] || [[ "$icpcprovider" = "examplecom" ]]; then
+			if [[ "$icpcprovider" = "kopijahe" ]] || [[ "$icpcprovider" = "kopijahe2" ]] || [[ "$icpcprovider" = "firefox" ]] || [[ "$icpcprovider" = "firefox2" ]] || [[ "$icpcprovider" = "google" ]] || [[ "$icpcprovider" = "google2" ]] || [[ "$icpcprovider" = "apple" ]] || [[ "$icpcprovider" = "apple2" ]] || [[ "$icpcprovider" = "microsoft" ]] || [[ "$icpcprovider" = "microsoft2" ]] || [[ "$icpcprovider" = "xiaomi" ]] || [[ "$icpcprovider" = "grapheneos" ]] || [[ "$icpcprovider" = "httpforever" ]] || [[ "$icpcprovider" = "ubuntu" ]] || [[ "$icpcprovider" = "archlinux" ]] || [[ "$icpcprovider" = "examplecom" ]]; then
 				uci set kopijahe.@autologin["$multiautologinnum"].cpcprovider="$icpcprovider"
 				uci commit kopijahe
 			elif [[ "$icpcprovider" = "test" ]]; then
@@ -2109,7 +2127,7 @@ do
 				exit 0
 			else
 				echo "Penyedia layanan yang didukung:"
-				echo "\"kopijahe\" (default), \"kopijahe2\", \"firefox\", \"google\", \"google2\", \"apple\", \"apple2\", \"microsoft\", \"microsoft2\", \"xiaomi\", \"grapheneos\", \"httpforever\", \"ubuntu\", \"archlinux\", \"examplecom\""
+				echo "\"kopijahe\" (default), \"kopijahe2\", \"firefox\", \"firefox2\", \"google\", \"google2\", \"apple\", \"apple2\", \"microsoft\", \"microsoft2\", \"xiaomi\", \"grapheneos\", \"httpforever\", \"ubuntu\", \"archlinux\", \"examplecom\""
 				echo ""
 				echo "Untuk menguji penyedia layanan yang bisa dipakai, bisa menggunakan -c test"
 				exit 1
