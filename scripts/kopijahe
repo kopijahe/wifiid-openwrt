@@ -20,7 +20,7 @@ detectrandommac="$(dmesg | grep 'generated random MAC address')"
 versi() {
 	# Fungsi versi aplikasi
 	# Tentukan versi dengan mengubah variabel "ver"
-	ver="3.2.8"
+	ver="3.2.9"
 }
 
 bantuan() {
@@ -55,7 +55,7 @@ bantuan() {
 	echo "Coba gunakan \"komunitas-generik\" jika komunitas atau kampus anda belum didukung secara langsung oleh script."
 	echo ""
 	echo "Penyedia layanan cek captive portal yang didukung:"
-	echo "\"kopijahe\" (default), \"kopijahe2\", \"firefox\", \"firefox2\", \"google\", \"google2\", \"apple\", \"apple2\", \"microsoft\", \"microsoft2\", \"xiaomi\", \"grapheneos\", \"httpforever\", \"ubuntu\", \"archlinux\""
+	echo "\"kopijahe\" (default), \"kopijahe2\", \"firefox\", \"firefox2\", \"google\", \"google2\", \"apple\", \"apple2\", \"microsoft\", \"microsoft2\", \"xiaomi\", \"grapheneos\", \"httpforever\", \"kde\", \"gnome\", \"debian\", \"opensuse\", \"ubuntu\", \"archlinux\", \"examplecom\""
 	echo ""
 	echo "=========================================================================="
 	echo ""
@@ -651,6 +651,18 @@ cpctesting() {
 	cpcprovider="httpforever"
 	captiveportalcheck
 	echo "$cpcprovider: $cpcstatus"
+	cpcprovider="kde"
+	captiveportalcheck
+	echo "$cpcprovider: $cpcstatus"
+	cpcprovider="gnome"
+	captiveportalcheck
+	echo "$cpcprovider: $cpcstatus"
+	cpcprovider="debian"
+	captiveportalcheck
+	echo "$cpcprovider: $cpcstatus"
+	cpcprovider="opensuse"
+	captiveportalcheck
+	echo "$cpcprovider: $cpcstatus"
 	cpcprovider="ubuntu"
 	captiveportalcheck
 	echo "$cpcprovider: $cpcstatus"
@@ -809,7 +821,7 @@ captiveportalcheck() {
 			dnsserver="$dnsquad9"
 			;;
 		"grapheneos")
-			# Layanan cek captive portal bawaan sistem operasi MIUI
+			# Layanan cek captive portal bawaan sistem operasi GrapheneOS
 			cekkoneksi="$(curl --interface "$wandevice" -LI --silent --retry "$cpcretry" --max-redirs 1 --connect-timeout "$cpctimeout" "http://connectivitycheck.grapheneos.network/generate_204" | grep -o "204")"
 			kodestatuslanding="$?"
 			hasil="204"
@@ -821,6 +833,34 @@ captiveportalcheck() {
 			kodestatuslanding="$?"
 			hasil="A reliably insecure connection"
 			dnsserver="$dnsgoogle"
+			;;
+		"kde")
+			# Layanan cek captive portal dari KDE
+			cekkoneksi="$(curl --interface "$wandevice" --silent --retry "$cpcretry" --max-redirs 1 --connect-timeout "$cpctimeout" "https://networkcheck.kde.org/" | grep -o "OK")"
+			kodestatuslanding="$?"
+			hasil="OK"
+			dnsserver="$dnsopendns"
+			;;
+		"gnome")
+			# Layanan cek captive portal dari GNOME
+			cekkoneksi="$(curl --interface "$wandevice" --silent --retry "$cpcretry" --max-redirs 1 --connect-timeout "$cpctimeout" "http://nmcheck.gnome.org/check_network_status.txt" | grep -o "NetworkManager is online")"
+			kodestatuslanding="$?"
+			hasil="NetworkManager is online"
+			dnsserver="$dnsopendns"
+			;;
+		"debian")
+			# Layanan cek captive portal bawaan sistem operasi debian
+			cekkoneksi="$(curl --interface "$wandevice" --silent --retry "$cpcretry" --max-redirs 1 --connect-timeout "$cpctimeout" "http://network-test.debian.org/nm" | grep -o "NetworkManager is online")"
+			kodestatuslanding="$?"
+			hasil="NetworkManager is online"
+			dnsserver="$dnsopendns"
+			;;
+		"opensuse")
+			# Layanan cek captive portal bawaan sistem operasi OpenSUSE
+			cekkoneksi="$(curl --interface "$wandevice" -LI --silent --retry "$cpcretry" --max-redirs 1 --connect-timeout "$cpctimeout" "http://conncheck.opensuse.org/" | grep -o "204")"
+			kodestatuslanding="$?"
+			hasil="204"
+			dnsserver="$dnsquad9"
 			;;
 		"ubuntu")
 			# Layanan cek captive portal bawaan sistem operasi ubuntu
@@ -1483,7 +1523,7 @@ hasil_loginout() {
                 ;;
             *) # Jika variabel hasil tidak kosong
                 # Laporkan jawaban dari server
-                hasilloginout="Jawaban server: $loginout"
+                hasilloginout="Jawaban dari server: $loginout"
                 ;;
         esac
         ;;
@@ -2118,7 +2158,7 @@ do
 			icpcprovider="$OPTARG"
 			advancedmode="true"
 			multiautologin
-			if [[ "$icpcprovider" = "kopijahe" ]] || [[ "$icpcprovider" = "kopijahe2" ]] || [[ "$icpcprovider" = "firefox" ]] || [[ "$icpcprovider" = "firefox2" ]] || [[ "$icpcprovider" = "google" ]] || [[ "$icpcprovider" = "google2" ]] || [[ "$icpcprovider" = "apple" ]] || [[ "$icpcprovider" = "apple2" ]] || [[ "$icpcprovider" = "microsoft" ]] || [[ "$icpcprovider" = "microsoft2" ]] || [[ "$icpcprovider" = "xiaomi" ]] || [[ "$icpcprovider" = "grapheneos" ]] || [[ "$icpcprovider" = "httpforever" ]] || [[ "$icpcprovider" = "ubuntu" ]] || [[ "$icpcprovider" = "archlinux" ]] || [[ "$icpcprovider" = "examplecom" ]]; then
+			if [[ "$icpcprovider" = "kopijahe" ]] || [[ "$icpcprovider" = "kopijahe2" ]] || [[ "$icpcprovider" = "firefox" ]] || [[ "$icpcprovider" = "firefox2" ]] || [[ "$icpcprovider" = "google" ]] || [[ "$icpcprovider" = "google2" ]] || [[ "$icpcprovider" = "apple" ]] || [[ "$icpcprovider" = "apple2" ]] || [[ "$icpcprovider" = "microsoft" ]] || [[ "$icpcprovider" = "microsoft2" ]] || [[ "$icpcprovider" = "xiaomi" ]] || [[ "$icpcprovider" = "grapheneos" ]] || [[ "$icpcprovider" = "httpforever" ]] || [[ "$icpcprovider" = "kde" ]] || [[ "$icpcprovider" = "gnome" ]] || [[ "$icpcprovider" = "debian" ]] || [[ "$icpcprovider" = "opensuse" ]] || [[ "$icpcprovider" = "ubuntu" ]] || [[ "$icpcprovider" = "archlinux" ]] || [[ "$icpcprovider" = "examplecom" ]]; then
 				uci set kopijahe.@autologin["$multiautologinnum"].cpcprovider="$icpcprovider"
 				uci commit kopijahe
 			elif [[ "$icpcprovider" = "test" ]]; then
@@ -2127,7 +2167,7 @@ do
 				exit 0
 			else
 				echo "Penyedia layanan yang didukung:"
-				echo "\"kopijahe\" (default), \"kopijahe2\", \"firefox\", \"firefox2\", \"google\", \"google2\", \"apple\", \"apple2\", \"microsoft\", \"microsoft2\", \"xiaomi\", \"grapheneos\", \"httpforever\", \"ubuntu\", \"archlinux\", \"examplecom\""
+				echo "\"kopijahe\" (default), \"kopijahe2\", \"firefox\", \"firefox2\", \"google\", \"google2\", \"apple\", \"apple2\", \"microsoft\", \"microsoft2\", \"xiaomi\", \"grapheneos\", \"httpforever\", \"kde\", \"gnome\", \"debian\", \"opensuse\", \"ubuntu\", \"archlinux\", \"examplecom\""
 				echo ""
 				echo "Untuk menguji penyedia layanan yang bisa dipakai, bisa menggunakan -c test"
 				exit 1
